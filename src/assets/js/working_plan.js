@@ -130,6 +130,38 @@
     };
 
     /**
+     * Enable editable availability date.
+     *
+     * This method makes editable the availability date cells.
+     *
+     * @param {Object} $selector The jquery selector ready for use.
+     */
+    WorkingPlan.prototype.editableAvailabilityDate = function ($selector) {
+        $selector.editable(function (value, settings) {
+            // Do not return the value because the user needs to press the "Save" button.
+            return value;
+        }, {
+			type: 'text',
+            event: 'edit',
+            height: '30px',
+            submit: '<button type="button" class="hidden submit-editable">Submit</button>',
+            cancel: '<button type="button" class="hidden cancel-editable">Cancel</button>',
+            onblur: 'ignore',
+			placeholder: '',
+            onreset: function (settings, td) {
+                if (!this.enableCancel) {
+                    return false; // disable ESC button
+                }
+            }.bind(this),
+            onsubmit: function (settings, td) {
+                if (!this.enableSubmit) {
+                    return false; // disable Enter button
+                }
+            }.bind(this)
+        });
+    };
+	
+    /**
      * Enable editable break time.
      *
      * This method makes editable the break time cells.
@@ -305,6 +337,169 @@
             $modifiedRow.find('.save-break, .cancel-break').addClass('hidden');
             $(element).closest('table').find('.edit-break, .delete-break').removeClass('hidden');
             $('.add-break').prop('disabled', false);
+        }.bind(this));
+
+        /**
+         * Event: Add Availability Button "Click"
+         *
+         * A new row is added on the table and the user can enter the new availability
+         * data. After that he can either press the save or cancel button.
+         */
+        $('.add-availability').click(function () {
+            var tr =
+                '<tr>' +
+                '<td class="availability-date-start editable">' + '' + '</td>' +
+                '<td class="availability-date-end editable">' + '' + '</td>' +
+                '<td class="availability-time-start editable">' + (GlobalVariables.timeFormat === 'regular' ? '9:00 AM' : '09:00') + '</td>' +
+                '<td class="availability-time-end editable">' + (GlobalVariables.timeFormat === 'regular' ? '5:00 PM' : '17:00') + '</td>' +
+                '<td>' +
+                '<button type="button" class="btn btn-default btn-sm edit-availability" title="' + EALang.edit + '">' +
+                '<span class="glyphicon glyphicon-pencil"></span>' +
+                '</button>' +
+                '<button type="button" class="btn btn-default btn-sm delete-availability" title="' + EALang.delete + '">' +
+                '<span class="glyphicon glyphicon-remove"></span>' +
+                '</button>' +
+                '<button type="button" class="btn btn-default btn-sm save-availability hidden" title="' + EALang.save + '">' +
+                '<span class="glyphicon glyphicon-ok"></span>' +
+                '</button>' +
+                '<button type="button" class="btn btn-default btn-sm cancel-availability hidden" title="' + EALang.cancel + '">' +
+                '<span class="glyphicon glyphicon-ban-circle"></span>' +
+                '</button>' +
+                '</td>' +
+                '</tr>';
+            $('.availabilities').prepend(tr);
+
+            // Bind editable and event handlers.
+            tr = $('.availabilities tr')[1];
+            this.editableAvailabilityDate($(tr).find('.availability-date-start, .availability-date-end'));
+            this.editableBreakTime($(tr).find('.availability-time-start, .availability-time-end'));
+            $(tr).find('.edit-availability').trigger('click');
+            $('.add-availability').prop('disabled', true);
+        }.bind(this));
+
+        /**
+         * Event: Edit Availability Button "Click"
+         *
+         * Enables the row editing for the "Availabilities" table rows.
+         */
+        $(document).on('click', '.edit-availability', function () {
+            // Reset previous editable tds
+            var $previousEdt = $(this).closest('table').find('.editable').get();
+            $.each($previousEdt, function (index, editable) {
+                if (editable.reset !== undefined) {
+                    editable.reset();
+                }
+            });
+
+			var dateFormat;
+
+			switch (GlobalVariables.dateFormat) {
+				case 'DMY':
+					dateFormat = 'dd/mm/yy';
+					break;
+				case 'MDY':
+					dateFormat = 'mm/dd/yy';
+					break;
+				case 'YMD':
+					dateFormat = 'yy/mm/dd';
+					break;
+			}
+		
+            // Make all cells in current row editable.
+            $(this).parent().parent().children().trigger('edit');
+            $(this).parent().parent().find('.availability-time-start input, .availability-time-end input').timepicker({
+                timeFormat: GlobalVariables.timeFormat === 'regular' ? 'h:mm TT' : 'HH:mm',
+                currentText: EALang.now,
+                closeText: EALang.close,
+                timeOnlyTitle: EALang.select_time,
+                timeText: EALang.time,
+                hourText: EALang.hour,
+                minuteText: EALang.minutes
+            });
+            $(this).parent().parent().find('.availability-date-start input, .availability-date-end input').datepicker({
+				dateFormat: dateFormat,
+
+				// Translation
+				dayNames: [EALang.sunday, EALang.monday, EALang.tuesday, EALang.wednesday,
+					EALang.thursday, EALang.friday, EALang.saturday],
+				dayNamesShort: [EALang.sunday.substr(0, 3), EALang.monday.substr(0, 3),
+					EALang.tuesday.substr(0, 3), EALang.wednesday.substr(0, 3),
+					EALang.thursday.substr(0, 3), EALang.friday.substr(0, 3),
+					EALang.saturday.substr(0, 3)],
+				dayNamesMin: [EALang.sunday.substr(0, 2), EALang.monday.substr(0, 2),
+					EALang.tuesday.substr(0, 2), EALang.wednesday.substr(0, 2),
+					EALang.thursday.substr(0, 2), EALang.friday.substr(0, 2),
+					EALang.saturday.substr(0, 2)],
+				monthNames: [EALang.january, EALang.february, EALang.march, EALang.april,
+					EALang.may, EALang.june, EALang.july, EALang.august, EALang.september,
+					EALang.october, EALang.november, EALang.december],
+				prevText: EALang.previous,
+				nextText: EALang.next,
+				firstDay: 0
+            });
+            $(this).parent().parent().find('.availability-date-start input').focus();
+
+            // Show save - cancel buttons.
+            $(this).closest('table').find('.edit-availability, .delete-availability').addClass('hidden');
+            $(this).parent().find('.save-availability, .cancel-availability').removeClass('hidden');
+            $(this).closest('tr').find('select,input:text').addClass('form-control input-sm')
+
+            $('.add-availability').prop('disabled', true);
+        });
+
+        /**
+         * Event: Delete Availability Button "Click"
+         *
+         * Removes the current line from the "Breaks" table.
+         */
+        $(document).on('click', '.delete-availability', function () {
+            $(this).parent().parent().remove();
+        });
+
+        /**
+         * Event: Cancel Availability Button "Click"
+         *
+         * Bring the ".availabilities" table back to its initial state.
+         *
+         * @param {jQuery.Event} e
+         */
+        $(document).on('click', '.cancel-availability', function (e) {
+            var element = e.target;
+            var $modifiedRow = $(element).closest('tr');
+            this.enableCancel = true;
+            $modifiedRow.find('.cancel-editable').trigger('click');
+            this.enableCancel = false;
+
+            $(element).closest('table').find('.edit-availability, .delete-availability').removeClass('hidden');
+            $modifiedRow.find('.save-availability, .cancel-availability').addClass('hidden');
+            $('.add-availability').prop('disabled', false);
+        }.bind(this));
+
+        /**
+         * Event: Save Availability Button "Click"
+         *
+         * Save the editable values and restore the table to its initial state.
+         *
+         * @param {jQuery.Event} e
+         */
+        $(document).on('click', '.save-availability', function (e) {
+            // Availability's start time must always be prior to availability's end.
+            var element = e.target,
+                $modifiedRow = $(element).closest('tr'),
+                start = Date.parse($modifiedRow.find('.availability-time-start input').val()),
+                end = Date.parse($modifiedRow.find('.availability-time-end input').val());
+
+            if (start > end) {
+                $modifiedRow.find('.availability-time-end input').val(start.addHours(1).toString(GlobalVariables.timeFormat === 'regular' ? 'h:mm tt' : 'HH:mm'));
+            }
+
+            this.enableSubmit = true;
+            $modifiedRow.find('.editable .submit-editable').trigger('click');
+            this.enableSubmit = false;
+
+            $modifiedRow.find('.save-availability, .cancel-availability').addClass('hidden');
+            $(element).closest('table').find('.edit-availability, .delete-availability').removeClass('hidden');
+            $('.add-availability').prop('disabled', false);
         }.bind(this));
     };
 

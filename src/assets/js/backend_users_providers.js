@@ -93,6 +93,7 @@
             $('#provider-password, #provider-password-confirm').addClass('required');
             $('#provider-notifications').prop('disabled', false);
             $('#providers').find('.add-break, .edit-break, .delete-break, #reset-working-plan').prop('disabled', false);
+			$('#providers').find('.add-availability, .edit-availability, .delete-availability').prop('disabled', false);
             $('#provider-services input:checkbox').prop('disabled', false);
             $('#providers input:checkbox').prop('disabled', false);
 
@@ -115,6 +116,7 @@
             $('#provider-notifications').prop('disabled', false);
             $('#provider-services input:checkbox').prop('disabled', false);
             $('#providers').find('.add-break, .edit-break, .delete-break, #reset-working-plan').prop('disabled', false);
+			$('#providers').find('.add-availability, .edit-availability, .delete-availability').prop('disabled', false);
             $('#providers input:checkbox').prop('disabled', false);
             BackendUsers.wp.timepickers(false);
         });
@@ -358,6 +360,7 @@
         $('#provider-notifications').prop('disabled', true);
         $('#provider-services input:checkbox').prop('disabled', true);
         $('#providers .add-break, #reset-working-plan').prop('disabled', true);
+		$('#providers .add-availability').prop('disabled', true);
         BackendUsers.wp.timepickers(true);
         $('#providers .working-plan input:text').timepicker('destroy');
         $('#providers .working-plan input:checkbox').prop('disabled', true);

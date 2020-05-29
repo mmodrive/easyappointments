@@ -203,6 +203,36 @@
                     </div>
 
                     <div class="working-plan-view provider-view" style="display: none;">
+                        <h3><?= lang('availability') ?></h3>
+
+                        <span class="help-block">
+                            <?= lang('fill_availability') ?>
+                        </span>
+
+                        <div>
+                            <button type="button" class="add-availability btn btn-primary">
+                                <span class="glyphicon glyphicon-plus"></span>
+                                <?= lang('add_availability') ?>
+                            </button>
+                        </div>
+
+                        <br>
+
+                        <table class="availabilities table table-striped">
+                            <thead>
+                                <tr>
+                                    <th><?= lang('date_start') ?></th>
+									<th><?= lang('date_end') ?></th>
+                                    <th><?= lang('time_start') ?></th>
+                                    <th><?= lang('time_end') ?></th>
+                                    <th><?= lang('actions') ?></th>
+                                </tr>
+                            </thead>
+                            <tbody><!-- Dynamic Content --></tbody>
+                        </table>
+
+                        <br>
+
                         <h3><?= lang('working_plan') ?></h3>
                         <button id="reset-working-plan" class="btn btn-primary"
                                 title="<?= lang('reset_working_plan') ?>">
