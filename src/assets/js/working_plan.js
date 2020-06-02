@@ -37,6 +37,7 @@
          * @type {Boolean}
          */
         this.enableSubmit = false;
+
     };
 
     /**
@@ -46,44 +47,74 @@
      */
     WorkingPlan.prototype.setup = function (workingPlan) {
         $.each(workingPlan, function (index, workingDay) {
-            if (workingDay != null) {
-                $('#' + index).prop('checked', true);
-                $('#' + index + '-start').val(Date.parse(workingDay.start).toString(GlobalVariables.timeFormat  === 'regular' ? 'h:mm tt' : 'HH:mm').toUpperCase());
-                $('#' + index + '-end').val(Date.parse(workingDay.end).toString(GlobalVariables.timeFormat === 'regular' ? 'h:mm tt' : 'HH:mm').toUpperCase());
+			if (['sunday','monday','tuesday','wednesday','thursday','friday','saturday'].includes(index)) {
+				if (workingDay != null) {
+					$('#' + index).prop('checked', true);
+					$('#' + index + '-start').val(Date.parse(workingDay.start).toString(GlobalVariables.timeFormat  === 'regular' ? 'h:mm tt' : 'HH:mm').toUpperCase());
+					$('#' + index + '-end').val(Date.parse(workingDay.end).toString(GlobalVariables.timeFormat === 'regular' ? 'h:mm tt' : 'HH:mm').toUpperCase());
 
-                // Add the day's breaks on the breaks table.
-                $.each(workingDay.breaks, function (i, brk) {
-                    var day = this.convertValueToDay(index);
+					// Add the day's breaks on the breaks table.
+					$.each(workingDay.breaks, function (i, brk) {
+						var day = this.convertValueToDay(index);
 
-                    var tr =
-                        '<tr>' +
-                        '<td class="break-day editable">' + GeneralFunctions.ucaseFirstLetter(day) + '</td>' +
-                        '<td class="break-start editable">' + Date.parse(brk.start).toString(GlobalVariables.timeFormat === 'regular' ? 'h:mm tt' : 'HH:mm').toUpperCase() + '</td>' +
-                        '<td class="break-end editable">' + Date.parse(brk.end).toString(GlobalVariables.timeFormat === 'regular' ? 'h:mm tt' : 'HH:mm').toUpperCase() + '</td>' +
-                        '<td>' +
-                        '<button type="button" class="btn btn-default btn-sm edit-break" title="' + EALang.edit + '">' +
-                        '<span class="glyphicon glyphicon-pencil"></span>' +
-                        '</button>' +
-                        '<button type="button" class="btn btn-default btn-sm delete-break" title="' + EALang.delete + '">' +
-                        '<span class="glyphicon glyphicon-remove"></span>' +
-                        '</button>' +
-                        '<button type="button" class="btn btn-default btn-sm save-break hidden" title="' + EALang.save + '">' +
-                        '<span class="glyphicon glyphicon-ok"></span>' +
-                        '</button>' +
-                        '<button type="button" class="btn btn-default btn-sm cancel-break hidden" title="' + EALang.cancel + '">' +
-                        '<span class="glyphicon glyphicon-ban-circle"></span>' +
-                        '</button>' +
-                        '</td>' +
-                        '</tr>';
-                    $('.breaks tbody').append(tr);
-                }.bind(this));
-            } else {
-                $('#' + index).prop('checked', false);
-                $('#' + index + '-start').prop('disabled', true);
-                $('#' + index + '-end').prop('disabled', true);
-            }
+						var tr =
+							'<tr>' +
+							'<td class="break-day editable">' + GeneralFunctions.ucaseFirstLetter(day) + '</td>' +
+							'<td class="break-start editable">' + Date.parse(brk.start).toString(GlobalVariables.timeFormat === 'regular' ? 'h:mm tt' : 'HH:mm').toUpperCase() + '</td>' +
+							'<td class="break-end editable">' + Date.parse(brk.end).toString(GlobalVariables.timeFormat === 'regular' ? 'h:mm tt' : 'HH:mm').toUpperCase() + '</td>' +
+							'<td>' +
+							'<button type="button" class="btn btn-default btn-sm edit-break" title="' + EALang.edit + '">' +
+							'<span class="glyphicon glyphicon-pencil"></span>' +
+							'</button>' +
+							'<button type="button" class="btn btn-default btn-sm delete-break" title="' + EALang.delete + '">' +
+							'<span class="glyphicon glyphicon-remove"></span>' +
+							'</button>' +
+							'<button type="button" class="btn btn-default btn-sm save-break hidden" title="' + EALang.save + '">' +
+							'<span class="glyphicon glyphicon-ok"></span>' +
+							'</button>' +
+							'<button type="button" class="btn btn-default btn-sm cancel-break hidden" title="' + EALang.cancel + '">' +
+							'<span class="glyphicon glyphicon-ban-circle"></span>' +
+							'</button>' +
+							'</td>' +
+							'</tr>';
+						$('.breaks tbody').append(tr);
+					}.bind(this));
+				} else {
+					$('#' + index).prop('checked', false);
+					$('#' + index + '-start').prop('disabled', true);
+					$('#' + index + '-end').prop('disabled', true);
+				}
+			} else if (index == 'availabilities') {
+				$.each(workingPlan.availabilities, function (i, avl) {
+					var tr =
+						'<tr class="datarow">' +
+						'<td class="availability-date-start editable">' + moment(avl.ds, GlobalVariables.dbDateFormat).format(GlobalVariables.momDateFormat) + '</td>' +
+						'<td class="availability-date-end editable">' + moment(avl.de, GlobalVariables.dbDateFormat).format(GlobalVariables.momDateFormat) + '</td>' +
+						'<td class="availability-time-start editable">' + (avl.ts && Date.parse(avl.ts).toString(GlobalVariables.timeFormat === 'regular' ? 'h:mm tt' : 'HH:mm').toUpperCase()) + '</td>' +
+						'<td class="availability-time-end editable">' + (avl.te && Date.parse(avl.te).toString(GlobalVariables.timeFormat === 'regular' ? 'h:mm tt' : 'HH:mm').toUpperCase()) + '</td>' +
+						'<td>' +
+						'<button type="button" class="btn btn-default btn-sm edit-availability" title="' + EALang.edit + '">' +
+						'<span class="glyphicon glyphicon-pencil"></span>' +
+						'</button>' +
+						'<button type="button" class="btn btn-default btn-sm delete-availability" title="' + EALang.delete + '">' +
+						'<span class="glyphicon glyphicon-remove"></span>' +
+						'</button>' +
+						'<button type="button" class="btn btn-default btn-sm save-availability hidden" title="' + EALang.save + '">' +
+						'<span class="glyphicon glyphicon-ok"></span>' +
+						'</button>' +
+						'<button type="button" class="btn btn-default btn-sm cancel-availability hidden" title="' + EALang.cancel + '">' +
+						'<span class="glyphicon glyphicon-ban-circle"></span>' +
+						'</button>' +
+						'</td>' +
+						'</tr>';
+					$('.availabilities tbody').append(tr);
+				}.bind(this));
+			}
         }.bind(this));
 
+		// Make availability cells editable.
+		this.editableAvailabilityDate($('.availability-date-start, .availability-date-end'));
+		this.editableBreakTime($('.availability-time-start, .availability-time-end'));
         // Make break cells editable.
         this.editableBreakDay($('.breaks .break-day'));
         this.editableBreakTime($('.breaks').find('.break-start, .break-end'));
@@ -178,6 +209,7 @@
             submit: '<button type="button" class="hidden submit-editable">Submit</button>',
             cancel: '<button type="button" class="hidden cancel-editable">Cancel</button>',
             onblur: 'ignore',
+			placeholder: '',
             onreset: function (settings, td) {
                 if (!this.enableCancel) {
                     return false; // disable ESC button
@@ -347,7 +379,7 @@
          */
         $('.add-availability').click(function () {
             var tr =
-                '<tr>' +
+                '<tr class="datarow">' +
                 '<td class="availability-date-start editable">' + '' + '</td>' +
                 '<td class="availability-date-end editable">' + '' + '</td>' +
                 '<td class="availability-time-start editable">' + (GlobalVariables.timeFormat === 'regular' ? '9:00 AM' : '09:00') + '</td>' +
@@ -391,20 +423,6 @@
                 }
             });
 
-			var dateFormat;
-
-			switch (GlobalVariables.dateFormat) {
-				case 'DMY':
-					dateFormat = 'dd/mm/yy';
-					break;
-				case 'MDY':
-					dateFormat = 'mm/dd/yy';
-					break;
-				case 'YMD':
-					dateFormat = 'yy/mm/dd';
-					break;
-			}
-		
             // Make all cells in current row editable.
             $(this).parent().parent().children().trigger('edit');
             $(this).parent().parent().find('.availability-time-start input, .availability-time-end input').timepicker({
@@ -417,7 +435,7 @@
                 minuteText: EALang.minutes
             });
             $(this).parent().parent().find('.availability-date-start input, .availability-date-end input').datepicker({
-				dateFormat: dateFormat,
+				dateFormat: GlobalVariables.dpDateFormat,
 
 				// Translation
 				dayNames: [EALang.sunday, EALang.monday, EALang.tuesday, EALang.wednesday,
@@ -542,6 +560,30 @@
             }
         }.bind(this));
 
+        $('.availabilities tr.datarow').each(function (index, tr) {
+			var date_start = $(tr).find('.availability-date-start').text();
+			var date_end = $(tr).find('.availability-date-end').text();
+			var time_start = $(tr).find('.availability-time-start').text();
+			var time_end = $(tr).find('.availability-time-end').text();
+			
+			if( ! workingPlan.availabilities )
+				workingPlan.availabilities = [];
+				
+			if( moment(date_start, GlobalVariables.momDateFormat).isValid() ) {
+				workingPlan.availabilities.push({
+					ds: moment(date_start, GlobalVariables.momDateFormat).format(GlobalVariables.dbDateFormat),
+					de: moment(date_end, GlobalVariables.momDateFormat).format(GlobalVariables.dbDateFormat),
+					ts: Date.parse(time_start) && Date.parse(time_start).toString('HH:mm') || '',
+					te: Date.parse(time_end) && Date.parse(time_end).toString('HH:mm') || ''
+				});
+
+				workingPlan.availabilities.sort(function (avl1, avl2) {
+					// We can do a direct string comparison since we have time based on 24 hours clock.
+					return avl1.ds - avl2.ds;
+				});
+			}
+        }.bind(this));
+		
         return workingPlan;
     };
 

@@ -9,6 +9,21 @@ services:
       - MYSQL_USER=easyapp
       - MYSQL_PASSWORD=veryhardpassword
 
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=database
+      - PMA_PORT=3306
+      - PMA_USER=easyapp
+      - PMA_PASSWORD=veryhardpassword
+    depends_on:
+      - database
+    restart: always
+    ports:
+      - 8080:80
+     
   application:
     image: easyappointments
     build:

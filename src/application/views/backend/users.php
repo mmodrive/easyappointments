@@ -5,6 +5,7 @@
 <script src="<?= asset_url('assets/js/working_plan.js') ?>"></script>
 <script src="<?= asset_url('assets/ext/jquery-ui/jquery-ui-timepicker-addon.js') ?>"></script>
 <script src="<?= asset_url('assets/ext/jquery-jeditable/jquery.jeditable.min.js') ?>"></script>
+<script src="<?= asset_url('assets/ext/moment/moment.min.js') ?>"></script>
 <script>
     var GlobalVariables = {
         csrfToken      : <?= json_encode($this->security->get_csrf_hash()) ?>,
@@ -21,7 +22,34 @@
             email      : <?= json_encode($user_email) ?>,
             role_slug  : <?= json_encode($role_slug) ?>,
             privileges : <?= json_encode($privileges) ?>
-        }
+        },
+		dbDateFormat   : 'YYYYMMDD',
+		dpDateFormat  : <?php
+			switch ( $date_format ) {
+				case 'DMY':
+					echo json_encode('dd/mm/yy');
+					break;
+				case 'MDY':
+					echo json_encode('mm/dd/yy');
+					break;
+				case 'YMD':
+					echo json_encode('yy/mm/dd');
+					break;
+			};
+			?>,
+		momDateFormat  : <?php
+			switch ( $date_format ) {
+				case 'DMY':
+					echo json_encode('DD/MM/YYYY');
+					break;
+				case 'MDY':
+					echo json_encode('MM/DD/YYYY');
+					break;
+				case 'YMD':
+					echo json_encode('YYYY/MM/DD');
+					break;
+			};
+			?>
     };
 
     $(document).ready(function() {

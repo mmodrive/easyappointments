@@ -365,6 +365,7 @@
         $('#providers .working-plan input:text').timepicker('destroy');
         $('#providers .working-plan input:checkbox').prop('disabled', true);
         $('.breaks').find('.edit-break, .delete-break').prop('disabled', true);
+		$('.availabilities').find('.edit-availability, .delete-availability').prop('disabled', true);
 
         $('#edit-provider, #delete-provider').prop('disabled', true);
         $('#providers .record-details').find('input, textarea').val('');
@@ -426,9 +427,11 @@
 
         // Display working plan
         $('#providers .breaks tbody').empty();
+		$('#providers .availabilities tbody').empty();
         var workingPlan = $.parseJSON(provider.settings.working_plan);
         BackendUsers.wp.setup(workingPlan);
         $('.breaks').find('.edit-break, .delete-break').prop('disabled', true);
+		$('.availabilities').find('.edit-availability, .delete-availability').prop('disabled', true);
     };
 
     /**
