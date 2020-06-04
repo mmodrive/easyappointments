@@ -825,6 +825,26 @@ class Appointments extends CI_Controller {
 
         $periods = [];
 
+        $availabilities = [];
+
+        if (isset($working_plan['availabilities']) && !empty($working_plan['availabilities']))
+        {
+            $dateInRange = FALSE;
+            $format = 'YmdGisu';
+            $sd = new DateTime($selected_date);
+            foreach ($working_plan['availabilities'] as $index => $availability) {
+                $ds = DateTime::createFromFormat($format, $availability["ds"].'000000000000');
+                $de = DateTime::createFromFormat($format, $availability["de"].'235959999999');
+                if(($sd >= $ds) && ($sd <= $de))
+                {
+                    $dateInRange = TRUE;
+                    break;
+                }
+            }
+            if(!$dateInRange)
+                return array_values($periods);
+        }
+
         if (isset($selected_date_working_plan['breaks']))
         {
             $periods[] = [

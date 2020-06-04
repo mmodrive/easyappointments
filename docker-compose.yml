@@ -36,6 +36,8 @@ services:
     environment:
       - DB_HOST=database:3306
       - APP_URL=localhost
+      - PHP_XDEBUG_ENABLED=1
+      - XDEBUG_CONFIG="remote_host=192.168.76.1"
     depends_on:
       - database
     env_file:

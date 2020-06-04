@@ -45,13 +45,32 @@
      *
      * @param {Object} workingPlan Contains the working hours and breaks for each day of the week.
      */
-    WorkingPlan.prototype.setup = function (workingPlan) {
+    WorkingPlan.prototype.setup = function (workingPlan, syncAvailabilities = null) {
+        var dow = null;
+        if (syncAvailabilities && Array.isArray(syncAvailabilities)){
+            syncAvailabilities.forEach(function (value){
+                var ds = moment(value.ds, GlobalVariables.dbDateFormat),
+                    de = moment(value.de, GlobalVariables.dbDateFormat);
+                for (var m = ds; m.diff(de, 'days') <= 0; m.add(1, 'days')) {
+                    var day = this.convertDayNumberToValue(m.day());
+                    if( ! dow )
+                        dow = [];
+                    if( dow.indexOf(day) === -1 )
+                        dow.push(day);
+                }
+            },this);
+        }
         $.each(workingPlan, function (index, workingDay) {
 			if (['sunday','monday','tuesday','wednesday','thursday','friday','saturday'].includes(index)) {
+                var alreadyChecked = $('#' + index).prop('checked');
+                if (dow && !dow.includes(index))
+                    workingDay = null;
+                else if (dow && dow.includes(index) && alreadyChecked)
+                    return;
 				if (workingDay != null) {
 					$('#' + index).prop('checked', true);
-					$('#' + index + '-start').val(Date.parse(workingDay.start).toString(GlobalVariables.timeFormat  === 'regular' ? 'h:mm tt' : 'HH:mm').toUpperCase());
-					$('#' + index + '-end').val(Date.parse(workingDay.end).toString(GlobalVariables.timeFormat === 'regular' ? 'h:mm tt' : 'HH:mm').toUpperCase());
+					$('#' + index + '-start').prop('disabled', false).val(Date.parse(workingDay.start).toString(GlobalVariables.timeFormat  === 'regular' ? 'h:mm tt' : 'HH:mm').toUpperCase());
+					$('#' + index + '-end').prop('disabled', false).val(Date.parse(workingDay.end).toString(GlobalVariables.timeFormat === 'regular' ? 'h:mm tt' : 'HH:mm').toUpperCase());
 
 					// Add the day's breaks on the breaks table.
 					$.each(workingDay.breaks, function (i, brk) {
@@ -81,17 +100,17 @@
 					}.bind(this));
 				} else {
 					$('#' + index).prop('checked', false);
-					$('#' + index + '-start').prop('disabled', true);
-					$('#' + index + '-end').prop('disabled', true);
+					$('#' + index + '-start').prop('disabled', true).val('');
+					$('#' + index + '-end').prop('disabled', true).val('');
 				}
 			} else if (index == 'availabilities') {
-				$.each(workingPlan.availabilities, function (i, avl) {
+				$.each(workingPlan[index], function (i, avl) {
 					var tr =
 						'<tr class="datarow">' +
 						'<td class="availability-date-start editable">' + moment(avl.ds, GlobalVariables.dbDateFormat).format(GlobalVariables.momDateFormat) + '</td>' +
 						'<td class="availability-date-end editable">' + moment(avl.de, GlobalVariables.dbDateFormat).format(GlobalVariables.momDateFormat) + '</td>' +
-						'<td class="availability-time-start editable">' + (avl.ts && Date.parse(avl.ts).toString(GlobalVariables.timeFormat === 'regular' ? 'h:mm tt' : 'HH:mm').toUpperCase()) + '</td>' +
-						'<td class="availability-time-end editable">' + (avl.te && Date.parse(avl.te).toString(GlobalVariables.timeFormat === 'regular' ? 'h:mm tt' : 'HH:mm').toUpperCase()) + '</td>' +
+						// '<td class="availability-time-start editable">' + (avl.ts && Date.parse(avl.ts).toString(GlobalVariables.timeFormat === 'regular' ? 'h:mm tt' : 'HH:mm').toUpperCase()) + '</td>' +
+						// '<td class="availability-time-end editable">' + (avl.te && Date.parse(avl.te).toString(GlobalVariables.timeFormat === 'regular' ? 'h:mm tt' : 'HH:mm').toUpperCase()) + '</td>' +
 						'<td>' +
 						'<button type="button" class="btn btn-default btn-sm edit-availability" title="' + EALang.edit + '">' +
 						'<span class="glyphicon glyphicon-pencil"></span>' +
@@ -114,7 +133,7 @@
 
 		// Make availability cells editable.
 		this.editableAvailabilityDate($('.availability-date-start, .availability-date-end'));
-		this.editableBreakTime($('.availability-time-start, .availability-time-end'));
+		// this.editableBreakTime($('.availability-time-start, .availability-time-end'));
         // Make break cells editable.
         this.editableBreakDay($('.breaks .break-day'));
         this.editableBreakTime($('.breaks').find('.break-start, .break-end'));
@@ -382,8 +401,8 @@
                 '<tr class="datarow">' +
                 '<td class="availability-date-start editable">' + '' + '</td>' +
                 '<td class="availability-date-end editable">' + '' + '</td>' +
-                '<td class="availability-time-start editable">' + (GlobalVariables.timeFormat === 'regular' ? '9:00 AM' : '09:00') + '</td>' +
-                '<td class="availability-time-end editable">' + (GlobalVariables.timeFormat === 'regular' ? '5:00 PM' : '17:00') + '</td>' +
+                // '<td class="availability-time-start editable">' + (GlobalVariables.timeFormat === 'regular' ? '9:00 AM' : '09:00') + '</td>' +
+                // '<td class="availability-time-end editable">' + (GlobalVariables.timeFormat === 'regular' ? '5:00 PM' : '17:00') + '</td>' +
                 '<td>' +
                 '<button type="button" class="btn btn-default btn-sm edit-availability" title="' + EALang.edit + '">' +
                 '<span class="glyphicon glyphicon-pencil"></span>' +
@@ -404,7 +423,7 @@
             // Bind editable and event handlers.
             tr = $('.availabilities tr')[1];
             this.editableAvailabilityDate($(tr).find('.availability-date-start, .availability-date-end'));
-            this.editableBreakTime($(tr).find('.availability-time-start, .availability-time-end'));
+            // this.editableBreakTime($(tr).find('.availability-time-start, .availability-time-end'));
             $(tr).find('.edit-availability').trigger('click');
             $('.add-availability').prop('disabled', true);
         }.bind(this));
@@ -425,15 +444,15 @@
 
             // Make all cells in current row editable.
             $(this).parent().parent().children().trigger('edit');
-            $(this).parent().parent().find('.availability-time-start input, .availability-time-end input').timepicker({
-                timeFormat: GlobalVariables.timeFormat === 'regular' ? 'h:mm TT' : 'HH:mm',
-                currentText: EALang.now,
-                closeText: EALang.close,
-                timeOnlyTitle: EALang.select_time,
-                timeText: EALang.time,
-                hourText: EALang.hour,
-                minuteText: EALang.minutes
-            });
+            // $(this).parent().parent().find('.availability-time-start input, .availability-time-end input').timepicker({
+            //     timeFormat: GlobalVariables.timeFormat === 'regular' ? 'h:mm TT' : 'HH:mm',
+            //     currentText: EALang.now,
+            //     closeText: EALang.close,
+            //     timeOnlyTitle: EALang.select_time,
+            //     timeText: EALang.time,
+            //     hourText: EALang.hour,
+            //     minuteText: EALang.minutes
+            // });
             $(this).parent().parent().find('.availability-date-start input, .availability-date-end input').datepicker({
 				dateFormat: GlobalVariables.dpDateFormat,
 
@@ -503,13 +522,13 @@
         $(document).on('click', '.save-availability', function (e) {
             // Availability's start time must always be prior to availability's end.
             var element = e.target,
-                $modifiedRow = $(element).closest('tr'),
-                start = Date.parse($modifiedRow.find('.availability-time-start input').val()),
-                end = Date.parse($modifiedRow.find('.availability-time-end input').val());
+                $modifiedRow = $(element).closest('tr')
+            //     start = Date.parse($modifiedRow.find('.availability-time-start input').val()),
+            //     end = Date.parse($modifiedRow.find('.availability-time-end input').val());
 
-            if (start > end) {
-                $modifiedRow.find('.availability-time-end input').val(start.addHours(1).toString(GlobalVariables.timeFormat === 'regular' ? 'h:mm tt' : 'HH:mm'));
-            }
+            // if (start > end) {
+            //     $modifiedRow.find('.availability-time-end input').val(start.addHours(1).toString(GlobalVariables.timeFormat === 'regular' ? 'h:mm tt' : 'HH:mm'));
+            // }
 
             this.enableSubmit = true;
             $modifiedRow.find('.editable .submit-editable').trigger('click');
@@ -560,31 +579,41 @@
             }
         }.bind(this));
 
-        $('.availabilities tr.datarow').each(function (index, tr) {
-			var date_start = $(tr).find('.availability-date-start').text();
-			var date_end = $(tr).find('.availability-date-end').text();
-			var time_start = $(tr).find('.availability-time-start').text();
-			var time_end = $(tr).find('.availability-time-end').text();
-			
-			if( ! workingPlan.availabilities )
-				workingPlan.availabilities = [];
-				
-			if( moment(date_start, GlobalVariables.momDateFormat).isValid() ) {
-				workingPlan.availabilities.push({
-					ds: moment(date_start, GlobalVariables.momDateFormat).format(GlobalVariables.dbDateFormat),
-					de: moment(date_end, GlobalVariables.momDateFormat).format(GlobalVariables.dbDateFormat),
-					ts: Date.parse(time_start) && Date.parse(time_start).toString('HH:mm') || '',
-					te: Date.parse(time_end) && Date.parse(time_end).toString('HH:mm') || ''
-				});
-
-				workingPlan.availabilities.sort(function (avl1, avl2) {
-					// We can do a direct string comparison since we have time based on 24 hours clock.
-					return avl1.ds - avl2.ds;
-				});
-			}
-        }.bind(this));
+        workingPlan.availabilities = this.getAvailabilities();
 		
         return workingPlan;
+    };
+
+/**
+     * Get the working plan settings.
+     *
+     * @return {Object} Returns the working plan settings object.
+     */
+    WorkingPlan.prototype.getAvailabilities = function () {
+        var availabilities = [];
+
+        $('.availabilities tr.datarow').each(function (index, tr) {
+            var date_start = $(tr).find('.availability-date-start').text();
+            var date_end = $(tr).find('.availability-date-end').text();
+            // var time_start = $(tr).find('.availability-time-start').text();
+            // var time_end = $(tr).find('.availability-time-end').text();
+            
+            if( moment(date_start, GlobalVariables.momDateFormat).isValid() ) {
+                availabilities.push({
+                    ds: moment(date_start, GlobalVariables.momDateFormat).format(GlobalVariables.dbDateFormat),
+                    de: moment(date_end, GlobalVariables.momDateFormat).format(GlobalVariables.dbDateFormat)
+                    // ts: Date.parse(time_start) && Date.parse(time_start).toString('HH:mm') || '',
+                    // te: Date.parse(time_end) && Date.parse(time_end).toString('HH:mm') || ''
+                });
+
+                availabilities.sort(function (avl1, avl2) {
+                    // We can do a direct string comparison since we have time based on 24 hours clock.
+                    return avl1.ds - avl2.ds;
+                });
+            }
+        }.bind(this));
+        
+        return availabilities;
     };
 
     /**
@@ -653,7 +682,9 @@
     };
 
     /**
-     * This is necessary for translated days.
+     * Enables or disables the timepicker functionality from the working plan input text fields.
+     *
+@ -657,21 +684,21 @@
      *
      * @param {String} value Day value could be like "Monday", "Tuesday" etc.
      */
@@ -672,6 +703,30 @@
             case EALang.friday:
                 return 'friday';
             case EALang.saturday:
+                return 'saturday';
+        }
+    };
+
+    /**
+     * This is necessary for translated days.
+     *
+     * @param {int} value Day of the week number
+     */
+    WorkingPlan.prototype.convertDayNumberToValue = function (day) {
+        switch (day) {
+            case 0:
+                return 'sunday';
+            case 1:
+                return 'monday';
+            case 2:
+                return 'tuesday';
+            case 3:
+                return 'wednesday';
+            case 4:
+                return 'thursday';
+            case 5:
+                return 'friday';
+            case 6:
                 return 'saturday';
         }
     };

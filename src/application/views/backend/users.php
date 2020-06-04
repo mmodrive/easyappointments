@@ -251,8 +251,8 @@
                                 <tr>
                                     <th><?= lang('date_start') ?></th>
 									<th><?= lang('date_end') ?></th>
-                                    <th><?= lang('time_start') ?></th>
-                                    <th><?= lang('time_end') ?></th>
+                                    <!-- <th><?= lang('time_start') ?></th>
+                                    <th><?= lang('time_end') ?></th> -->
                                     <th><?= lang('actions') ?></th>
                                 </tr>
                             </thead>

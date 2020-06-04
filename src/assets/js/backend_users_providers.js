@@ -235,8 +235,8 @@
          */
         $('#providers').on('click', '#reset-working-plan', function () {
             $('.breaks tbody').empty();
-            $('.work-start, .work-end').val('');
-            BackendUsers.wp.setup(GlobalVariables.workingPlan);
+            // $('.work-start, .work-end').val('');
+            BackendUsers.wp.setup(GlobalVariables.workingPlan, BackendUsers.wp.getAvailabilities());
             BackendUsers.wp.timepickers(false);
         });
     };
