@@ -49,8 +49,8 @@
         var dow = null;
         if (syncAvailabilities && Array.isArray(syncAvailabilities)){
             syncAvailabilities.forEach(function (value){
-                var ds = moment(value.ds, GlobalVariables.dbDateFormat),
-                    de = moment(value.de, GlobalVariables.dbDateFormat);
+                var ds = moment(value.start, GlobalVariables.dbDateFormat),
+                    de = moment(value.end, GlobalVariables.dbDateFormat);
                 for (var m = ds; m.diff(de, 'days') <= 0; m.add(1, 'days')) {
                     var day = this.convertDayNumberToValue(m.day());
                     if( ! dow )
@@ -107,8 +107,8 @@
 				$.each(workingPlan[index], function (i, avl) {
 					var tr =
 						'<tr class="datarow">' +
-						'<td class="availability-date-start editable">' + moment(avl.ds, GlobalVariables.dbDateFormat).format(GlobalVariables.momDateFormat) + '</td>' +
-						'<td class="availability-date-end editable">' + moment(avl.de, GlobalVariables.dbDateFormat).format(GlobalVariables.momDateFormat) + '</td>' +
+						'<td class="availability-date-start editable">' + moment(avl.start, GlobalVariables.dbDateFormat).format(GlobalVariables.momDateFormat) + '</td>' +
+						'<td class="availability-date-end editable">' + moment(avl.end, GlobalVariables.dbDateFormat).format(GlobalVariables.momDateFormat) + '</td>' +
 						// '<td class="availability-time-start editable">' + (avl.ts && Date.parse(avl.ts).toString(GlobalVariables.timeFormat === 'regular' ? 'h:mm tt' : 'HH:mm').toUpperCase()) + '</td>' +
 						// '<td class="availability-time-end editable">' + (avl.te && Date.parse(avl.te).toString(GlobalVariables.timeFormat === 'regular' ? 'h:mm tt' : 'HH:mm').toUpperCase()) + '</td>' +
 						'<td>' +
@@ -600,15 +600,15 @@
             
             if( moment(date_start, GlobalVariables.momDateFormat).isValid() ) {
                 availabilities.push({
-                    ds: moment(date_start, GlobalVariables.momDateFormat).format(GlobalVariables.dbDateFormat),
-                    de: moment(date_end, GlobalVariables.momDateFormat).format(GlobalVariables.dbDateFormat)
+                    start: moment(date_start, GlobalVariables.momDateFormat).format(GlobalVariables.dbDateFormat),
+                    end: moment(date_end, GlobalVariables.momDateFormat).format(GlobalVariables.dbDateFormat)
                     // ts: Date.parse(time_start) && Date.parse(time_start).toString('HH:mm') || '',
                     // te: Date.parse(time_end) && Date.parse(time_end).toString('HH:mm') || ''
                 });
 
                 availabilities.sort(function (avl1, avl2) {
                     // We can do a direct string comparison since we have time based on 24 hours clock.
-                    return avl1.ds - avl2.ds;
+                    return avl1.start - avl2.start;
                 });
             }
         }.bind(this));
