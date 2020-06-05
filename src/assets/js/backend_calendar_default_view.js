@@ -804,6 +804,33 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                         var workingPlan = jQuery.parseJSON(provider.settings.working_plan);
                         var unavailablePeriod;
 
+                        var getAvailableDates = function(){
+                            var availableDates = null;
+                            if (this.availabilities){
+                                $.each(this.availabilities, function (index, rangeString) {
+                                    if (!availableDates)
+                                        availableDates = [];
+                                    availableDates.push({
+                                        start: moment(rangeString.start, GlobalVariables.dbDateFormat).toDate(),
+                                        end: moment(rangeString.end, GlobalVariables.dbDateFormat).add(1, 'd').subtract(1, 'ms').toDate()
+                                    });
+                                });
+                            }
+                            delete workingPlan.availabilities;
+                            if( availableDates )
+                                availableDates.isInRange = function(date){
+                                    for (var i = 0; i < this.length; i++) {
+                                        if (date >= this[i].start && date <= this[i].end){
+                                            return true;
+                                        }
+                                    }
+                                    return false;
+                                }
+                            return availableDates;
+                        }.bind(workingPlan);
+                        
+                        var availableDates = getAvailableDates();
+
                         switch (calendarView) {
                             case 'agendaDay':
                                 var selectedDayName = weekDays[$calendar.fullCalendar('getView').start.format('d')];
@@ -829,6 +856,12 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
 
                                     $calendar.fullCalendar('renderEvent', unavailablePeriod, false);
                                 });
+
+                                if (availableDates){
+                                    var targetDate = $calendar.fullCalendar('getView').start;
+                                    if (!availableDates.isInRange(targetDate))
+                                        workingPlan[selectedDayName] = null;
+                                }
 
                                 // Non-working day.
                                 if (workingPlan[selectedDayName] == null) {
@@ -946,21 +979,11 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                                     $calendar.fullCalendar('renderEvent', unavailablePeriod, false);
                                 });
 
-                                var availableDates = null;
-                                if (workingPlan.availabilities){
-                                    $.each(workingPlan.availabilities, function (index, rangeString) {
-                                        if (!availableDates)
-                                            availableDates = [];
-                                        availableDates.push({
-                                            start: moment(rangeString.start, GlobalVariables.dbDateFormat),
-                                            end: moment(rangeString.end, GlobalVariables.dbDateFormat)
-                                        });
-                                    });
-                                }
-
                                 $.each(workingPlan, function (index, workingDay) {
                                     if (availableDates){
-                                        
+                                        var targetDate = new Date(currentDateStart + weekDays.indexOf(index));
+                                        if (!availableDates.isInRange(targetDate))
+                                            workingDay = null;
                                     }
 
                                     if (workingDay == null) {
@@ -981,9 +1004,6 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
 
                                         return; // Go to the next loop.
                                     }
-
-                                    if (workingDay.start == null)
-                                        return;
 
                                     var start;
                                     var end;
