@@ -234,9 +234,12 @@
          * Event: Reset Working Plan Button "Click".
          */
         $('#providers').on('click', '#reset-working-plan', function () {
-            $('.breaks tbody').empty();
-            // $('.work-start, .work-end').val('');
-            BackendUsers.wp.setup(GlobalVariables.workingPlan, BackendUsers.wp.getAvailabilities());
+            var availabilities = BackendUsers.wp.getAvailabilities();
+            if (! availabilities) {
+                $('.breaks tbody').empty();
+                $('.work-start, .work-end').val('');
+            }
+            BackendUsers.wp.setup(GlobalVariables.workingPlan,  availabilities);
             BackendUsers.wp.timepickers(false);
         });
     };
