@@ -232,6 +232,43 @@ class Backend extends CI_Controller {
     }
 
     /**
+     * Displays the backend print appointments page.
+     *
+     * Here the admin user will be able to filer and list appointments.
+     *
+     */
+    public function print_appointments()
+    {
+        $this->session->set_userdata('dest_url', site_url('backend/print_appointments'));
+
+        if ( ! $this->_has_privileges(PRIV_SERVICES))
+        {
+            return;
+        }
+
+        $this->load->model('customers_model');
+        $this->load->model('services_model');
+        $this->load->model('settings_model');
+        $this->load->model('user_model');
+
+        $view['base_url'] = $this->config->item('base_url');
+        $view['user_display_name'] = $this->user_model->get_user_display_name($this->session->userdata('user_id'));
+        $view['active_menu'] = PRIV_PRINT_APPOINTMENTS;
+        $view['company_name'] = $this->settings_model->get_setting('company_name');
+        $view['date_format'] = $this->settings_model->get_setting('date_format');
+        $view['time_format'] = $this->settings_model->get_setting('time_format');
+        $view['services'] = $this->services_model->get_batch();
+        $view['categories'] = $this->services_model->get_all_categories();
+        $this->set_user_data($view);
+
+        $this->load->helper('form');
+
+        // $this->load->view('backend/header', $view);
+        $this->load->view('backend/print_appointments', $view);
+        // $this->load->view('backend/footer', $view);
+    }
+
+    /**
      * Display the user/system settings.
      *
      * This page will display the user settings (name, password etc). If current user is an administrator, then he will

@@ -85,6 +85,15 @@
                     </a>
                 </li>
 
+                <?php $hidden = ($privileges[PRIV_SERVICES]['view'] ==  TRUE) ? '' : 'hidden' ?>
+                <?php $active = ($active_menu == PRIV_PRINT_APPOINTMENTS) ? 'active' : '' ?>
+                <li class="<?= $active . $hidden ?>">
+                    <a href="<?= site_url('backend/print_appointments') ?>" class="menu-item"
+                            title="<?= lang('print_appointment') ?>">
+                        <?= lang('print_appointment') ?>
+                    </a>
+                </li>
+
                 <?php $hidden = ($privileges[PRIV_SYSTEM_SETTINGS]['view'] == TRUE
                         || $privileges[PRIV_USER_SETTINGS]['view'] == TRUE) ? '' : 'hidden' ?>
                 <?php $active = ($active_menu == PRIV_SYSTEM_SETTINGS) ? 'active' : '' ?>

@@ -331,6 +331,9 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                 + '<br>' +
                 '<strong>' + EALang.phone_number + '</strong> '
                 + event.data.customer.phone_number
+                + '<br>' +
+                '<strong>' + EALang.notes + '</strong> '
+                + event.data.notes
                 + '<hr>' +
                 '<div class="text-center">' +
                 '<button class="edit-popover btn btn-primary ' + displayEdit + '">' + EALang.edit + '</button>' +

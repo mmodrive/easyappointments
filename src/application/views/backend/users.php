@@ -187,7 +187,7 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="provider-notes"><?= lang('notes') ?></label>
+                                    <label for="provider-notes"><?= lang('user_notes') ?></label>
                                     <textarea id="provider-notes" class="form-control" rows="3"></textarea>
                                 </div>
                             </div>
@@ -505,7 +505,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="secretary-notes"><?= lang('notes') ?></label>
+                                <label for="secretary-notes"><?= lang('user_notes') ?></label>
                                 <textarea id="secretary-notes" class="form-control" rows="3"></textarea>
                             </div>
                         </div>
@@ -660,7 +660,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="admin-notes"><?= lang('notes') ?></label>
+                                <label for="admin-notes"><?= lang('user_notes') ?></label>
                                 <textarea id="admin-notes" class="form-control" rows="3"></textarea>
                             </div>
                         </div>

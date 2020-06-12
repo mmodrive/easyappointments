@@ -258,7 +258,7 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="customer-notes" class="control-label"><?= lang('notes') ?></label>
+                                    <label for="customer-notes" class="control-label"><?= lang('user_notes') ?></label>
                                     <textarea id="customer-notes" rows="2" class="form-control"></textarea>
                                 </div>
                             </div>
