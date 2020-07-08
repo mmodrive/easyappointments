@@ -436,6 +436,101 @@ class Appointments extends CI_Controller {
     }
 
     /**
+     * [AJAX] Check whether the user has entered the correct login credentials.
+     *
+     * The session data of a logged in user are the following:
+     *   - 'user_id'
+     *   - 'user_email'
+     *   - 'role_slug'
+     *   - 'dest_url'
+     */
+    public function ajax_check_login()
+    {
+        try
+        {
+            if ( ! $this->input->post('email') || ! $this->input->post('password'))
+            {
+                throw new Exception('Invalid credentials given!');
+            }
+
+            $this->load->model('customers_model');
+            $customer_data = $this->customers_model->check_login($this->input->post('email'), $this->input->post('password'));
+
+            if ($customer_data)
+            {
+                $this->session->set_userdata($customer_data); // Save data on user's session.
+                $this->output
+                    ->set_content_type('application/json')
+                    ->set_output(json_encode($customer_data));
+            }
+            else
+            {
+                $this->output
+                    ->set_content_type('application/json')
+                    ->set_output(json_encode(AJAX_FAILURE));
+            }
+
+        }
+        catch (Exception $exc)
+        {
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode(['exceptions' => [exceptionToJavaScript($exc)]]));
+        }
+    }
+
+    /**
+     * Regenerate a new password for the current user, only if the username and
+     * email address given correspond to an existing user in db.
+     *
+     * Required POST Parameters:
+     *
+     * - string $_POST['username'] Username to be validated.
+     * - string $_POST['email'] Email to be validated.
+     */
+    public function ajax_forgot_password()
+    {
+        try
+        {
+            if ( ! $this->input->post('username') || ! $this->input->post('email'))
+            {
+                throw new Exception('You must enter a valid username and email address in '
+                    . 'order to get a new password!');
+            }
+
+            $this->load->model('user_model');
+            $this->load->model('settings_model');
+
+            $new_password = $this->user_model->regenerate_password($this->input->post('username'),
+                $this->input->post('email'));
+
+            if ($new_password != FALSE)
+            {
+                $this->config->load('email');
+                $email = new \EA\Engine\Notifications\Email($this, $this->config->config);
+                $company_settings = [
+                    'company_name' => $this->settings_model->get_setting('company_name'),
+                    'company_link' => $this->settings_model->get_setting('company_link'),
+                    'company_email' => $this->settings_model->get_setting('company_email')
+                ];
+
+                $email->sendPassword(new NonEmptyText($new_password), new Email($this->input->post('email')),
+                    $company_settings);
+            }
+
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode($new_password != FALSE ? AJAX_SUCCESS : AJAX_FAILURE));
+        }
+        catch (Exception $exc)
+        {
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode(['exceptions' => [exceptionToJavaScript($exc)]]));
+        }
+    }
+
+    /**
      * [AJAX] Register the appointment to the database.
      *
      * Outputs a JSON string with the appointment ID.

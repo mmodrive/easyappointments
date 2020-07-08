@@ -267,6 +267,21 @@ window.FrontendBook = window.FrontendBook || {};
             // If we are on the 3rd tab then we will need to validate the user's
             // input before proceeding to the next step.
             if ($(this).attr('data-step_index') === '3') {
+                if (!_validateLoginForm()) {
+                    return; // Validation failed, do not continue.
+                } 
+                if( this.id == 'button-next-3' ){
+                    //attempt to login and retrieve customer data
+                    if ( $('#login_success').val() == '0' ){
+                        FrontendBookApi.loginCustomer( $('#email').val(), $('#password').val());
+                        return;
+                    }
+                }
+            }
+
+            // If we are on the 4th tab then we will need to validate the user's
+            // input before proceeding to the next step.
+            if ($(this).attr('data-step_index') === '4') {
                 if (!_validateCustomerForm()) {
                     return; // Validation failed, do not continue.
                 } else {
@@ -432,6 +447,42 @@ window.FrontendBook = window.FrontendBook || {};
         })
     }
 
+     /**
+     * This function validates the customer's data input. The user cannot continue
+     * without passing all the validation checks.
+     *
+     * @return {Boolean} Returns the validation result.
+     */
+    function _validateLoginForm() {
+        $('#wizard-frame-3 .has-error').removeClass('has-error');
+        $('#wizard-frame-3 label.text-danger').removeClass('text-danger');
+
+        try {
+            // Validate required fields.
+            var missingRequiredField = false;
+            $('#wizard-frame-3 .required').each(function () {
+                if ($(this).val() == '') {
+                    $(this).parents('.form-group').addClass('has-error');
+                    missingRequiredField = true;
+                }
+            });
+            if (missingRequiredField) {
+                throw EALang.fields_are_required;
+            }
+
+            // Validate email address.
+            if (!GeneralFunctions.validateEmail($('#email').val())) {
+                $('#email').parents('.form-group').addClass('has-error');
+                throw EALang.invalid_email;
+            }
+
+            return true;
+        } catch (exc) {
+            $('#form-3-message').text(exc);
+            return false;
+        }
+    }
+
     /**
      * This function validates the customer's data input. The user cannot continue
      * without passing all the validation checks.
@@ -439,13 +490,13 @@ window.FrontendBook = window.FrontendBook || {};
      * @return {Boolean} Returns the validation result.
      */
     function _validateCustomerForm() {
-        $('#wizard-frame-3 .has-error').removeClass('has-error');
-        $('#wizard-frame-3 label.text-danger').removeClass('text-danger');
+        $('#wizard-frame-4 .has-error').removeClass('has-error');
+        $('#wizard-frame-4 label.text-danger').removeClass('text-danger');
 
         try {
             // Validate required fields.
             var missingRequiredField = false;
-            $('.required').each(function () {
+            $('#wizard-frame-4 .required').each(function () {
                 if ($(this).val() == '') {
                     $(this).parents('.form-group').addClass('has-error');
                     missingRequiredField = true;
@@ -467,16 +518,9 @@ window.FrontendBook = window.FrontendBook || {};
                 throw EALang.fields_are_required;
             }
 
-
-            // Validate email address.
-            if (!GeneralFunctions.validateEmail($('#email').val())) {
-                $('#email').parents('.form-group').addClass('has-error');
-                throw EALang.invalid_email;
-            }
-
             return true;
         } catch (exc) {
-            $('#form-message').text(exc);
+            $('#form-4-message').text(exc);
             return false;
         }
     }
@@ -557,7 +601,10 @@ window.FrontendBook = window.FrontendBook || {};
             phone_number: $('#phone-number').val(),
             address: $('#address').val(),
             city: $('#city').val(),
-            zip_code: $('#zip-code').val()
+            zip_code: $('#zip-code').val(),
+            settings: {
+                password: $('#password').val()
+            }
         };
 
         postData.appointment = {
@@ -616,6 +663,30 @@ window.FrontendBook = window.FrontendBook || {};
      * This method applies the appointment's data to the wizard so
      * that the user can start making changes on an existing record.
      *
+     * @param {Object} customer Selected customer's data.
+     *
+     */
+    exports.applyCustomerData = function (customer) {
+        try {
+            // Apply Customer's Data
+            $('#last-name').val(customer.last_name);
+            $('#first-name').val(customer.first_name);
+            $('#email').val(customer.email);
+            $('#phone-number').val(customer.phone_number);
+            $('#address').val(customer.address);
+            $('#city').val(customer.city);
+            $('#zip-code').val(customer.zip_code);
+
+            return true;
+        } catch (exc) {
+            return false;
+        }
+    }
+
+    /**
+     * This method applies the appointment's data to the wizard so
+     * that the user can start making changes on an existing record.
+     *
      * @param {Object} appointment Selected appointment's data.
      * @param {Object} provider Selected provider's data.
      * @param {Object} customer Selected customer's data.
@@ -634,13 +705,7 @@ window.FrontendBook = window.FrontendBook || {};
             FrontendBookApi.getAvailableHours($('#select-date').val());
 
             // Apply Customer's Data
-            $('#last-name').val(customer.last_name);
-            $('#first-name').val(customer.first_name);
-            $('#email').val(customer.email);
-            $('#phone-number').val(customer.phone_number);
-            $('#address').val(customer.address);
-            $('#city').val(customer.city);
-            $('#zip-code').val(customer.zip_code);
+            FrontendBook.applyCustomerData(customer);
             var appointmentNotes = (appointment.notes !== null)
                 ? appointment.notes : '';
             $('#notes').val(appointmentNotes);

@@ -33,7 +33,6 @@
                         <div id="step-1" class="book-step active-step" title="<?= lang('step_one_title') ?>">
                             <strong>1</strong>
                         </div>
-
                         <div id="step-2" class="book-step" title="<?= lang('step_two_title') ?>">
                             <strong>2</strong>
                         </div>
@@ -42,6 +41,9 @@
                         </div>
                         <div id="step-4" class="book-step" title="<?= lang('step_four_title') ?>">
                             <strong>4</strong>
+                        </div>
+                        <div id="step-5" class="book-step" title="<?= lang('step_five_title') ?>">
+                            <strong>5</strong>
                         </div>
                     </div>
                 </div>
@@ -201,12 +203,58 @@
                     </div>
                 </div>
 
-                <!-- ENTER CUSTOMER DATA -->
+                <!-- LOGIN OR REGISTER -->
 
                 <div id="wizard-frame-3" class="wizard-frame" style="display:none;">
                     <div class="frame-container">
 
                         <h3 class="frame-title"><?= lang('step_three_title') ?></h3>
+
+                        <div class="frame-content row">
+                            <div class="col-xs-12 col-sm-6">
+                                <div class="form-group">
+                                    <label for="email" class="control-label"><?= lang('email') ?> *</label>
+                                    <input type="text" id="email" class="required form-control" maxlength="120" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="password" class="control-label"><?= lang('password') ?> *</label>
+                                    <input type="password" id="password" class="required form-control" maxlength="60" />
+                                </div>
+                            </div>
+
+                            <div class="col-xs-12 col-sm-6">
+                                <label class="control-label"><?= lang('login_instructions') ?></label>
+                            </div>
+
+                            <input type="hidden" id="login_success" value="0">
+
+                            <span id="form-3-message" class="text-danger"><?= lang('fields_are_required') ?></span>
+                        </div>
+                    </div>
+
+                    <div class="command-buttons">
+                        <button type="button" id="button-back-3" class="btn button-back btn-default"
+                                data-step_index="3"><span class="glyphicon glyphicon-backward"></span>
+                            <?= lang('back') ?>
+                        </button>
+                        <button type="button" id="button-reset-3" class="btn button-next"
+                                data-step_index="3"><span class="glyphicon glyphicon-forward"></span>
+                            <?= lang('reset') ?>
+                        </button>
+                        <button type="button" id="button-next-3" class="btn button-next btn-primary"
+                                data-step_index="3">
+                            <?= lang('next') ?>
+                            <span class="glyphicon glyphicon-forward"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ENTER CUSTOMER DATA -->
+
+                <div id="wizard-frame-4" class="wizard-frame" style="display:none;">
+                    <div class="frame-container">
+
+                        <h3 class="frame-title"><?= lang('step_four_title') ?></h3>
 
                         <div class="frame-content row">
                             <div class="col-xs-12 col-sm-6">
@@ -217,10 +265,6 @@
                                 <div class="form-group">
                                     <label for="last-name" class="control-label"><?= lang('last_name') ?> *</label>
                                     <input type="text" id="last-name" class="required form-control" maxlength="120" />
-                                </div>
-                                <div class="form-group">
-                                    <label for="email" class="control-label"><?= lang('email') ?> *</label>
-                                    <input type="text" id="email" class="required form-control" maxlength="120" />
                                 </div>
                                 <div class="form-group">
                                     <label for="phone-number" class="control-label"><?= lang('phone_number') ?> *</label>
@@ -273,17 +317,17 @@
                             <br>
                             <?php endif ?>
 
-                            <span id="form-message" class="text-danger"><?= lang('fields_are_required') ?></span>
+                            <span id="form-4-message" class="text-danger"><?= lang('fields_are_required') ?></span>
                         </div>
                     </div>
 
                     <div class="command-buttons">
-                        <button type="button" id="button-back-3" class="btn button-back btn-default"
-                                data-step_index="3"><span class="glyphicon glyphicon-backward"></span>
+                        <button type="button" id="button-back-4" class="btn button-back btn-default"
+                                data-step_index="4"><span class="glyphicon glyphicon-backward"></span>
                             <?= lang('back') ?>
                         </button>
-                        <button type="button" id="button-next-3" class="btn button-next btn-primary"
-                                data-step_index="3">
+                        <button type="button" id="button-next-4" class="btn button-next btn-primary"
+                                data-step_index="4">
                             <?= lang('next') ?>
                             <span class="glyphicon glyphicon-forward"></span>
                         </button>
@@ -292,9 +336,9 @@
 
                 <!-- APPOINTMENT DATA CONFIRMATION -->
 
-                <div id="wizard-frame-4" class="wizard-frame" style="display:none;">
+                <div id="wizard-frame-5" class="wizard-frame" style="display:none;">
                     <div class="frame-container">
-                        <h3 class="frame-title"><?= lang('step_four_title') ?></h3>
+                        <h3 class="frame-title"><?= lang('step_five_title') ?></h3>
                         <div class="frame-content row">
                             <div id="appointment-details" class="col-xs-12 col-sm-6"></div>
                             <div id="customer-details" class="col-xs-12 col-sm-6"></div>
@@ -315,8 +359,8 @@
                     </div>
 
                     <div class="command-buttons">
-                        <button type="button" id="button-back-4" class="btn button-back btn-default"
-                                data-step_index="4">
+                        <button type="button" id="button-back-5" class="btn button-back btn-default"
+                                data-step_index="5">
                             <span class="glyphicon glyphicon-backward"></span>
                             <?= lang('back') ?>
                         </button>
@@ -334,12 +378,8 @@
                 <!-- FRAME FOOTER -->
 
                 <div id="frame-footer">
-                    Powered By
-                    <a href="http://easyappointments.org" target="_blank">Easy!Appointments</a>
-                    |
-                    <span id="select-language" class="label label-success">
-    		        	<?= ucfirst($this->config->item('language')) ?>
-    		        </span>
+                    Maintained by
+                    <a href="https://neouniverse.com.au" target="_blank">Neo Universe</a>
                     |
                     <a href="<?= site_url('backend'); ?>">
                         <?= $this->session->user_id ? lang('backend_section') : lang('login') ?>
@@ -374,7 +414,8 @@
             appointmentData     : <?= json_encode($appointment_data) ?>,
             providerData        : <?= json_encode($provider_data) ?>,
             customerData        : <?= json_encode($customer_data) ?>,
-            csrfToken           : <?= json_encode($this->security->get_csrf_hash()) ?>
+            csrfToken           : <?= json_encode($this->security->get_csrf_hash()) ?>,
+            LOGIN_FAILURE        : "<?= AJAX_FAILURE ?>"
         };
 
         var EALang = <?= json_encode($this->lang->language) ?>;

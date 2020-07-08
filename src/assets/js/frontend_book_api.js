@@ -104,6 +104,33 @@ window.FrontendBookApi = window.FrontendBookApi || {};
         }, 'json').fail(GeneralFunctions.ajaxFailureHandler);
     };
 
+    exports.loginCustomer = function(email, password) {
+        var postUrl = GlobalVariables.baseUrl + '/index.php/appointments/ajax_check_login';
+        var postData = {
+            'csrfToken': GlobalVariables.csrfToken,
+            'email': email,
+            'password': password
+        };
+
+        $.post(postUrl, postData, function(response) {
+            if (!GeneralFunctions.handleAjaxExceptions(response)) {
+                return;
+            }
+
+
+            if (response != GlobalVariables.LOGIN_FAILURE) {
+                FrontendBook.applyCustomerData(response);
+                $('#login_success').val('1');
+                $('#button-next-3').click();
+                $('#login_success').val('0');
+            } else {
+                FrontendBook.applyCustomerData({});
+                $('#login_success').val('0');
+                $('#form-3-message').text(EALang['login_failed']);
+            }
+        }, 'json');
+    };
+
     /**
      * Register an appointment to the database.
      *

@@ -97,6 +97,8 @@ class Customers_Model extends CI_Model {
      */
     protected function _insert($customer)
     {
+        $this->load->helper('general');
+
         // Before inserting the customer we need to get the customer's role id
         // from the database and assign it to the new record as a foreign key.
         $customer_role_id = $this->db
@@ -106,11 +108,29 @@ class Customers_Model extends CI_Model {
             ->get()->row()->id;
 
         $customer['id_roles'] = $customer_role_id;
+        $settings = $customer['settings'];
+        unset($customer['settings']);
+
+        $this->db->trans_begin();
 
         if ( ! $this->db->insert('ea_users', $customer))
         {
             throw new Exception('Could not insert customer to the database.');
         }
+
+        $customer['id'] = (int)$this->db->insert_id();
+        $settings['id_users'] = $customer['id'];
+        $settings['salt'] = generate_salt();
+        $settings['password'] = hash_password($settings['salt'], $settings['password']);
+
+        // Insert customer settings. 
+        if ( ! $this->db->insert('ea_user_settings', $settings))
+        {
+            $this->db->trans_rollback();
+            throw new Exception('Could not insert customer settings into the database.');
+        }
+
+        $this->db->trans_complete();
 
         return (int)$this->db->insert_id();
     }
@@ -129,6 +149,8 @@ class Customers_Model extends CI_Model {
      */
     protected function _update($customer)
     {
+        $this->load->helper('general');
+
         // Do not update empty string values.
         foreach ($customer as $key => $value)
         {
@@ -138,11 +160,49 @@ class Customers_Model extends CI_Model {
             }
         }
 
+        $settings = $customer['settings'];
+        $settings_row = $this->db->get_where('ea_user_settings', ['id_users' => $customer['id']])->row();
+        unset($customer['settings']);
+        $settings['id_users'] = $customer['id'];
+
+        $this->db->trans_begin();
+
         $this->db->where('id', $customer['id']);
         if ( ! $this->db->update('ea_users', $customer))
         {
             throw new Exception('Could not update customer to the database.');
         }
+
+        if( !empty($settings) ){
+            if (isset($settings['password']))
+            {
+                if( isset($settings_row) )
+                    $salt = $settings_row->salt;
+                else 
+                    $settings['salt'] = $salt = generate_salt();
+                $settings['password'] = hash_password($salt, $settings['password']);
+            }
+
+            if( isset($settings_row) ){
+                // Update customer settings.
+                $this->db->where('id_users', $settings['id_users']);
+                if ( ! $this->db->update('ea_user_settings', $settings))
+                {
+                    throw new Exception('Could not update customer settings.');
+                }
+            }
+            else
+            {
+                // Insert customer settings. 
+                if ( ! $this->db->insert('ea_user_settings', $settings))
+                {
+                    $this->db->trans_rollback();
+                    throw new Exception('Could not insert customer settings into the database.');
+                }
+            }
+        }
+
+        $this->db->trans_complete();
 
         return (int)$customer['id'];
     }
@@ -227,6 +287,16 @@ class Customers_Model extends CI_Model {
                 . $customer['email']);
         }
 
+        // Validate customer password
+        if (isset($customer['settings']['password']))
+        {
+            if (strlen($customer['settings']['password']) < MIN_PASSWORD_LENGTH)
+            {
+                throw new Exception('The user password must be at least '
+                    . MIN_PASSWORD_LENGTH . ' characters long.');
+            }
+        }
+
         // When inserting a record the email address must be unique.
         $customer_id = (isset($customer['id'])) ? $customer['id'] : '';
 
@@ -290,7 +360,14 @@ class Customers_Model extends CI_Model {
         {
             throw new Exception('Invalid argument provided as $customer_id : ' . $customer_id);
         }
-        return $this->db->get_where('ea_users', ['id' => $customer_id])->row_array();
+
+        $customer = $this->db->get_where('ea_users', ['id' => $customer_id])->row_array();
+
+        $customer['settings'] = $this->db->get_where('ea_user_settings',
+            ['id_users' => $customer_id])->row_array();
+        unset($customer['settings']['id_users']);
+
+        return $customer;
     }
 
     /**
@@ -360,7 +437,17 @@ class Customers_Model extends CI_Model {
 
         $this->db->where('id_roles', $customers_role_id);
 
-        return $this->db->get('ea_users')->result_array();
+        $batch = $this->db->get('ea_users')->result_array();
+
+        // Get every customer settings.
+        foreach ($batch as &$customer)
+        {
+            $customer['settings'] = $this->db->get_where('ea_user_settings',
+                ['id_users' => $customer['id']])->row_array();
+            unset($customer['settings']['id_users']);
+        }
+
+        return $batch;
     }
 
     /**
@@ -371,5 +458,87 @@ class Customers_Model extends CI_Model {
     public function get_customers_role_id()
     {
         return $this->db->get_where('ea_roles', ['slug' => DB_SLUG_CUSTOMER])->row()->id;
+    }
+
+    /**
+     * Retrieve user's salt from database.
+     *
+     * @param string $username This will be used to find the user record.
+     *
+     * @return string Returns the salt db value.
+     */
+    public function get_salt($customer_id)
+    {
+        $user = $this->db->get_where('ea_user_settings', ['id_users' => $customer_id])->row_array();
+        return ($user) ? $user['salt'] : '';
+    }
+
+    /**
+     * Performs the check of the given user credentials.
+     *
+     * @param string $username Given user's name.
+     * @param string $password Given user's password (not hashed yet).
+     *
+     * @return array|null Returns the session data of the logged in user or null on failure.
+     */
+    public function check_login($email, $password)
+    {
+        $this->load->helper('general');
+
+        $customer = [ 'email' => $email ];
+        $customer_id = $this->customers_model->find_record_id($customer);
+
+        $salt = $this->customers_model->get_salt($customer_id);
+        if ( !$salt )
+            return [ 'email' => $email ];
+
+        $password = hash_password($salt, $password);
+
+        $customer = $this->db
+            ->select('ea_users.*')
+            ->from('ea_users')
+            ->join('ea_user_settings', 'ea_user_settings.id_users = ea_users.id', 'inner')
+            ->where('ea_users.email', $email)
+            ->where('ea_user_settings.password', $password)
+            ->get()->row_array();
+
+        return ($customer) ? $customer : NULL;
+    }
+
+    /**
+     * If the given arguments correspond to an existing user record, generate a new
+     * password and send it with an email.
+     *
+     * @param string $username User's username.
+     * @param string $email User's email.
+     *
+     * @return string|bool Returns the new password on success or FALSE on failure.
+     */
+    public function regenerate_password($username, $email)
+    {
+        $this->load->helper('general');
+
+        $result = $this->db
+            ->select('ea_users.id')
+            ->from('ea_users')
+            ->join('ea_user_settings', 'ea_user_settings.id_users = ea_users.id', 'inner')
+            ->where('ea_users.email', $email)
+            ->where('ea_user_settings.username', $username)
+            ->get();
+
+        if ($result->num_rows() == 0)
+        {
+            return FALSE;
+        }
+
+        $user_id = $result->row()->id;
+
+        // Create a new password and send it with an email to the given email address.
+        $new_password = generate_random_string();
+        $salt = $this->db->get_where('ea_user_settings', ['id_users' => $user_id])->row()->salt;
+        $hash_password = hash_password($salt, $new_password);
+        $this->db->update('ea_user_settings', ['password' => $hash_password], ['id_users' => $user_id]);
+
+        return $new_password;
     }
 }
