@@ -217,7 +217,7 @@
                                     <input type="text" id="email" class="required form-control" maxlength="120" />
                                 </div>
                                 <div class="form-group">
-                                    <label for="password" class="control-label"><?= lang('password') ?> *</label>
+                                    <label for="password" class="control-label"><?= lang('passcode') ?> *</label>
                                     <input type="password" id="password" class="required form-control" maxlength="60" />
                                 </div>
                             </div>
