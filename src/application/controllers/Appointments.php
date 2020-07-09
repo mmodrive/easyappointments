@@ -547,6 +547,7 @@ class Appointments extends CI_Controller {
             $this->load->model('services_model');
             $this->load->model('customers_model');
             $this->load->model('settings_model');
+            $this->load->model('pets_model');
 
             // Validate the CAPTCHA string.
             if ($this->settings_model->get_setting('require_captcha') === '1'
@@ -568,15 +569,20 @@ class Appointments extends CI_Controller {
 
             $appointment = $_POST['post_data']['appointment'];
             $customer = $_POST['post_data']['customer'];
+            $pet = $_POST['post_data']['pet'];
+            $is_existing_customer = false;
 
             if ($this->customers_model->exists($customer))
             {
                 $customer['id'] = $this->customers_model->find_record_id($customer);
+                $is_existing_customer = true;
             }
 
             $customer_id = $this->customers_model->add($customer);
             $appointment['id_users_customer'] = $customer_id;
             $appointment['is_unavailable'] = (int)$appointment['is_unavailable']; // needs to be type casted
+            $pet['id_users'] = $customer_id;
+            $appointment['id_pets'] = $this->pets_model->add($pet, $is_existing_customer);
             $appointment['id'] = $this->appointments_model->add($appointment);
             $appointment['hash'] = $this->appointments_model->get_value('hash', $appointment['id']);
 

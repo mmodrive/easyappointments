@@ -141,6 +141,32 @@ window.FrontendBook = window.FrontendBook || {};
             }
         });
 
+        $('#pet_dob').datepicker({
+            dateFormat: 'dd-mm-yy',
+            firstDay: 0,
+            minDate: 0,
+            defaultDate: Date.today(),
+
+            dayNames: [
+                EALang.sunday, EALang.monday, EALang.tuesday, EALang.wednesday,
+                EALang.thursday, EALang.friday, EALang.saturday],
+            dayNamesShort: [EALang.sunday.substr(0, 3), EALang.monday.substr(0, 3),
+                EALang.tuesday.substr(0, 3), EALang.wednesday.substr(0, 3),
+                EALang.thursday.substr(0, 3), EALang.friday.substr(0, 3),
+                EALang.saturday.substr(0, 3)],
+            dayNamesMin: [EALang.sunday.substr(0, 2), EALang.monday.substr(0, 2),
+                EALang.tuesday.substr(0, 2), EALang.wednesday.substr(0, 2),
+                EALang.thursday.substr(0, 2), EALang.friday.substr(0, 2),
+                EALang.saturday.substr(0, 2)],
+            monthNames: [EALang.january, EALang.february, EALang.march, EALang.april,
+                EALang.may, EALang.june, EALang.july, EALang.august, EALang.september,
+                EALang.october, EALang.november, EALang.december],
+            prevText: EALang.previous,
+            nextText: EALang.next,
+            currentText: EALang.now,
+            closeText: EALang.close,
+        });
+
         // Bind the event handlers (might not be necessary every time we use this class).
         if (bindEventHandlers) {
             _bindEventHandlers();
@@ -246,8 +272,20 @@ window.FrontendBook = window.FrontendBook || {};
         $('.button-next').click(function () {
             // If we are on the first step and there is not provider selected do not continue
             // with the next step.
-            if ($(this).attr('data-step_index') === '1' && $('#select-provider').val() == null) {
-                return;
+            if ($(this).attr('data-step_index') === '1') {
+                if ($('#select-provider').val() == null)
+                    return;
+
+                var pets_option = 'N'; // Default value of NO
+                $.each(GlobalVariables.availableServices, function (index, service) {
+                    if (service.id == $('#select-service').val()) {
+                        pets_option = service.pets_option;
+                    }
+                });
+                if( pets_option == 'N' )
+                    $('#step-5').addClass('disabled-step');
+                else
+                    $('#step-5').removeClass('disabled-step');
             }
 
             // If we are on the 2nd tab then the user should have an appointment hour
@@ -270,9 +308,11 @@ window.FrontendBook = window.FrontendBook || {};
                 if (!_validateLoginForm()) {
                     return; // Validation failed, do not continue.
                 } 
+                // button-next-3 is Login, button-reset-3 is Reset
                 if( this.id == 'button-next-3' ){
                     //attempt to login and retrieve customer data
                     if ( $('#login_success').val() == '0' ){
+                        $(this).fadeOut('fast', function(){ $(this).fadeIn('fast');} );
                         FrontendBookApi.loginCustomer( $('#email').val(), $('#password').val());
                         return;
                     }
@@ -319,8 +359,20 @@ window.FrontendBook = window.FrontendBook || {};
                 }
             }
 
+            // If we are on the 5th tab then we will need to validate the user's
+            // input before proceeding to the next step.
+            if ($(this).attr('data-step_index') === '5') {
+                if (!_validatePetForm()) {
+                    return; // Validation failed, do not continue.
+                } else {
+                    FrontendBook.updateConfirmFrame();
+                }
+            }
+
             // Display the next step tab (uses jquery animation effect).
-            var nextTabIndex = parseInt($(this).attr('data-step_index')) + 1;
+            var nextTabIndex = parseInt($(this).data('step_index')) + 1;
+            while( $('#step-' + nextTabIndex).hasClass('disabled-step') )
+                nextTabIndex++;
 
             $(this).parents().eq(1).hide('fade', function () {
                 $('.active-step').removeClass('active-step');
@@ -526,6 +578,36 @@ window.FrontendBook = window.FrontendBook || {};
     }
 
     /**
+     * This function validates the customer's data input. The user cannot continue
+     * without passing all the validation checks.
+     *
+     * @return {Boolean} Returns the validation result.
+     */
+    function _validatePetForm() {
+        $('#wizard-frame-5 .has-error').removeClass('has-error');
+        $('#wizard-frame-5 label.text-danger').removeClass('text-danger');
+
+        try {
+            // Validate required fields.
+            var missingRequiredField = false;
+            $('#wizard-frame-5 .required').each(function () {
+                if ($(this).val() == '') {
+                    $(this).parents('.form-group').addClass('has-error');
+                    missingRequiredField = true;
+                }
+            });
+            if (missingRequiredField) {
+                throw EALang.fields_are_required;
+            }
+
+            return true;
+        } catch (exc) {
+            $('#form-5-message').text(exc);
+            return false;
+        }
+    }
+
+    /**
      * Every time this function is executed, it updates the confirmation page with the latest
      * customer settings and input for the appointment booking.
      */
@@ -616,6 +698,13 @@ window.FrontendBook = window.FrontendBook || {};
             id_users_provider: $('#select-provider').val(),
             id_services: $('#select-service').val()
         };
+
+        postData.pet = {};
+        $('.form-control[id^="pet_"]').each(function () {
+            if ($(this).val() != '') 
+                postData.pet[this.id.substr(4)] = $(this).val();
+        });
+
 
         postData.manage_mode = FrontendBook.manageMode;
 

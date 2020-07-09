@@ -45,6 +45,9 @@
                         <div id="step-5" class="book-step" title="<?= lang('step_five_title') ?>">
                             <strong>5</strong>
                         </div>
+                        <div id="step-6" class="book-step" title="<?= lang('step_six_title') ?>">
+                            <strong>6</strong>
+                        </div>
                     </div>
                 </div>
 
@@ -334,11 +337,96 @@
                     </div>
                 </div>
 
+                <!-- ENTER PET DATA -->
+
+                <div id="wizard-frame-5" class="wizard-frame" style="display:block;">
+                    <div class="frame-container">
+
+                        <h3 class="frame-title"><?= lang('step_five_title') ?></h3>
+
+                        <div class="frame-content row">
+                            <div class="col-xs-12 col-sm-6">
+                                <div class="form-group">
+                                    <label for="pet_id" class="control-label"><?= lang('pet_select') ?></label>
+                                    <select id="pet_id" class="form-control" >
+                                        <option selected value> -- enter new pet -- </option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="pet_name" class="control-label"><?= lang('pet_name') ?> *</label>
+                                    <input type="text" id="pet_name" class="required form-control" maxlength="100" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="pet_breed" class="control-label"><?= lang('pet_breed') ?> *</label>
+                                    <input type="text" id="pet_breed" class="required form-control" maxlength="120" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="pet_colours" class="control-label"><?= lang('pet_colours') ?> *</label>
+                                    <input type="text" id="pet_colours" class="required form-control" maxlength="250" />
+                                </div>
+                            </div>
+
+                            <div class="col-xs-12 col-sm-6">
+                                <div class="form-group">
+                                    <label for="pet_sex" class="control-label"><?= lang('pet_sex') ?> *</label>
+                                    <select id="pet_sex" class="form-control" >
+                                        <option disabled selected value> -- select an option -- </option>
+                                        <?php
+                                            $this->load->model('settings_model');
+                                            $pet_natures = json_decode($this->settings_model->get_setting('pet_sex'));
+
+                                            foreach($pet_natures as $id => $name) {
+                                                echo '<option value="' . $id . '">' . $name . '</option>';
+                                            }
+                                        ?>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="pet_dob" class="control-label"><?= lang('pet_dob') ?> *</label>
+                                    <input type="text" id="pet_dob" class="form-control" maxlength="120" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="pet_nature" class="control-label"><?= lang('pet_nature') ?> *</label>
+                                    <select id="pet_nature" class="form-control" >
+                                        <option disabled selected value> -- select an option -- </option>
+                                        <?php
+                                            $this->load->model('settings_model');
+                                            $pet_natures = json_decode($this->settings_model->get_setting('pet_nature'));
+
+                                            foreach($pet_natures as $id => $name) {
+                                                echo '<option value="' . $id . '">' . $name . '</option>';
+                                            }
+                                        ?>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="pet_attachment" class="control-label"><?= lang('attachment') ?></label>
+                                    <input type="file" id="pet_attachment" class="form-control" maxlength="120" multiple />
+                                </div>
+                            </div>
+
+                            <span id="form-5-message" class="text-danger"><?= lang('fields_are_required') ?></span>
+                        </div>
+                    </div>
+
+                    <div class="command-buttons">
+                        <button type="button" id="button-back-5" class="btn button-back btn-default"
+                                data-step_index="5"><span class="glyphicon glyphicon-backward"></span>
+                            <?= lang('back') ?>
+                        </button>
+                        <button type="button" id="button-next-5" class="btn button-next btn-primary"
+                                data-step_index="5">
+                            <?= lang('next') ?>
+                            <span class="glyphicon glyphicon-forward"></span>
+                        </button>
+                    </div>
+                </div>
+
                 <!-- APPOINTMENT DATA CONFIRMATION -->
 
-                <div id="wizard-frame-5" class="wizard-frame" style="display:none;">
+                <div id="wizard-frame-6" class="wizard-frame" style="display:none;">
                     <div class="frame-container">
-                        <h3 class="frame-title"><?= lang('step_five_title') ?></h3>
+                        <h3 class="frame-title"><?= lang('step_six_title') ?></h3>
                         <div class="frame-content row">
                             <div id="appointment-details" class="col-xs-12 col-sm-6"></div>
                             <div id="customer-details" class="col-xs-12 col-sm-6"></div>
@@ -359,8 +447,8 @@
                     </div>
 
                     <div class="command-buttons">
-                        <button type="button" id="button-back-5" class="btn button-back btn-default"
-                                data-step_index="5">
+                        <button type="button" id="button-back-6" class="btn button-back btn-default"
+                                data-step_index="6">
                             <span class="glyphicon glyphicon-backward"></span>
                             <?= lang('back') ?>
                         </button>

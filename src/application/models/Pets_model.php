@@ -16,90 +16,90 @@
  *
  * @package Models
  */
-class Customers_Model extends CI_Model {
+class Pets_Model extends CI_Model {
     /**
-     * Add a customer record to the database.
+     * Add a pet record to the database.
      *
-     * This method adds a customer to the database. If the customer doesn't exists it is going to be inserted, otherwise
+     * This method adds a pet to the database. If the pet doesn't exists it is going to be inserted, otherwise
      * the record is going to be updated.
      *
-     * @param array $customer Associative array with the customer's data. Each key has the same name with the database
+     * @param array $pet Associative array with the pet's data. Each key has the same name with the database
      * fields.
      *
-     * @return int Returns the customer id.
+     * @return int Returns the pet id.
      */
-    public function add($customer)
+    public function add($pet)
     {
-        // Validate the customer data before doing anything.
-        $this->validate($customer);
+        // Validate the pet data before doing anything.
+        $this->validate($pet);
 
-        // :: CHECK IF CUSTOMER ALREADY EXIST (FROM EMAIL).
-        if ($this->exists($customer) && ! isset($customer['id']))
+        // :: CHECK IF pet ALREADY EXIST (FROM EMAIL).
+        if ($this->exists($pet) && ! isset($pet['id']))
         {
-            // Find the customer id from the database.
-            $customer['id'] = $this->find_record_id($customer);
+            // Find the pet id from the database.
+            $pet['id'] = $this->find_record_id($pet);
         }
 
-        // :: INSERT OR UPDATE CUSTOMER RECORD
-        if ( ! isset($customer['id']))
+        // :: INSERT OR UPDATE pet RECORD
+        if ( ! isset($pet['id']))
         {
-            $customer['id'] = $this->_insert($customer);
+            $pet['id'] = $this->_insert($pet);
         }
         else
         {
-            $this->_update($customer);
+            $this->_update($pet);
         }
 
-        return $customer['id'];
+        return $pet['id'];
     }
 
     /**
-     * Check if a particular customer record already exists.
+     * Check if a particular pet record already exists.
      *
-     * This method checks whether the given customer already exists in the database. It doesn't search with the id, but
+     * This method checks whether the given pet already exists in the database. It doesn't search with the id, but
      * with the following fields: "email"
      *
-     * @param array $customer Associative array with the customer's data. Each key has the same name with the database
+     * @param array $pet Associative array with the pet's data. Each key has the same name with the database
      * fields.
      *
      * @return bool Returns whether the record exists or not.
      *
-     * @throws Exception If customer email property is missing.
+     * @throws Exception If pet email property is missing.
      */
-    public function exists($customer)
+    public function exists($pet)
     {
-        if ( ! isset($customer['email']))
+        if ( ! isset($pet['id_users']) || ! isset($pet['name']))
         {
-            throw new Exception('Customer\'s email is not provided.');
+            throw new Exception('pet\'s owner or pet\'s name is not provided.');
         }
 
         // This method shouldn't depend on another method of this class.
         $num_rows = $this->db
             ->select('*')
             ->from('ea_users')
-            ->join('ea_roles', 'ea_roles.id = ea_users.id_roles', 'inner')
-            ->where('ea_users.email', $customer['email'])
-            ->where('ea_roles.slug', DB_SLUG_CUSTOMER)
+            ->join('ea_pets', 'ea_users.id = ea_pets.id_users', 'inner')
+            ->where('ea_pets.name', $pet['name'])
+            ->where('ea_users.id', $pet['id_users'])
             ->get()->num_rows();
 
         return ($num_rows > 0) ? TRUE : FALSE;
     }
 
     /**
-     * Insert a new customer record to the database.
+     * Insert a new pet record to the database.
      *
-     * @param array $customer Associative array with the customer's data. Each key has the same name with the database
+     * @param array $pet Associative array with the pet's data. Each key has the same name with the database
      * fields.
      *
      * @return int Returns the id of the new record.
      *
-     * @throws Exception If customer record could not be inserted.
+     * @throws Exception If pet record could not be inserted.
      */
-    protected function _insert($customer)
+    protected function _insert($pet)
     {
         $this->load->helper('general');
 
-        // Before inserting the customer we need to get the customer's role id
+        // Before inserting the pet we need to get the pet's role id
         // from the database and assign it to the new record as a foreign key.
         $customer_role_id = $this->db
             ->select('id')
@@ -107,27 +107,27 @@ class Customers_Model extends CI_Model {
             ->where('slug', DB_SLUG_CUSTOMER)
             ->get()->row()->id;
 
-        $customer['id_roles'] = $customer_role_id;
-        $settings = $customer['settings'];
-        unset($customer['settings']);
+        $pet['id_roles'] = $customer_role_id;
+        $settings = $pet['settings'];
+        unset($pet['settings']);
 
         $this->db->trans_begin();
 
-        if ( ! $this->db->insert('ea_users', $customer))
+        if ( ! $this->db->insert('ea_users', $pet))
         {
-            throw new Exception('Could not insert customer to the database.');
+            throw new Exception('Could not insert pet to the database.');
         }
 
-        $customer['id'] = (int)$this->db->insert_id();
-        $settings['id_users'] = $customer['id'];
+        $pet['id'] = (int)$this->db->insert_id();
+        $settings['id_users'] = $pet['id'];
         $settings['salt'] = generate_salt();
         $settings['password'] = hash_password($settings['salt'], $settings['password']);
 
-        // Insert customer settings. 
+        // Insert pet settings. 
         if ( ! $this->db->insert('ea_user_settings', $settings))
         {
             $this->db->trans_rollback();
-            throw new Exception('Could not insert customer settings into the database.');
+            throw new Exception('Could not insert pet settings into the database.');
         }
 
         $this->db->trans_complete();
@@ -136,41 +136,41 @@ class Customers_Model extends CI_Model {
     }
 
     /**
-     * Update an existing customer record in the database.
+     * Update an existing pet record in the database.
      *
-     * The customer data argument should already include the record ID in order to process the update operation.
+     * The pet data argument should already include the record ID in order to process the update operation.
      *
-     * @param array $customer Associative array with the customer's data. Each key has the same name with the database
+     * @param array $pet Associative array with the pet's data. Each key has the same name with the database
      * fields.
      *
      * @return int Returns the updated record ID.
      *
-     * @throws Exception If customer record could not be updated.
+     * @throws Exception If pet record could not be updated.
      */
-    protected function _update($customer)
+    protected function _update($pet)
     {
         $this->load->helper('general');
 
         // Do not update empty string values.
-        foreach ($customer as $key => $value)
+        foreach ($pet as $key => $value)
         {
             if ($value === '')
             {
-                unset($customer[$key]);
+                unset($pet[$key]);
             }
         }
 
-        $settings = $customer['settings'];
-        $settings_row = $this->db->get_where('ea_user_settings', ['id_users' => $customer['id']])->row();
-        unset($customer['settings']);
-        $settings['id_users'] = $customer['id'];
+        $settings = $pet['settings'];
+        $settings_row = $this->db->get_where('ea_user_settings', ['id_users' => $pet['id']])->row();
+        unset($pet['settings']);
+        $settings['id_users'] = $pet['id'];
 
         $this->db->trans_begin();
 
-        $this->db->where('id', $customer['id']);
-        if ( ! $this->db->update('ea_users', $customer))
+        $this->db->where('id', $pet['id']);
+        if ( ! $this->db->update('ea_users', $pet))
         {
-            throw new Exception('Could not update customer to the database.');
+            throw new Exception('Could not update pet to the database.');
         }
 
         if( !empty($settings) ){
@@ -184,113 +184,113 @@ class Customers_Model extends CI_Model {
             }
 
             if( isset($settings_row) ){
-                // Update customer settings.
+                // Update pet settings.
                 $this->db->where('id_users', $settings['id_users']);
                 if ( ! $this->db->update('ea_user_settings', $settings))
                 {
-                    throw new Exception('Could not update customer settings.');
+                    throw new Exception('Could not update pet settings.');
                 }
             }
             else
             {
-                // Insert customer settings. 
+                // Insert pet settings. 
                 if ( ! $this->db->insert('ea_user_settings', $settings))
                 {
                     $this->db->trans_rollback();
-                    throw new Exception('Could not insert customer settings into the database.');
+                    throw new Exception('Could not insert pet settings into the database.');
                 }
             }
         }
 
         $this->db->trans_complete();
 
-        return (int)$customer['id'];
+        return (int)$pet['id'];
     }
 
     /**
-     * Find the database id of a customer record.
+     * Find the database id of a pet record.
      *
-     * The customer data should include the following fields in order to get the unique id from the database: "email"
+     * The pet data should include the following fields in order to get the unique id from the database: "email"
      *
      * IMPORTANT: The record must already exists in the database, otherwise an exception is raised.
      *
-     * @param array $customer Array with the customer data. The keys of the array should have the same names as the
+     * @param array $pet Array with the pet data. The keys of the array should have the same names as the
      * database fields.
      *
      * @return int Returns the ID.
      *
-     * @throws Exception If customer record does not exist.
+     * @throws Exception If pet record does not exist.
      */
-    public function find_record_id($customer)
+    public function find_record_id($pet)
     {
-        if ( ! isset($customer['email']))
+        if ( ! isset($pet['email']))
         {
-            throw new Exception('Customer\'s email was not provided: '
-                . print_r($customer, TRUE));
+            throw new Exception('pet\'s email was not provided: '
+                . print_r($pet, TRUE));
         }
 
-        // Get customer's role id
+        // Get pet's role id
         $result = $this->db
             ->select('ea_users.id')
             ->from('ea_users')
             ->join('ea_roles', 'ea_roles.id = ea_users.id_roles', 'inner')
-            ->where('ea_users.email', $customer['email'])
+            ->where('ea_users.email', $pet['email'])
             ->where('ea_roles.slug', DB_SLUG_CUSTOMER)
             ->get();
 
         if ($result->num_rows() == 0)
         {
-            throw new Exception('Could not find customer record id.');
+            throw new Exception('Could not find pet record id.');
         }
 
         return $result->row()->id;
     }
 
     /**
-     * Validate customer data before the insert or update operation is executed.
+     * Validate pet data before the insert or update operation is executed.
      *
-     * @param array $customer Contains the customer data.
+     * @param array $pet Contains the pet data.
      *
      * @return bool Returns the validation result.
      *
-     * @throws Exception If customer validation fails.
+     * @throws Exception If pet validation fails.
      */
-    public function validate($customer)
+    public function validate($pet)
     {
         $this->load->helper('data_validation');
 
-        // If a customer id is provided, check whether the record
+        // If a pet id is provided, check whether the record
         // exist in the database.
-        if (isset($customer['id']))
+        if (isset($pet['id']))
         {
             $num_rows = $this->db->get_where('ea_users',
-                ['id' => $customer['id']])->num_rows();
+                ['id' => $pet['id']])->num_rows();
             if ($num_rows == 0)
             {
-                throw new Exception('Provided customer id does not '
+                throw new Exception('Provided pet id does not '
                     . 'exist in the database.');
             }
         }
         // Validate required fields
-        if ( ! isset($customer['last_name'])
-            || ! isset($customer['email'])
-            || ! isset($customer['phone_number']))
+        if ( ! isset($pet['last_name'])
+            || ! isset($pet['email'])
+            || ! isset($pet['phone_number']))
         {
             throw new Exception('Not all required fields are provided: '
-                . print_r($customer, TRUE));
+                . print_r($pet, TRUE));
         }
 
         // Validate email address
-        if ( ! filter_var($customer['email'], FILTER_VALIDATE_EMAIL))
+        if ( ! filter_var($pet['email'], FILTER_VALIDATE_EMAIL))
         {
             throw new Exception('Invalid email address provided: '
-                . $customer['email']);
+                . $pet['email']);
         }
 
-        // Validate customer password
-        if (isset($customer['settings']['password']))
+        // Validate pet password
+        if (isset($pet['settings']['password']))
         {
-            if (strlen($customer['settings']['password']) < MIN_PASSWORD_LENGTH)
+            if (strlen($pet['settings']['password']) < MIN_PASSWORD_LENGTH)
             {
                 throw new Exception('The user password must be at least '
                     . MIN_PASSWORD_LENGTH . ' characters long.');
@@ -298,21 +298,21 @@ class Customers_Model extends CI_Model {
         }
 
         // When inserting a record the email address must be unique.
-        $customer_id = (isset($customer['id'])) ? $customer['id'] : '';
+        $customer_id = (isset($pet['id'])) ? $pet['id'] : '';
 
         $num_rows = $this->db
             ->select('*')
             ->from('ea_users')
             ->join('ea_roles', 'ea_roles.id = ea_users.id_roles', 'inner')
             ->where('ea_roles.slug', DB_SLUG_CUSTOMER)
-            ->where('ea_users.email', $customer['email'])
+            ->where('ea_users.email', $pet['email'])
             ->where('ea_users.id <>', $customer_id)
             ->get()
             ->num_rows();
 
         if ($num_rows > 0)
         {
-            throw new Exception('Given email address belongs to another customer record. '
+            throw new Exception('Given email address belongs to another pet record. '
                 . 'Please use a different email.');
         }
 
@@ -320,7 +320,7 @@ class Customers_Model extends CI_Model {
     }
 
     /**
-     * Delete an existing customer record from the database.
+     * Delete an existing pet record from the database.
      *
      * @param int $customer_id The record id to be deleted.
      *
@@ -361,13 +361,13 @@ class Customers_Model extends CI_Model {
             throw new Exception('Invalid argument provided as $customer_id : ' . $customer_id);
         }
 
-        $customer = $this->db->get_where('ea_users', ['id' => $customer_id])->row_array();
+        $pet = $this->db->get_where('ea_users', ['id' => $customer_id])->row_array();
 
-        $customer['settings'] = $this->db->get_where('ea_user_settings',
+        $pet['settings'] = $this->db->get_where('ea_user_settings',
             ['id_users' => $customer_id])->row_array();
-        unset($customer['settings']['id_users']);
+        unset($pet['settings']['id_users']);
 
-        return $customer;
+        return $pet;
     }
 
     /**
@@ -380,7 +380,7 @@ class Customers_Model extends CI_Model {
      *
      * @throws Exception If $customer_id argument is invalid.
      * @throws Exception If $field_name argument is invalid.
-     * @throws Exception If requested customer record does not exist in the database.
+     * @throws Exception If requested pet record does not exist in the database.
      * @throws Exception If requested field name does not exist in the database.
      */
     public function get_value($field_name, $customer_id)
@@ -411,9 +411,9 @@ class Customers_Model extends CI_Model {
                 . 'exist in the database: ' . $field_name);
         }
 
-        $customer = $this->db->get_where('ea_users', ['id' => $customer_id])->row_array();
+        $pet = $this->db->get_where('ea_users', ['id' => $customer_id])->row_array();
 
-        return $customer[$field_name];
+        return $pet[$field_name];
     }
 
     /**
@@ -439,12 +439,12 @@ class Customers_Model extends CI_Model {
 
         $batch = $this->db->get('ea_users')->result_array();
 
-        // Get every customer settings.
-        foreach ($batch as &$customer)
+        // Get every pet settings.
+        foreach ($batch as &$pet)
         {
-            $customer['settings'] = $this->db->get_where('ea_user_settings',
-                ['id_users' => $customer['id']])->row_array();
-            unset($customer['settings']['id_users']);
+            $pet['settings'] = $this->db->get_where('ea_user_settings',
+                ['id_users' => $pet['id']])->row_array();
+            unset($pet['settings']['id_users']);
         }
 
         return $batch;
@@ -453,7 +453,7 @@ class Customers_Model extends CI_Model {
     /**
      * Get the customers role id from the database.
      *
-     * @return int Returns the role id for the customer records.
+     * @return int Returns the role id for the pet records.
      */
     public function get_customers_role_id()
     {
@@ -485,8 +485,8 @@ class Customers_Model extends CI_Model {
     {
         $this->load->helper('general');
 
-        $customer = [ 'email' => $email ];
-        $customer_id = $this->customers_model->find_record_id($customer);
+        $pet = [ 'email' => $email ];
+        $customer_id = $this->customers_model->find_record_id($pet);
 
         $salt = $this->customers_model->get_salt($customer_id);
         if ( !$salt )
@@ -494,7 +494,7 @@ class Customers_Model extends CI_Model {
 
         $password = hash_password($salt, $password);
 
-        $customer = $this->db
+        $pet = $this->db
             ->select('ea_users.*')
             ->from('ea_users')
             ->join('ea_user_settings', 'ea_user_settings.id_users = ea_users.id', 'inner')
@@ -502,6 +502,6 @@ class Customers_Model extends CI_Model {
             ->where('ea_user_settings.password', $password)
             ->get()->row_array();
 
-        return ($customer) ? $customer : NULL;
+        return ($pet) ? $pet : NULL;
     }
 }

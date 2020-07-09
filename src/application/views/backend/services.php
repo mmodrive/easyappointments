@@ -134,6 +134,20 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="pets_option"><?= lang('pets_option') ?> *</label>
+                        <select id="pets_option" class="form-control" >
+                            <?php
+                                $this->load->model('settings_model');
+                                $pet_natures = json_decode($this->settings_model->get_setting('pet_appointments'));
+
+                                foreach($pet_natures as $id => $name) {
+                                    echo '<option value="' . $id . '">' . $name . '</option>';
+                                }
+                            ?>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
                         <label for="service-description"><?= lang('description') ?></label>
                         <textarea id="service-description" rows="4" class="form-control"></textarea>
                     </div>

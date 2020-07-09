@@ -58,10 +58,14 @@ body {
 }
 
 #book-appointment-wizard #steps {
-    width: 225px;
+    width: 270px;
     display: inline-block;
     float: right;
     margin-top: 17px;
+}
+
+#book-appointment-wizard #steps .disabled-step {
+    background: lightgray;
 }
 
 #book-appointment-wizard .wizard-frame {
