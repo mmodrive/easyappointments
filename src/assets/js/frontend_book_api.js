@@ -112,7 +112,28 @@ window.FrontendBookApi = window.FrontendBookApi || {};
             'password': password
         };
 
-        $.post(postUrl, postData, function(response) {
+        var $layer = $('<div/>');
+
+        $.ajax({
+            url: postUrl,
+            method: 'post',
+            data: postData,
+            dataType: 'json',
+            beforeSend: function (jqxhr, settings) {
+                $layer
+                    .appendTo('body')
+                    .css({
+                        background: 'white',
+                        position: 'fixed',
+                        top: '0',
+                        left: '0',
+                        height: '100vh',
+                        width: '100vw',
+                        opacity: '0.5'
+                    });
+            }
+        })
+        .done(function (response) {
             if (!GeneralFunctions.handleAjaxExceptions(response)) {
                 return;
             }
@@ -128,7 +149,10 @@ window.FrontendBookApi = window.FrontendBookApi || {};
                 $('#login_success').val('0');
                 $('#form-3-message').text(EALang['login_failed']);
             }
-        }, 'json');
+        })
+        .always(function () {
+            $layer.remove();
+        });
     };
 
     /**
