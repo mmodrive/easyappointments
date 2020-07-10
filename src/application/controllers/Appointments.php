@@ -539,6 +539,7 @@ class Appointments extends CI_Controller {
     {
         try
         {
+            $_POST["post_data"] = json_decode($_POST["post_data"], true);
             $post_data = $this->input->post('post_data'); // alias
             $post_data['manage_mode'] = filter_var($post_data['manage_mode'], FILTER_VALIDATE_BOOLEAN);
 
@@ -567,9 +568,9 @@ class Appointments extends CI_Controller {
                 throw new Exception($this->lang->line('requested_hour_is_unavailable'));
             }
 
-            $appointment = $_POST['post_data']['appointment'];
-            $customer = $_POST['post_data']['customer'];
-            $pet = $_POST['post_data']['pet'];
+            $appointment = $post_data['appointment'];
+            $customer = $post_data['customer'];
+            $pet = $post_data['pet'];
             $is_existing_customer = false;
 
             if ($this->customers_model->exists($customer))

@@ -144,8 +144,6 @@ window.FrontendBook = window.FrontendBook || {};
         $('#pet_dob').datepicker({
             dateFormat: 'dd-mm-yy',
             firstDay: 0,
-            minDate: 0,
-            defaultDate: Date.today(),
 
             dayNames: [
                 EALang.sunday, EALang.monday, EALang.tuesday, EALang.wednesday,
@@ -282,10 +280,14 @@ window.FrontendBook = window.FrontendBook || {};
                         pets_option = service.pets_option;
                     }
                 });
-                if( pets_option == 'N' )
+                if( pets_option == 'N' ){
                     $('#step-5').addClass('disabled-step');
-                else
+                    $('#pet-details').hide();
+                }
+                else{
                     $('#step-5').removeClass('disabled-step');
+                    $('#pet-details').show();
+                }
             }
 
             // If we are on the 2nd tab then the user should have an appointment hour
@@ -497,6 +499,20 @@ window.FrontendBook = window.FrontendBook || {};
                 FrontendBookApi.applyPreviousUnavailableDates(); // New jQuery UI version will replace the td elements.
             }, 300); // There is no draw event unfortunately.
         })
+
+        $('#pet_id').change(function (event) {
+            var values = $(this).find('option:selected').data('pet');
+            if( values )
+                $.each(values, function (key, value) {
+                    if(key == 'dob')
+                        $('.form-control[id="pet_' + key + '"]').datepicker('setDate',
+                            Date.parseExact(value, 'yyyy-MM-dd HH:mm:ss'));
+                    else
+                        $('.form-control[id="pet_' + key + '"]').val(value);
+                });
+            else
+                $('.form-control[id^="pet_"]:not([id="pet_id"])').val('');
+        });
     }
 
      /**
@@ -672,6 +688,35 @@ window.FrontendBook = window.FrontendBook || {};
 
         $('#customer-details').html(html);
 
+        // Pet Details
+        var pet_name = GeneralFunctions.escapeHtml($('#pet_name').val());
+        var pet_breed = GeneralFunctions.escapeHtml($('#pet_breed').val());
+        var pet_colours = GeneralFunctions.escapeHtml($('#pet_colours').val());
+        var pet_sex = GeneralFunctions.escapeHtml($('#pet_sex option:selected').text());
+        var pet_dob = '';
+        if($('#pet_dob').datepicker('getDate'))
+            pet_dob = GeneralFunctions.formatDate($('#pet_dob').datepicker('getDate'), GlobalVariables.dateFormat);
+        var pet_nature = GeneralFunctions.escapeHtml($('#pet_nature option:selected').text());
+        var pet_attachment = $('#pet_attachment').get(0).files.length;
+
+        html =
+            '<h4>' + pet_name + '</h4>' +
+            '<p>' +
+            EALang.pet_breed + ': ' + pet_breed +
+            '<br/>' +
+            EALang.pet_colours + ': ' + pet_colours +
+            '<br/>' +
+            EALang.pet_sex + ': ' + pet_sex +
+            '<br/>' +
+            EALang.pet_dob + ': ' + pet_dob +
+            '<br/>' +
+            EALang.pet_nature + ': ' + pet_nature +
+            '<br/>' +
+            EALang.attachment + ': ' + pet_attachment +
+            '</p>';
+
+        $('#pet-details').html(html);
+
         // Update appointment form data for submission to server when the user confirms
         // the appointment.
         var postData = {};
@@ -701,8 +746,14 @@ window.FrontendBook = window.FrontendBook || {};
 
         postData.pet = {};
         $('.form-control[id^="pet_"]').each(function () {
-            if ($(this).val() != '') 
-                postData.pet[this.id.substr(4)] = $(this).val();
+            if ($(this).val() != ''){ 
+                if($(this).is(':input[type="file"]'))
+                    postData.pet[this.id.substr(4)] = this.id;
+                else if(this.id == 'pet_dob')
+                    postData.pet[this.id.substr(4)] = $(this).datepicker('getDate').toString('yyyy-MM-dd');
+                else
+                    postData.pet[this.id.substr(4)] = $(this).val();
+            }
         });
 
 
@@ -765,6 +816,22 @@ window.FrontendBook = window.FrontendBook || {};
             $('#address').val(customer.address);
             $('#city').val(customer.city);
             $('#zip-code').val(customer.zip_code);
+
+            var pet_select = $('#pet_id');
+            pet_select.find('option:not(:first)').remove();
+            $.each(customer.pets, function(iPet, pet){
+                pet_select.append($('<option>', { 
+                    value: pet.id,
+                    text : pet.name,
+                    'data-pet': JSON.stringify(pet)
+                }));
+            } );
+
+            if( pet_select.find('option').length == 1 )
+                pet_select.val('');
+            else if( pet_select.find('option').length == 2 )
+                pet_select.val(pet_select.find('option:not(:first)').val());
+            pet_select.change();
 
             return true;
         } catch (exc) {

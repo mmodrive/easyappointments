@@ -367,6 +367,9 @@ class Customers_Model extends CI_Model {
             ['id_users' => $customer_id])->row_array();
         unset($customer['settings']['id_users']);
 
+        $customer['pets'] = $this->db->get_where('ea_pets',
+            ['id_users' => $customer_id])->row_array();
+
         return $customer;
     }
 
@@ -501,6 +504,9 @@ class Customers_Model extends CI_Model {
             ->where('ea_users.email', $email)
             ->where('ea_user_settings.password', $password)
             ->get()->row_array();
+
+        $customer['pets'] = $this->db->get_where('ea_pets',
+            ['id_users' => $customer_id])->result_array();
 
         return ($customer) ? $customer : NULL;
     }

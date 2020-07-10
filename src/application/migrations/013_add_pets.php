@@ -93,7 +93,8 @@ class Migration_Add_pets extends CI_Migration {
                 ON UPDATE CURRENT_TIMESTAMP,
                 `id_pets` INT,
                 `filename` VARCHAR(256),
-                `content` LONGBLOB,
+                `type` VARCHAR(256),
+                `storage_name` VARCHAR(256),
                 PRIMARY KEY (`id`)
             )
                 ENGINE = InnoDB

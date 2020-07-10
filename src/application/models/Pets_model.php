@@ -40,6 +40,16 @@ class Pets_Model extends CI_Model {
             $pet['id'] = $this->find_record_id($pet);
         }
 
+        $attachments = 0;
+        if( isset($pet['attachment']) ){
+            if ( !is_numeric($pet['attachment']) )
+                throw new Exception('attachment is expected to specify number of attachments if any.');
+            $attachments = (int)$pet['attachment'];
+            unset($pet['attachment']);
+        }
+
+        $this->db->trans_begin();
+
         // :: INSERT OR UPDATE pet RECORD
         if ( ! isset($pet['id']))
         {
@@ -49,6 +59,33 @@ class Pets_Model extends CI_Model {
         {
             $this->_update($pet);
         }
+
+        if( $attachments > 0 ){
+
+            for($i=0; $i<count($_FILES['pet_attachment']['name']); $i++){
+                $target_path = FCPATH.'storage/uploads/';
+                $ext = explode('.', basename( $_FILES['pet_attachment']['name'][$i]));
+                $storage_name = md5(uniqid()) . "." . $ext[count($ext)-1];
+                $target_path = $target_path . $storage_name; 
+                $tmp_path = $_FILES['pet_attachment']['tmp_name'][$i];
+
+                if(!move_uploaded_file($tmp_path, $target_path))
+                    throw new Exception("There was an error uploading the file, please try again!");
+
+                $attachment = [ 
+                    'id_pets' => $pet['id'], 
+                    'type' => $_FILES['pet_attachment']['type'][$i],
+                    'filename' => $_FILES['pet_attachment']['name'][$i],
+                    'storage_name' => $storage_name
+                ];
+
+                if ( ! $this->db->insert('ea_attachments', $attachment))
+                    throw new Exception('Could not insert pet to the database.');
+            }
+
+        }
+
+        $this->db->trans_complete();
 
         return $pet['id'];
     }
@@ -70,7 +107,7 @@ class Pets_Model extends CI_Model {
     {
         if ( ! isset($pet['id_users']) || ! isset($pet['name']))
         {
-            throw new Exception('pet\'s owner or pet\'s name is not provided.');
+            throw new Exception('Pet\'s owner or pet\'s name is not provided.');
         }
 
         // This method shouldn't depend on another method of this class.
@@ -97,40 +134,12 @@ class Pets_Model extends CI_Model {
      */
     protected function _insert($pet)
     {
-        $this->load->helper('general');
-
-        // Before inserting the pet we need to get the pet's role id
-        // from the database and assign it to the new record as a foreign key.
-        $customer_role_id = $this->db
-            ->select('id')
-            ->from('ea_roles')
-            ->where('slug', DB_SLUG_CUSTOMER)
-            ->get()->row()->id;
-
-        $pet['id_roles'] = $customer_role_id;
-        $settings = $pet['settings'];
-        unset($pet['settings']);
-
-        $this->db->trans_begin();
-
-        if ( ! $this->db->insert('ea_users', $pet))
+        if ( ! $this->db->insert('ea_pets', $pet))
         {
             throw new Exception('Could not insert pet to the database.');
         }
 
         $pet['id'] = (int)$this->db->insert_id();
-        $settings['id_users'] = $pet['id'];
-        $settings['salt'] = generate_salt();
-        $settings['password'] = hash_password($settings['salt'], $settings['password']);
-
-        // Insert pet settings. 
-        if ( ! $this->db->insert('ea_user_settings', $settings))
-        {
-            $this->db->trans_rollback();
-            throw new Exception('Could not insert pet settings into the database.');
-        }
-
-        $this->db->trans_complete();
 
         return (int)$this->db->insert_id();
     }
@@ -149,60 +158,20 @@ class Pets_Model extends CI_Model {
      */
     protected function _update($pet)
     {
-        $this->load->helper('general');
-
         // Do not update empty string values.
-        foreach ($pet as $key => $value)
-        {
-            if ($value === '')
-            {
-                unset($pet[$key]);
-            }
-        }
-
-        $settings = $pet['settings'];
-        $settings_row = $this->db->get_where('ea_user_settings', ['id_users' => $pet['id']])->row();
-        unset($pet['settings']);
-        $settings['id_users'] = $pet['id'];
-
-        $this->db->trans_begin();
+        // foreach ($pet as $key => $value)
+        // {
+        //     if ($value === '')
+        //     {
+        //         unset($pet[$key]);
+        //     }
+        // }
 
         $this->db->where('id', $pet['id']);
-        if ( ! $this->db->update('ea_users', $pet))
+        if ( ! $this->db->update('ea_pets', $pet))
         {
             throw new Exception('Could not update pet to the database.');
         }
-
-        if( !empty($settings) ){
-            if (isset($settings['password']))
-            {
-                if( isset($settings_row) )
-                    $salt = $settings_row->salt;
-                else 
-                    $settings['salt'] = $salt = generate_salt();
-                $settings['password'] = hash_password($salt, $settings['password']);
-            }
-
-            if( isset($settings_row) ){
-                // Update pet settings.
-                $this->db->where('id_users', $settings['id_users']);
-                if ( ! $this->db->update('ea_user_settings', $settings))
-                {
-                    throw new Exception('Could not update pet settings.');
-                }
-            }
-            else
-            {
-                // Insert pet settings. 
-                if ( ! $this->db->insert('ea_user_settings', $settings))
-                {
-                    $this->db->trans_rollback();
-                    throw new Exception('Could not insert pet settings into the database.');
-                }
-            }
-        }
-
-        $this->db->trans_complete();
 
         return (int)$pet['id'];
     }
@@ -223,19 +192,17 @@ class Pets_Model extends CI_Model {
      */
     public function find_record_id($pet)
     {
-        if ( ! isset($pet['email']))
+        if ( ! isset($pet['id_users']) || ! isset($pet['name']))
         {
-            throw new Exception('pet\'s email was not provided: '
-                . print_r($pet, TRUE));
+            throw new Exception('Pet\'s owner or pet\'s name is not provided.');
         }
 
-        // Get pet's role id
         $result = $this->db
-            ->select('ea_users.id')
+            ->select('ea_pets.id')
             ->from('ea_users')
-            ->join('ea_roles', 'ea_roles.id = ea_users.id_roles', 'inner')
-            ->where('ea_users.email', $pet['email'])
-            ->where('ea_roles.slug', DB_SLUG_CUSTOMER)
+            ->join('ea_pets', 'ea_users.id = ea_pets.id_users', 'inner')
+            ->where('ea_pets.name', $pet['name'])
+            ->where('ea_users.id', $pet['id_users'])
             ->get();
 
         if ($result->num_rows() == 0)
@@ -263,7 +230,7 @@ class Pets_Model extends CI_Model {
         // exist in the database.
         if (isset($pet['id']))
         {
-            $num_rows = $this->db->get_where('ea_users',
+            $num_rows = $this->db->get_where('ea_pets',
                 ['id' => $pet['id']])->num_rows();
             if ($num_rows == 0)
             {
@@ -272,48 +239,34 @@ class Pets_Model extends CI_Model {
             }
         }
         // Validate required fields
-        if ( ! isset($pet['last_name'])
-            || ! isset($pet['email'])
-            || ! isset($pet['phone_number']))
+        if ( ! isset($pet['name'])
+            || ! isset($pet['breed'])
+            || ! isset($pet['colours'])
+            || ! isset($pet['sex'])
+            || ! isset($pet['dob'])
+            || ! isset($pet['nature'])
+        )
         {
             throw new Exception('Not all required fields are provided: '
                 . print_r($pet, TRUE));
         }
 
-        // Validate email address
-        if ( ! filter_var($pet['email'], FILTER_VALIDATE_EMAIL))
-        {
-            throw new Exception('Invalid email address provided: '
-                . $pet['email']);
-        }
-
-        // Validate pet password
-        if (isset($pet['settings']['password']))
-        {
-            if (strlen($pet['settings']['password']) < MIN_PASSWORD_LENGTH)
-            {
-                throw new Exception('The user password must be at least '
-                    . MIN_PASSWORD_LENGTH . ' characters long.');
-            }
-        }
-
-        // When inserting a record the email address must be unique.
-        $customer_id = (isset($pet['id'])) ? $pet['id'] : '';
+        // When inserting a pet the name must be unique.
+        $pet_id = (isset($pet['id'])) ? $pet['id'] : '';
 
         $num_rows = $this->db
             ->select('*')
-            ->from('ea_users')
-            ->join('ea_roles', 'ea_roles.id = ea_users.id_roles', 'inner')
-            ->where('ea_roles.slug', DB_SLUG_CUSTOMER)
-            ->where('ea_users.email', $pet['email'])
-            ->where('ea_users.id <>', $customer_id)
+            ->from('ea_pets')
+            ->where('name', $pet['name'])
+            ->where('id_users', $pet['id_users'])
+            ->where('id <>', $pet_id)
             ->get()
             ->num_rows();
 
         if ($num_rows > 0)
         {
-            throw new Exception('Given email address belongs to another pet record. '
-                . 'Please use a different email.');
+            throw new Exception('A pet with this name already exists. '
+                . 'Please select from existing to update or check the name.');
         }
 
         return TRUE;
@@ -322,50 +275,49 @@ class Pets_Model extends CI_Model {
     /**
      * Delete an existing pet record from the database.
      *
-     * @param int $customer_id The record id to be deleted.
+     * @param int $pet_id The record id to be deleted.
      *
      * @return bool Returns the delete operation result.
      *
-     * @throws Exception If $customer_id argument is invalid.
+     * @throws Exception If $pet_id argument is invalid.
      */
-    public function delete($customer_id)
+    public function delete($pet_id)
     {
-        if ( ! is_numeric($customer_id))
+        if ( ! is_numeric($pet_id))
         {
-            throw new Exception('Invalid argument type $customer_id: ' . $customer_id);
+            throw new Exception('Invalid argument type $pet_id: ' . $pet_id);
         }
 
-        $num_rows = $this->db->get_where('ea_users', ['id' => $customer_id])->num_rows();
+        $num_rows = $this->db->get_where('ea_pets', ['id' => $pet_id])->num_rows();
         if ($num_rows == 0)
         {
             return FALSE;
         }
 
-        return $this->db->delete('ea_users', ['id' => $customer_id]);
+        return $this->db->delete('ea_pets', ['id' => $pet_id]);
     }
 
     /**
      * Get a specific row from the appointments table.
      *
-     * @param int $customer_id The record's id to be returned.
+     * @param int $pet_id The record's id to be returned.
      *
      * @return array Returns an associative array with the selected record's data. Each key has the same name as the
      * database field names.
      *
-     * @throws Exception If $customer_id argumnet is invalid.
+     * @throws Exception If $pet_id argumnet is invalid.
      */
-    public function get_row($customer_id)
+    public function get_row($pet_id)
     {
-        if ( ! is_numeric($customer_id))
+        if ( ! is_numeric($pet_id))
         {
-            throw new Exception('Invalid argument provided as $customer_id : ' . $customer_id);
+            throw new Exception('Invalid argument provided as $pet_id : ' . $pet_id);
         }
 
-        $pet = $this->db->get_where('ea_users', ['id' => $customer_id])->row_array();
+        $pet = $this->db->get_where('ea_pets', ['id' => $pet_id])->row_array();
 
-        $pet['settings'] = $this->db->get_where('ea_user_settings',
-            ['id_users' => $customer_id])->row_array();
-        unset($pet['settings']['id_users']);
+        $pet['appointments'] = $this->db->get_where('ea_appointments',
+            ['id_pets' => $pet_id])->row_array();
 
         return $pet;
     }
@@ -374,21 +326,21 @@ class Pets_Model extends CI_Model {
      * Get a specific field value from the database.
      *
      * @param string $field_name The field name of the value to be returned.
-     * @param int $customer_id The selected record's id.
+     * @param int $pet_id The selected record's id.
      *
      * @return string Returns the records value from the database.
      *
-     * @throws Exception If $customer_id argument is invalid.
+     * @throws Exception If $pet_id argument is invalid.
      * @throws Exception If $field_name argument is invalid.
      * @throws Exception If requested pet record does not exist in the database.
      * @throws Exception If requested field name does not exist in the database.
      */
-    public function get_value($field_name, $customer_id)
+    public function get_value($field_name, $pet_id)
     {
-        if ( ! is_numeric($customer_id))
+        if ( ! is_numeric($pet_id))
         {
-            throw new Exception('Invalid argument provided as $customer_id: '
-                . $customer_id);
+            throw new Exception('Invalid argument provided as $pet_id: '
+                . $pet_id);
         }
 
         if ( ! is_string($field_name))
@@ -397,111 +349,21 @@ class Pets_Model extends CI_Model {
                 . $field_name);
         }
 
-        if ($this->db->get_where('ea_users', ['id' => $customer_id])->num_rows() == 0)
+        if ($this->db->get_where('ea_pets', ['id' => $pet_id])->num_rows() == 0)
         {
-            throw new Exception('The record with the $customer_id argument '
-                . 'does not exist in the database: ' . $customer_id);
+            throw new Exception('The record with the $pet_id argument '
+                . 'does not exist in the database: ' . $pet_id);
         }
 
-        $row_data = $this->db->get_where('ea_users', ['id' => $customer_id]
-        )->row_array();
+        $row_data = $this->db->get_where('ea_pets', ['id' => $pet_id])->row_array();
         if ( ! isset($row_data[$field_name]))
         {
             throw new Exception('The given $field_name argument does not'
                 . 'exist in the database: ' . $field_name);
         }
 
-        $pet = $this->db->get_where('ea_users', ['id' => $customer_id])->row_array();
+        $pet = $this->db->get_where('ea_pets', ['id' => $pet_id])->row_array();
 
         return $pet[$field_name];
-    }
-
-    /**
-     * Get all, or specific records from appointment's table.
-     *
-     * @example $this->Model->getBatch('id = ' . $recordId);
-     *
-     * @param string $whereClause (OPTIONAL) The WHERE clause of the query to be executed. DO NOT INCLUDE 'WHERE'
-     * KEYWORD.
-     *
-     * @return array Returns the rows from the database.
-     */
-    public function get_batch($where_clause = '')
-    {
-        $customers_role_id = $this->get_customers_role_id();
-
-        if ($where_clause != '')
-        {
-            $this->db->where($where_clause);
-        }
-
-        $this->db->where('id_roles', $customers_role_id);
-
-        $batch = $this->db->get('ea_users')->result_array();
-
-        // Get every pet settings.
-        foreach ($batch as &$pet)
-        {
-            $pet['settings'] = $this->db->get_where('ea_user_settings',
-                ['id_users' => $pet['id']])->row_array();
-            unset($pet['settings']['id_users']);
-        }
-
-        return $batch;
-    }
-
-    /**
-     * Get the customers role id from the database.
-     *
-     * @return int Returns the role id for the pet records.
-     */
-    public function get_customers_role_id()
-    {
-        return $this->db->get_where('ea_roles', ['slug' => DB_SLUG_CUSTOMER])->row()->id;
-    }
-
-    /**
-     * Retrieve user's salt from database.
-     *
-     * @param string $username This will be used to find the user record.
-     *
-     * @return string Returns the salt db value.
-     */
-    public function get_salt($customer_id)
-    {
-        $user = $this->db->get_where('ea_user_settings', ['id_users' => $customer_id])->row_array();
-        return ($user) ? $user['salt'] : '';
-    }
-
-    /**
-     * Performs the check of the given user credentials.
-     *
-     * @param string $username Given user's name.
-     * @param string $password Given user's password (not hashed yet).
-     *
-     * @return array|null Returns the session data of the logged in user or null on failure.
-     */
-    public function check_login($email, $password)
-    {
-        $this->load->helper('general');
-
-        $pet = [ 'email' => $email ];
-        $customer_id = $this->customers_model->find_record_id($pet);
-
-        $salt = $this->customers_model->get_salt($customer_id);
-        if ( !$salt )
-            return [ 'email' => $email ];
-
-        $password = hash_password($salt, $password);
-
-        $pet = $this->db
-            ->select('ea_users.*')
-            ->from('ea_users')
-            ->join('ea_user_settings', 'ea_user_settings.id_users = ea_users.id', 'inner')
-            ->where('ea_users.email', $email)
-            ->where('ea_user_settings.password', $password)
-            ->get()->row_array();
-
-        return ($pet) ? $pet : NULL;
     }
 }

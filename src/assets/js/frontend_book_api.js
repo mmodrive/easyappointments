@@ -148,18 +148,27 @@ window.FrontendBookApi = window.FrontendBookApi || {};
             }
         }
 
+        var postData = new FormData();
         var formData = jQuery.parseJSON($('input[name="post_data"]').val());
-        var postData = {
-            csrfToken: GlobalVariables.csrfToken,
-            post_data: formData
-        };
+        if( formData["pet"] && formData["pet"]["attachment"] ){
+            var files_el = $('#' + formData["pet"]["attachment"]).get(0);
+            $.each(files_el.files,function(iFile,file){
+                    postData.append(formData["pet"]["attachment"] + '['+iFile+']', file);
+                    });
+            formData["pet"]["attachment"] = files_el.files.length;
+        }
+        // $.each(formData, function(key, value){
+        //     fd.append(key, value);
+        // })
+        postData.append("csrfToken", GlobalVariables.csrfToken);
+        postData.append("post_data", JSON.stringify(formData));
 
         if ($captchaText.length > 0) {
-            postData.captcha = $captchaText.val();
+            postData.append("captcha", $captchaText.val());
         }
 
         if (GlobalVariables.manageMode) {
-            postData.exclude_appointment_id = GlobalVariables.appointmentData.id;
+            postData.append("exclude_appointment_id", GlobalVariables.appointmentData.id);
         }
 
         var postUrl = GlobalVariables.baseUrl + '/index.php/appointments/ajax_register_appointment';
@@ -169,7 +178,9 @@ window.FrontendBookApi = window.FrontendBookApi || {};
             url: postUrl,
             method: 'post',
             data: postData,
-            dataType: 'json',
+            //dataType: 'json',
+            processData: false,
+            contentType: false,
             beforeSend: function (jqxhr, settings) {
                 $layer
                     .appendTo('body')

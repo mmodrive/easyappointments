@@ -222,6 +222,7 @@
                                 <div class="form-group">
                                     <label for="password" class="control-label"><?= lang('passcode') ?> *</label>
                                     <input type="password" id="password" class="required form-control" maxlength="60" />
+                                    <span><?= sprintf(lang('passcode_req'), MIN_PASSWORD_LENGTH) ?></span>
                                 </div>
                             </div>
 
@@ -288,6 +289,9 @@
                                     <label for="zip-code" class="control-label"><?= lang('zip_code') ?></label>
                                     <input type="text" id="zip-code" class="form-control" maxlength="120" />
                                 </div>
+                            </div>
+
+                            <div class="col-xs-24 col-sm-12">
                                 <div class="form-group">
                                     <label for="notes" class="control-label"><?= lang('notes') ?></label>
                                     <textarea id="notes" maxlength="500" class="form-control" rows="3"></textarea>
@@ -339,7 +343,7 @@
 
                 <!-- ENTER PET DATA -->
 
-                <div id="wizard-frame-5" class="wizard-frame" style="display:block;">
+                <div id="wizard-frame-5" class="wizard-frame" style="display:none;">
                     <div class="frame-container">
 
                         <h3 class="frame-title"><?= lang('step_five_title') ?></h3>
@@ -369,7 +373,7 @@
                             <div class="col-xs-12 col-sm-6">
                                 <div class="form-group">
                                     <label for="pet_sex" class="control-label"><?= lang('pet_sex') ?> *</label>
-                                    <select id="pet_sex" class="form-control" >
+                                    <select id="pet_sex" class="required form-control" >
                                         <option disabled selected value> -- select an option -- </option>
                                         <?php
                                             $this->load->model('settings_model');
@@ -383,11 +387,11 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="pet_dob" class="control-label"><?= lang('pet_dob') ?> *</label>
-                                    <input type="text" id="pet_dob" class="form-control" maxlength="120" />
+                                    <input type="text" id="pet_dob" class="required form-control" maxlength="120" />
                                 </div>
                                 <div class="form-group">
                                     <label for="pet_nature" class="control-label"><?= lang('pet_nature') ?> *</label>
-                                    <select id="pet_nature" class="form-control" >
+                                    <select id="pet_nature" class="required form-control" >
                                         <option disabled selected value> -- select an option -- </option>
                                         <?php
                                             $this->load->model('settings_model');
@@ -400,8 +404,10 @@
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label for="pet_attachment" class="control-label"><?= lang('attachment') ?></label>
-                                    <input type="file" id="pet_attachment" class="form-control" maxlength="120" multiple />
+                                    <form enctype="multipart/form-data">
+                                        <label for="pet_attachment" class="control-label"><?= lang('attachment') ?></label>
+                                        <input type="file" id="pet_attachment" class="form-control" maxlength="120" multiple />
+                                    </form>
                                 </div>
                             </div>
 
@@ -430,6 +436,7 @@
                         <div class="frame-content row">
                             <div id="appointment-details" class="col-xs-12 col-sm-6"></div>
                             <div id="customer-details" class="col-xs-12 col-sm-6"></div>
+                            <div id="pet-details" class="col-xs-12 col-sm-6"></div>
                         </div>
                         <?php if ($this->settings_model->get_setting('require_captcha') === '1'): ?>
                         <div class="frame-content row">
