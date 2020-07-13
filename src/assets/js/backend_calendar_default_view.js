@@ -92,6 +92,16 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                 $dialog.find('#zip-code').val(customer.zip_code);
                 $dialog.find('#appointment-notes').val(appointment.notes);
                 $dialog.find('#customer-notes').val(customer.notes);
+
+                var pet = appointment.pet;
+                $.each(pet, function (key, value) {
+                    if(key == 'dob')
+                        $('.form-control[id="pet_' + key + '"]').datepicker('setDate',
+                            Date.parseExact(value, 'yyyy-MM-dd HH:mm:ss'));
+                    else
+                        $('.form-control[id="pet_' + key + '"]').val(value);
+                });
+
             } else {
                 var unavailable = lastFocusedEventData.data;
 
@@ -277,7 +287,7 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
 
             var notes = '';
             if (event.data) { // Only custom unavailable periods have notes.
-                notes = '<strong>Notes</strong> ' + event.data.notes;
+                notes = '<strong>' + EALang.notes + '</strong> ' + event.data.notes;
             }
 
             html =
@@ -326,6 +336,13 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                 + event.data.customer.first_name + ' '
                 + event.data.customer.last_name
                 + '<br>' +
+                ( event.data.pet ? 
+                '<strong>' + EALang.pet + '</strong> '
+                + event.data.pet.name + ', '
+                + event.data.pet.breed + ', '
+                + event.data.pet.colours + ', '
+                + event.data.pet.age
+                + '<br>' : '' ) +
                 '<strong>' + EALang.email + '</strong> '
                 + event.data.customer.email
                 + '<br>' +
@@ -445,7 +462,7 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
             };
 
             // Update appointment data.
-            BackendCalendarApi.saveAppointment(appointment, undefined, successCallback);
+            BackendCalendarApi.saveAppointment(appointment, undefined, undefined, successCallback);
         } else {
             // Update unavailable time period.
             var unavailable = {
@@ -627,7 +644,7 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
             };
 
             // Update appointment data.
-            BackendCalendarApi.saveAppointment(appointment, undefined, successCallback);
+            BackendCalendarApi.saveAppointment(appointment, undefined, undefined, successCallback);
         } else {
             // Update unavailable time period.
             var unavailable = {
@@ -775,7 +792,8 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                     id: appointment.id,
                     title: appointment.service.name + ' - '
                     + appointment.customer.first_name + ' '
-                    + appointment.customer.last_name,
+                    + appointment.customer.last_name +
+                    (appointment.pet ? ' - ' + appointment.pet.name : ''),
                     start: moment(appointment.start_datetime),
                     end: moment(appointment.end_datetime),
                     allDay: false,

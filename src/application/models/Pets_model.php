@@ -48,6 +48,8 @@ class Pets_Model extends CI_Model {
             unset($pet['attachment']);
         }
 
+        unset($pet['age']);
+
         $this->db->trans_begin();
 
         // :: INSERT OR UPDATE pet RECORD
@@ -319,7 +321,36 @@ class Pets_Model extends CI_Model {
         $pet['appointments'] = $this->db->get_where('ea_appointments',
             ['id_pets' => $pet_id])->row_array();
 
+        $this->calc_age($pet);
+
         return $pet;
+    }
+
+    /**
+     * Get a specific row from the appointments table.
+     *
+     * @param int $pet_id The record's id to be returned.
+     *
+     * @return array Returns an associative array with the selected record's data. Each key has the same name as the
+     * database field names.
+     *
+     * @throws Exception If $pet_id argumnet is invalid.
+     */
+    public function calc_age(&$pet_details)
+    {
+        if ( ! isset($pet_details) )
+        {
+            throw new Exception('No Pet provided');
+        }
+
+        if ( isset($pet_details['dob']) ){
+            $date = new DateTime($pet_details['dob']);
+            $now = new DateTime();
+            $interval = $now->diff($date);
+            $pet_details['age'] = $interval->y == 0 ? $interval->m.' '.lang('months') : $interval->y.' '.lang('years');
+        }
+
+        return $pet_details;
     }
 
     /**

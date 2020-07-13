@@ -264,6 +264,75 @@
                             </div>
                         </div>
                     </fieldset>
+
+                    <br>
+
+                    <fieldset>
+                        <legend>
+                            <?= lang('pet_details_title') ?>
+                        </legend>
+
+                        <input id="pet_id" type="hidden" class="form-control">
+
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-6">
+                                <div class="form-group">
+                                    <label for="pet_name" class="control-label"><?= lang('pet_name') ?> *</label>
+                                    <input type="text" id="pet_name" class="required form-control" maxlength="100" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="pet_breed" class="control-label"><?= lang('pet_breed') ?> *</label>
+                                    <input type="text" id="pet_breed" class="required form-control" maxlength="120" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="pet_colours" class="control-label"><?= lang('pet_colours') ?> *</label>
+                                    <input type="text" id="pet_colours" class="required form-control" maxlength="250" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="pet_sex" class="control-label"><?= lang('pet_sex') ?> *</label>
+                                    <select id="pet_sex" class="required form-control" >
+                                        <option disabled selected value> -- select an option -- </option>
+                                        <?php
+                                            $this->load->model('settings_model');
+                                            $pet_natures = json_decode($this->settings_model->get_setting('pet_sex'));
+
+                                            foreach($pet_natures as $id => $name) {
+                                                echo '<option value="' . $id . '">' . $name . '</option>';
+                                            }
+                                        ?>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-6">
+                                <div class="form-group">
+                                    <label for="pet_dob" class="control-label"><?= lang('pet_dob') ?> *</label>
+                                    <input type="text" id="pet_dob" class="required form-control" maxlength="120" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="pet_age" class="control-label"><?= lang('pet_age') ?></label>
+                                    <input type="text" id="pet_age" disabled class="form-control" maxlength="120" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="pet_nature" class="control-label"><?= lang('pet_nature') ?> *</label>
+                                    <select id="pet_nature" class="required form-control" >
+                                        <option disabled selected value> -- select an option -- </option>
+                                        <?php
+                                            $this->load->model('settings_model');
+                                            $pet_natures = json_decode($this->settings_model->get_setting('pet_nature'));
+
+                                            foreach($pet_natures as $id => $name) {
+                                                echo '<option value="' . $id . '">' . $name . '</option>';
+                                            }
+                                        ?>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="pet_pathology" class="control-label"><?= lang('pet_pathology') ?></label>
+                                    <input type="text" id="pet_pathology" class="form-control" maxlength="250" />
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
                 </form>
             </div>
 

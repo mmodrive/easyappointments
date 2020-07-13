@@ -744,18 +744,19 @@ window.FrontendBook = window.FrontendBook || {};
             id_services: $('#select-service').val()
         };
 
-        postData.pet = {};
-        $('.form-control[id^="pet_"]').each(function () {
-            if ($(this).val() != ''){ 
-                if($(this).is(':input[type="file"]'))
-                    postData.pet[this.id.substr(4)] = this.id;
-                else if(this.id == 'pet_dob')
-                    postData.pet[this.id.substr(4)] = $(this).datepicker('getDate').toString('yyyy-MM-dd');
-                else
-                    postData.pet[this.id.substr(4)] = $(this).val();
-            }
-        });
-
+        if( !$('#step-5').hasClass('disabled-step') ){
+            postData.pet = {};
+            $('.form-control[id^="pet_"]').each(function () {
+                if ($(this).val() != ''){ 
+                    if($(this).is(':input[type="file"]'))
+                        postData.pet[this.id.substr(4)] = this.id;
+                    else if(this.id == 'pet_dob')
+                        postData.pet[this.id.substr(4)] = $(this).datepicker('getDate').toString('yyyy-MM-dd');
+                    else
+                        postData.pet[this.id.substr(4)] = $(this).val();
+                }
+            });
+        }
 
         postData.manage_mode = FrontendBook.manageMode;
 

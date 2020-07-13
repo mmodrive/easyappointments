@@ -97,6 +97,7 @@ class Email {
         array $provider,
         array $service,
         array $customer,
+        array $pet=null,
         array $company,
         Text $title,
         Text $message,
@@ -160,6 +161,14 @@ class Email {
             'Address' => $this->framework->lang->line('address'),
             'Appointment Link' => $this->framework->lang->line('appointment_link_title')
         ];
+
+        if( isset($pet) )
+            foreach ($pet as $key => $value) {
+                if( $key === 'dob' )
+                    $replaceArray['pet_'.$key] = date($date_format, strtotime($value));
+                elseif( $value === null || is_scalar($value) || (is_object($value) && method_exists($value, '__toString')) )
+                    $replaceArray['pet_'.$key] = $value;
+            }
 
         $html = file_get_contents(__DIR__ . '/../../application/views/emails/appointment_details.php');
         $html = $this->_replaceTemplateVariables($replaceArray, $html);

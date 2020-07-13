@@ -241,8 +241,11 @@ window.FrontendBookApi = window.FrontendBookApi || {};
                     return false;
                 }
 
-                window.location.href = GlobalVariables.baseUrl
-                    + '/index.php/appointments/book_success/' + response.appointment_id;
+                if( response.appointment_id )
+                    window.location.href = GlobalVariables.baseUrl
+                        + '/index.php/appointments/book_success/' + response.appointment_id;
+                else
+                    console.log(response);
             })
             .fail(function (jqxhr, textStatus, errorThrown) {
                 $('.captcha-title small').trigger('click');

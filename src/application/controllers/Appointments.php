@@ -570,7 +570,7 @@ class Appointments extends CI_Controller {
 
             $appointment = $post_data['appointment'];
             $customer = $post_data['customer'];
-            $pet = $post_data['pet'];
+            $pet = isset($post_data['pet']) ? $post_data['pet'] : null;
             $is_existing_customer = false;
 
             if ($this->customers_model->exists($customer))
@@ -582,13 +582,17 @@ class Appointments extends CI_Controller {
             $customer_id = $this->customers_model->add($customer);
             $appointment['id_users_customer'] = $customer_id;
             $appointment['is_unavailable'] = (int)$appointment['is_unavailable']; // needs to be type casted
-            $pet['id_users'] = $customer_id;
-            $appointment['id_pets'] = $this->pets_model->add($pet, $is_existing_customer);
+            if( isset($pet) ) {
+                $pet['id_users'] = $customer_id;
+                $appointment['id_pets'] = $this->pets_model->add($pet, $is_existing_customer);
+            }
             $appointment['id'] = $this->appointments_model->add($appointment);
             $appointment['hash'] = $this->appointments_model->get_value('hash', $appointment['id']);
 
             $provider = $this->providers_model->get_row($appointment['id_users_provider']);
             $service = $this->services_model->get_row($appointment['id_services']);
+            if( isset($appointment['id_pets']) )
+                $pet = $this->pets_model->get_row($appointment['id_pets']);
 
             $company_settings = [
                 'company_name' => $this->settings_model->get_setting('company_name'),
@@ -673,7 +677,7 @@ class Appointments extends CI_Controller {
                 if ($send_customer === TRUE)
                 {
                     $email->sendAppointmentDetails($appointment, $provider,
-                        $service, $customer, $company_settings, $customer_title,
+                        $service, $customer, $pet, $company_settings, $customer_title,
                         $customer_message, $customer_link, new Email($customer['email']), new Text($ics_stream));
                 }
 
@@ -683,7 +687,7 @@ class Appointments extends CI_Controller {
                 if ($send_provider === TRUE)
                 {
                     $email->sendAppointmentDetails($appointment, $provider,
-                        $service, $customer, $company_settings, $provider_title,
+                        $service, $customer, $pet, $company_settings, $provider_title,
                         $provider_message, $provider_link, new Email($provider['email']), new Text($ics_stream));
                 }
             }

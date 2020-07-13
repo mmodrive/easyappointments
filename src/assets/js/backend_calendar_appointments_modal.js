@@ -77,10 +77,23 @@ window.BackendCalendarAppointmentsModal = window.BackendCalendarAppointmentsModa
                 notes: $dialog.find('#customer-notes').val()
             };
 
+            var pet = {};
+            $('.form-control[id^="pet_"]').each(function () {
+                if ($(this).val() != ''){ 
+                    if($(this).is(':input[type="file"]'))
+                        pet[this.id.substr(4)] = this.id;
+                    else if(this.id == 'pet_dob')
+                        pet[this.id.substr(4)] = $(this).datepicker('getDate').toString('yyyy-MM-dd');
+                    else
+                        pet[this.id.substr(4)] = $(this).val();
+                }
+            });
+
             if ($dialog.find('#customer-id').val() !== '') {
                 // Set the id value, only if we are editing an appointment.
                 customer.id = $dialog.find('#customer-id').val();
                 appointment.id_users_customer = customer.id;
+                pet.id_users = customer.id;
             }
 
             // Define success callback.
@@ -112,7 +125,7 @@ window.BackendCalendarAppointmentsModal = window.BackendCalendarAppointmentsModa
             };
 
             // Save appointment data.
-            BackendCalendarApi.saveAppointment(appointment, customer, successCallback, errorCallback);
+            BackendCalendarApi.saveAppointment(appointment, customer, pet, successCallback, errorCallback);
         });
 
         /**
@@ -456,6 +469,31 @@ window.BackendCalendarAppointmentsModal = window.BackendCalendarAppointmentsModa
             firstDay: 0
         });
         $dialog.find('#end-datetime').datetimepicker('setDate', endDatetime);
+
+        $dialog.find('#pet_dob').datepicker({
+            dateFormat: dateFormat,
+            timeFormat: GlobalVariables.timeFormat === 'regular' ? 'h:mm TT' : 'HH:mm',
+
+            // Translation
+            dayNames: [EALang.sunday, EALang.monday, EALang.tuesday, EALang.wednesday,
+                EALang.thursday, EALang.friday, EALang.saturday],
+            dayNamesShort: [EALang.sunday.substr(0, 3), EALang.monday.substr(0, 3),
+                EALang.tuesday.substr(0, 3), EALang.wednesday.substr(0, 3),
+                EALang.thursday.substr(0, 3), EALang.friday.substr(0, 3),
+                EALang.saturday.substr(0, 3)],
+            dayNamesMin: [EALang.sunday.substr(0, 2), EALang.monday.substr(0, 2),
+                EALang.tuesday.substr(0, 2), EALang.wednesday.substr(0, 2),
+                EALang.thursday.substr(0, 2), EALang.friday.substr(0, 2),
+                EALang.saturday.substr(0, 2)],
+            monthNames: [EALang.january, EALang.february, EALang.march, EALang.april,
+                EALang.may, EALang.june, EALang.july, EALang.august, EALang.september,
+                EALang.october, EALang.november, EALang.december],
+            prevText: EALang.previous,
+            nextText: EALang.next,
+            currentText: EALang.now,
+            closeText: EALang.close,
+            firstDay: 0
+        });
     };
 
     /**

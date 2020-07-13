@@ -188,6 +188,7 @@ class Backend_api extends CI_Controller {
             $this->load->model('providers_model');
             $this->load->model('services_model');
             $this->load->model('customers_model');
+            $this->load->model('pets_model');
 
             if ($this->input->post('filter_type') == FILTER_TYPE_PROVIDER)
             {
@@ -217,6 +218,8 @@ class Backend_api extends CI_Controller {
                 $appointment['provider'] = $this->providers_model->get_row($appointment['id_users_provider']);
                 $appointment['service'] = $this->services_model->get_row($appointment['id_services']);
                 $appointment['customer'] = $this->customers_model->get_row($appointment['id_users_customer']);
+                if( isset($appointment['id_pets']) )
+                    $appointment['pet'] = $this->pets_model->get_row($appointment['id_pets']);
             }
 
             // Get unavailable periods (only for provider).
@@ -260,6 +263,7 @@ class Backend_api extends CI_Controller {
             $this->load->model('providers_model');
             $this->load->model('services_model');
             $this->load->model('customers_model');
+            $this->load->model('pets_model');
             $this->load->model('settings_model');
 
             // :: SAVE CUSTOMER CHANGES TO DATABASE
@@ -276,6 +280,22 @@ class Backend_api extends CI_Controller {
                 }
 
                 $customer['id'] = $this->customers_model->add($customer);
+            }
+
+            // :: SAVE PET CHANGES TO DATABASE
+            if ($this->input->post('pet_data'))
+            {
+                $pet = json_decode($this->input->post('pet_data'), TRUE);
+
+                $REQUIRED_PRIV = ( ! isset($customer['id']))
+                    ? $this->privileges[PRIV_CUSTOMERS]['add']
+                    : $this->privileges[PRIV_CUSTOMERS]['edit'];
+                if ($REQUIRED_PRIV == FALSE)
+                {
+                    throw new Exception('You do not have the required privileges for this task.');
+                }
+
+                $pet['id'] = $this->pets_model->add($pet);
             }
 
             // :: SAVE APPOINTMENT CHANGES TO DATABASE
@@ -298,6 +318,10 @@ class Backend_api extends CI_Controller {
                 {
                     $appointment['id_users_customer'] = $customer['id'];
                 }
+                if ( ! isset($appointment['id_pets']))
+                {
+                    $appointment['id_pets'] = $pet['id'];
+                }
 
                 $appointment['id'] = $this->appointments_model->add($appointment);
             }
@@ -305,6 +329,7 @@ class Backend_api extends CI_Controller {
             $appointment = $this->appointments_model->get_row($appointment['id']);
             $provider = $this->providers_model->get_row($appointment['id_users_provider']);
             $customer = $this->customers_model->get_row($appointment['id_users_customer']);
+            $pet = $this->pets_model->get_row($appointment['id_pets']);
             $service = $this->services_model->get_row($appointment['id_services']);
 
             $company_settings = [
@@ -383,14 +408,14 @@ class Backend_api extends CI_Controller {
                 if ((bool)$send_customer === TRUE)
                 {
                     $email->sendAppointmentDetails($appointment, $provider,
-                        $service, $customer, $company_settings, $customer_title,
+                        $service, $customer, $pet, $company_settings, $customer_title,
                         $customer_message, $customer_link, new Email($customer['email']), new Text($ics_stream));
                 }
 
                 if ($send_provider == TRUE)
                 {
                     $email->sendAppointmentDetails($appointment, $provider,
-                        $service, $customer, $company_settings, $provider_title,
+                        $service, $customer, $pet, $company_settings, $provider_title,
                         $provider_message, $provider_link, new Email($provider['email']), new Text($ics_stream));
                 }
 
