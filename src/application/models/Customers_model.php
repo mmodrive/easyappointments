@@ -160,10 +160,13 @@ class Customers_Model extends CI_Model {
             }
         }
 
-        $settings = $customer['settings'];
-        $settings_row = $this->db->get_where('ea_user_settings', ['id_users' => $customer['id']])->row();
-        unset($customer['settings']);
-        $settings['id_users'] = $customer['id'];
+        $settings = null;
+        if (isset($customer['settings'])) {
+            $settings = $customer['settings'];
+            $settings_row = $this->db->get_where('ea_user_settings', ['id_users' => $customer['id']])->row();
+            unset($customer['settings']);
+            $settings['id_users'] = $customer['id'];
+        }
 
         $this->db->trans_begin();
 

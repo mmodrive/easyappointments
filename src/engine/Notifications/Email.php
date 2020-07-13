@@ -185,8 +185,7 @@ class Email {
 
         if ( ! $mailer->Send())
         {
-            throw new \RuntimeException('Email could not been sent. Mailer Error (Line ' . __LINE__ . '): '
-                . $mailer->ErrorInfo);
+            throw new \RuntimeException('Email could not been sent. Mailer Error (Line ' . __LINE__ . '): '. $mailer->ErrorInfo);
         }
     }
 
@@ -288,8 +287,7 @@ class Email {
 
         if ( ! $mailer->Send())
         {
-            throw new \RuntimeException('Email could not been sent. Mailer Error (Line ' . __LINE__ . '): '
-                . $mailer->ErrorInfo);
+            throw new \RuntimeException('Email could not been sent. Mailer Error (Line ' . __LINE__ . '): '. $mailer->ErrorInfo);
         }
     }
 
@@ -324,8 +322,7 @@ class Email {
 
         if ( ! $mailer->Send())
         {
-            throw new \RuntimeException('Email could not been sent. Mailer Error (Line ' . __LINE__ . '): '
-                . $mailer->ErrorInfo);
+            throw new \RuntimeException('Email could not been sent. Mailer Error (Line ' . __LINE__ . '): '. $mailer->ErrorInfo);
         }
     }
 

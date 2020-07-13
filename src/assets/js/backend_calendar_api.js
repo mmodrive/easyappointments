@@ -44,7 +44,7 @@ window.BackendCalendarApi = window.BackendCalendarApi || {};
             data.customer_data = JSON.stringify(customer);
         }
 
-        if (pet !== undefined) {
+        if (pet !== undefined && pet != null) {
             data.pet_data = JSON.stringify(pet);
         }
 
@@ -62,6 +62,7 @@ window.BackendCalendarApi = window.BackendCalendarApi || {};
             .fail(function (jqXHR, textStatus, errorThrown) {
                 if (errorCallback !== undefined) {
                     errorCallback();
+                    console.log(textStatus + " " + errorThrown + " " + jqXHR.responseText);
                 }
             });
     };

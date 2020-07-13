@@ -283,6 +283,7 @@ class Backend_api extends CI_Controller {
             }
 
             // :: SAVE PET CHANGES TO DATABASE
+            $pet = null;
             if ($this->input->post('pet_data'))
             {
                 $pet = json_decode($this->input->post('pet_data'), TRUE);
@@ -318,7 +319,7 @@ class Backend_api extends CI_Controller {
                 {
                     $appointment['id_users_customer'] = $customer['id'];
                 }
-                if ( ! isset($appointment['id_pets']))
+                if ( ! isset($appointment['id_pets']) && isset($pet))
                 {
                     $appointment['id_pets'] = $pet['id'];
                 }
@@ -329,7 +330,8 @@ class Backend_api extends CI_Controller {
             $appointment = $this->appointments_model->get_row($appointment['id']);
             $provider = $this->providers_model->get_row($appointment['id_users_provider']);
             $customer = $this->customers_model->get_row($appointment['id_users_customer']);
-            $pet = $this->pets_model->get_row($appointment['id_pets']);
+            if(isset($appointment['id_pets']))
+                $pet = $this->pets_model->get_row($appointment['id_pets']);
             $service = $this->services_model->get_row($appointment['id_services']);
 
             $company_settings = [

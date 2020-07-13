@@ -77,9 +77,11 @@ window.BackendCalendarAppointmentsModal = window.BackendCalendarAppointmentsModa
                 notes: $dialog.find('#customer-notes').val()
             };
 
-            var pet = {};
-            $('.form-control[id^="pet_"]').each(function () {
+            var pet = null;
+            $('.form-control[id^="pet_"]:visible, #pet_id').each(function () {
                 if ($(this).val() != ''){ 
+                    if(!pet)
+                        pet = {};
                     if($(this).is(':input[type="file"]'))
                         pet[this.id.substr(4)] = this.id;
                     else if(this.id == 'pet_dob')
@@ -93,7 +95,8 @@ window.BackendCalendarAppointmentsModal = window.BackendCalendarAppointmentsModa
                 // Set the id value, only if we are editing an appointment.
                 customer.id = $dialog.find('#customer-id').val();
                 appointment.id_users_customer = customer.id;
-                pet.id_users = customer.id;
+                if( pet )
+                    pet.id_users = customer.id;
             }
 
             // Define success callback.
@@ -300,11 +303,13 @@ window.BackendCalendarAppointmentsModal = window.BackendCalendarAppointmentsModa
             var sid = $('#select-service').val();
             $('#select-provider').empty();
 
+            var pets_option = 'N';
             // Automatically update the service duration.
             $.each(GlobalVariables.availableServices, function (indexService, service) {
                 if (service.id == sid) {
                     var start = $('#start-datetime').datetimepicker('getDate');
                     $('#end-datetime').datetimepicker('setDate', new Date(start.getTime() + service.duration * 60000));
+                    pets_option = service.pets_option;
                     return false; // break loop
                 }
             });
@@ -329,6 +334,17 @@ window.BackendCalendarAppointmentsModal = window.BackendCalendarAppointmentsModa
                     }
                 });
             });
+
+        if( pets_option == 'N' )
+            $('#pet_id').closest('fieldset').slideUp();
+        else{
+            $('#pet_id').closest('fieldset').slideDown();
+            if( pets_option == 'O' )
+                $('#pet_id').closest('fieldset').find('input.required').data('input_required', 1).removeClass('required');
+            else
+                $('#pet_id').closest('fieldset').find('input[data-input_required]').addClass('required');
+        } 
+
         });
 
         /**
@@ -513,7 +529,7 @@ window.BackendCalendarAppointmentsModal = window.BackendCalendarAppointmentsModa
             // Check required fields.
             var missingRequiredField = false;
 
-            $dialog.find('.required').each(function () {
+            $dialog.find('.required:visible').each(function () {
                 if ($(this).val() == '' || $(this).val() == null) {
                     $(this).closest('.form-group').addClass('has-error');
                     missingRequiredField = true;
