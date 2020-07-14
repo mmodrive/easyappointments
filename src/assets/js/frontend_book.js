@@ -144,6 +144,8 @@ window.FrontendBook = window.FrontendBook || {};
         $('#pet_dob').datepicker({
             dateFormat: 'dd-mm-yy',
             firstDay: 0,
+            changeYear: true,
+            changeMonth: true,
 
             dayNames: [
                 EALang.sunday, EALang.monday, EALang.tuesday, EALang.wednesday,
@@ -391,6 +393,8 @@ window.FrontendBook = window.FrontendBook || {};
          */
         $('.button-back').click(function () {
             var prevTabIndex = parseInt($(this).attr('data-step_index')) - 1;
+            while( $('#step-' + prevTabIndex).hasClass('disabled-step') )
+                prevTabIndex--;
 
             $(this).parents().eq(1).hide('fade', function () {
                 $('.active-step').removeClass('active-step');

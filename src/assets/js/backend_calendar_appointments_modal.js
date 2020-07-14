@@ -489,6 +489,8 @@ window.BackendCalendarAppointmentsModal = window.BackendCalendarAppointmentsModa
         $dialog.find('#pet_dob').datepicker({
             dateFormat: dateFormat,
             timeFormat: GlobalVariables.timeFormat === 'regular' ? 'h:mm TT' : 'HH:mm',
+            changeYear: true,
+            changeMonth: true,
 
             // Translation
             dayNames: [EALang.sunday, EALang.monday, EALang.tuesday, EALang.wednesday,

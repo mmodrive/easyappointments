@@ -216,6 +216,13 @@ body legend {
     color: #666;
 }
 
+.ui-datepicker select.ui-datepicker-month,
+.ui-datepicker select.ui-datepicker-year{
+    color: #888;
+    padding: 2px;
+    margin: 2px;
+}
+
 /* BACKEND COMPONENTS
    -------------------------------------------------------------------- */
 

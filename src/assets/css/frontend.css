@@ -208,6 +208,13 @@ body {
     margin-bottom: 20px;
 }
 
+.ui-datepicker select.ui-datepicker-month,
+.ui-datepicker select.ui-datepicker-year{
+    color: #888;
+    padding: 2px;
+    margin: 2px;
+}
+
 /* BOOK SUCCESS & MESSAGE
    ------------------------------------------------------------------------- */
 #message-frame,
