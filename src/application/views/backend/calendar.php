@@ -344,7 +344,7 @@
 
                                 <div class="form-group">
                                     <label for="time" class="control-label"><?= lang('time') ?></label>
-                                    <input id="time" type="number" placeholder="Time in minutes" class="form-control">
+                                    <input id="time" placeholder="Time in minutes" class="form-control" maxlength="250">
                                 </div>
                             </div>
                             <div class="col-xs-12 col-sm-6">

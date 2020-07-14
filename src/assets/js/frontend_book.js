@@ -146,6 +146,7 @@ window.FrontendBook = window.FrontendBook || {};
             firstDay: 0,
             changeYear: true,
             changeMonth: true,
+            yearRange: "-30:+0",
 
             dayNames: [
                 EALang.sunday, EALang.monday, EALang.tuesday, EALang.wednesday,

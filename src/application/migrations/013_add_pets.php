@@ -58,7 +58,8 @@ class Migration_Add_pets extends CI_Migration {
                 'after' => 'notes'
             ],
             'time' => [
-                'type' => 'INT',
+                'type' => 'VARCHAR',
+                'constraint' => '256',
                 'after' => 'notes'
             ],
             'comments' => [
