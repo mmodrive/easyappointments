@@ -331,6 +331,28 @@
                                     <input type="text" id="pet_pathology" class="form-control" maxlength="250" />
                                 </div>
                             </div>
+                            <div class="col-xs-12 col-sm-6">
+                                <div class="form-group">
+                                    <label for="depth" class="control-label"><?= lang('depth') ?></label>
+                                    <input id="depth" type="number" step="0.01" placeholder="Depth in cm" class="form-control">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="speed" class="control-label"><?= lang('speed') ?></label>
+                                    <input id="speed" type="number" step="0.01" placeholder="Speed in km/h" class="form-control">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="time" class="control-label"><?= lang('time') ?></label>
+                                    <input id="time" type="number" placeholder="Time in minutes" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-6">
+                                <div class="form-group">
+                                    <label for="comments" class="control-label"><?= lang('comments') ?></label>
+                                    <textarea id="comments" rows="7" class="form-control"></textarea>
+                                </div>
+                            </div>
                         </div>
                     </fieldset>
                 </form>

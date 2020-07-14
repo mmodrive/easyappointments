@@ -92,6 +92,10 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                 $dialog.find('#zip-code').val(customer.zip_code);
                 $dialog.find('#appointment-notes').val(appointment.notes);
                 $dialog.find('#customer-notes').val(customer.notes);
+                $dialog.find('#depth').val(appointment.depth);
+                $dialog.find('#speed').val(appointment.speed);
+                $dialog.find('#time').val(appointment.time);
+                $dialog.find('#comments').val(appointment.comments);
 
                 var pet = appointment.pet;
                 $.each(pet, function (key, value) {
@@ -1343,6 +1347,10 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
             $dialog.find('#zip-code').val(customer.zip_code);
             $dialog.find('#appointment-notes').val(appointment.notes);
             $dialog.find('#customer-notes').val(customer.notes);
+            $dialog.find('#depth').val(appointment.depth);
+            $dialog.find('#speed').val(appointment.speed);
+            $dialog.find('#time').val(appointment.time);
+            $dialog.find('#comments').val(appointment.comments);
 
             $dialog.modal('show');
         }
