@@ -318,8 +318,15 @@ class Pets_Model extends CI_Model {
 
         $pet = $this->db->get_where('ea_pets', ['id' => $pet_id])->row_array();
 
-        $pet['appointments'] = $this->db->get_where('ea_appointments',
-            ['id_pets' => $pet_id])->row_array();
+        $pet['appointments'] = $this->db
+            ->order_by('start_datetime', 'DESC')
+            ->limit(10)
+            ->get_where('ea_appointments',['id_pets' => $pet_id])
+            ->result_array();
+
+        $pet['attachments'] = $this->db
+            ->get_where('ea_attachments',['id_pets' => $pet_id])
+            ->result_array();
 
         $this->calc_age($pet);
 

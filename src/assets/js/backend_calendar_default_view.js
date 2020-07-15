@@ -106,6 +106,31 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                         $('.form-control[id="pet_' + key + '"]').val(value);
                 });
 
+                var history_table = $('#pet_history');
+                history_table.find('tbody').empty();
+                if( pet.appointments )
+                    $.each(pet.appointments, function(i, app){
+                        var tr = $("<tr></tr>").appendTo(history_table.find('tbody'));
+                        tr.append("<td>" + (app.start_datetime ? 
+                            GeneralFunctions.formatDate(app.start_datetime, GlobalVariables.dateFormat, false) :
+                            '') + "</td>");
+                        tr.append("<td>" + (app.depth ? app.depth : '') + "</td>");
+                        tr.append("<td>" + (app.speed ? app.speed : '') + "</td>");
+                        tr.append("<td>" + (app.time ? app.time : '') + "</td>");
+                        tr.append("<td>" + (app.comments ? app.comments : '') + "</td>");
+                    });
+
+                var pet_attachments = $('#pet_attachments');
+                pet_attachments.empty();
+                if( pet.attachments )
+                    $.each(pet.attachments, function(i, att){
+                        var tr = $("<a></a>")
+                            .attr('href', GlobalVariables.baseUrl + '/index.php/api/v1/attachments/open_attachment/' + att.id)
+                            .attr('target', '_blank')
+                            .text(att.filename)
+                            .appendTo(pet_attachments);
+                    });
+
             } else {
                 var unavailable = lastFocusedEventData.data;
 

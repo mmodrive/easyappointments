@@ -354,6 +354,33 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-xs-24 col-sm-12">
+                                <table id="pet_history">
+                                    <thead>
+                                        <tr>
+                                            <th><?= lang('date') ?></th>
+                                            <th><?= lang('depth') ?></th>
+                                            <th><?= lang('speed') ?></th>
+                                            <th><?= lang('time') ?></th>
+                                            <th><?= lang('comments') ?></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-24 col-sm-12">
+                                <label class="control-label"><?= lang('attachment') ?></label>
+                                <div class="col-xs-24 col-sm-12">
+                                    <div id="pet_attachments"></div>
+                                </div>
+                            </div>
+                        </div>
+
                     </fieldset>
                 </form>
             </div>
