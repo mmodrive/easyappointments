@@ -59,10 +59,10 @@ window.BackendCalendarAppointmentsModal = window.BackendCalendarAppointmentsModa
                 end_datetime: endDatetime,
                 notes: $dialog.find('#appointment-notes').val(),
                 is_unavailable: false,
-                depth: $dialog.find('#depth').val(),
-                speed: $dialog.find('#speed').val(),
-                time: $dialog.find('#time').val(),
-                comments: $dialog.find('#comments').val(),
+                depth: $dialog.find('#depth:visible').val(),
+                speed: $dialog.find('#speed:visible').val(),
+                time: $dialog.find('#time:visible').val(),
+                comments: $dialog.find('#comments:visible').val(),
             };
 
             if ($dialog.find('#appointment-id').val() !== '') {

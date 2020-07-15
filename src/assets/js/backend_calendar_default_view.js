@@ -108,7 +108,7 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
 
                 var history_table = $('#pet_history');
                 history_table.find('tbody').empty();
-                if( pet.appointments )
+                if( pet && pet.appointments )
                     $.each(pet.appointments, function(i, app){
                         var tr = $("<tr></tr>").appendTo(history_table.find('tbody'));
                         tr.append("<td>" + (app.start_datetime ? 
@@ -122,7 +122,7 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
 
                 var pet_attachments = $('#pet_attachments');
                 pet_attachments.empty();
-                if( pet.attachments )
+                if( pet && pet.attachments )
                     $.each(pet.attachments, function(i, att){
                         var tr = $("<a></a>")
                             .attr('href', GlobalVariables.baseUrl + '/index.php/api/v1/attachments/open_attachment/' + att.id)
