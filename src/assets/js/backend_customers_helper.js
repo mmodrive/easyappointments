@@ -103,6 +103,29 @@
             instance.displayAppointment(appointment);
         });
 
+        $(document).on('click', '.pet-row', function () {
+            $('#customer-pets .selected').removeClass('selected');
+            $(this).addClass('selected');
+
+            var customerId = $('#filter-customers .selected').attr('data-id');
+            var petId = $(this).attr('data-id');
+            var pet = {};
+
+            $.each(instance.filterResults, function (index, c) {
+                if (c.id === customerId) {
+                    $.each(c.pets, function (index, p) {
+                        if (p.id == petId) {
+                            pet = p;
+                            return false;
+                        }
+                    });
+                    return false;
+                }
+            });
+
+            instance.displayPet(pet);
+        });
+
         /**
          * Event: Add Customer Button "Click"
          */
@@ -297,6 +320,9 @@
         $('#filter-customers button').prop('disabled', false);
         $('#filter-customers .selected').removeClass('selected');
         $('#filter-customers .results').css('color', '');
+
+        $('#customer-pets').empty();
+        $('#pet-details').toggleClass('hidden', true).empty();
     };
 
     /**
@@ -332,11 +358,24 @@
                 start + ' - ' + end + '<br>' +
                 appointment.service.name + ', ' +
                 appointment.provider.first_name + ' ' + appointment.provider.last_name +
+                (appointment.pet ? '<br>' + appointment.pet.title : '') +
                 '</div>';
             $('#customer-appointments').append(html);
         });
 
         $('#appointment-details').empty();
+
+        $('#customer-pets').empty();
+        $.each(customer.pets, function (index, pet) {
+            var html =
+                '<div class="pet-row" data-id="' + pet.id + '">' +
+                pet.name + ' - ' + pet.age + '<br>' +
+                pet.breed + ', ' +
+                pet.colours + 
+                '</div>';
+            $('#customer-pets').append(html);
+        });
+        $('#pet-details').empty();
     };
 
     /**
@@ -452,6 +491,25 @@
             '</div>';
 
         $('#appointment-details').html(html).removeClass('hidden');
+    };
+
+    /**
+     * Display pet details on customers backend page.
+     *
+     * @param {Object} pet Pet data
+     */
+    CustomersHelper.prototype.displayPet = function (pet) {
+        var dob = GeneralFunctions.formatDate(Date.parse(pet.dob), GlobalVariables.dateFormat, false);
+
+        var html =
+            '<div>' +
+            '<strong>' + pet.name + ', ' + pet.age + '</strong><br>' +
+            pet.breed + ', ' + pet.colours + ', ' + dob + '<br>' +
+            pet.sex_name + ', ' + pet.nature_name + 
+            (pet.pathology ? '<br>' + pet.pathology : '') + '<br>' +
+            '</div>';
+
+        $('#pet-details').html(html).removeClass('hidden');
     };
 
     window.CustomersHelper = CustomersHelper;

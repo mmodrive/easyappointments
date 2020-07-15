@@ -328,7 +328,7 @@ class Pets_Model extends CI_Model {
             ->get_where('ea_attachments',['id_pets' => $pet_id])
             ->result_array();
 
-        $this->calc_age($pet);
+        $this->compute_details($pet);
 
         return $pet;
     }
@@ -343,8 +343,10 @@ class Pets_Model extends CI_Model {
      *
      * @throws Exception If $pet_id argumnet is invalid.
      */
-    public function calc_age(&$pet_details)
+    public function compute_details(&$pet_details)
     {
+        $this->load->model('settings_model');
+
         if ( ! isset($pet_details) )
         {
             throw new Exception('No Pet provided');
@@ -356,6 +358,21 @@ class Pets_Model extends CI_Model {
             $interval = $now->diff($date);
             $pet_details['age'] = $interval->y == 0 ? $interval->m.' '.lang('months') : $interval->y.' '.lang('years');
         }
+
+        if ( isset($pet_details['nature']) ){
+            $natures = json_decode($this->settings_model->get_setting('pet_nature'));
+            $pet_details['nature_name'] = $natures->{$pet_details['nature']};
+        }
+
+        if ( isset($pet_details['sex']) ){
+            $sexes = json_decode($this->settings_model->get_setting('pet_sex'));
+            $pet_details['sex_name'] = $sexes->{$pet_details['sex']};
+        }
+
+        $pet_details['title'] = $pet_details['name'] .', '.
+            $pet_details['breed'] .', '.
+            $pet_details['colours'] .', '.
+            $pet_details['age'];
 
         return $pet_details;
     }

@@ -348,7 +348,7 @@ class Customers_Model extends CI_Model {
     }
 
     /**
-     * Get a specific row from the appointments table.
+     * Get a specific row from the customers table.
      *
      * @param int $customer_id The record's id to be returned.
      *
@@ -434,6 +434,8 @@ class Customers_Model extends CI_Model {
      */
     public function get_batch($where_clause = '')
     {
+        $this->load->model('pets_model');
+
         $customers_role_id = $this->get_customers_role_id();
 
         if ($where_clause != '')
@@ -451,6 +453,16 @@ class Customers_Model extends CI_Model {
             $customer['settings'] = $this->db->get_where('ea_user_settings',
                 ['id_users' => $customer['id']])->row_array();
             unset($customer['settings']['id_users']);
+
+            $pet_ids = $this->db
+                ->select('id')
+                ->get_where('ea_pets', ['id_users' => $customer['id']])
+                ->result_array();
+            if( !empty($pet_ids) ){
+                $customer['pets'] = [];
+                foreach ($pet_ids as $pet_row)
+                    array_push($customer['pets'], $this->pets_model->get_row($pet_row['id']));
+            }
         }
 
         return $batch;

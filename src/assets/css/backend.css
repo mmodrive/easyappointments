@@ -295,7 +295,7 @@ body legend {
 }
 
 .record-details {
-    max-width: 800px;
+    max-width: 1200px;
     margin-bottom: 20px;
 }
 
@@ -538,7 +538,8 @@ body .form-horizontal .controls {
 /* BACKEND CUSTOMERS PAGE
    -------------------------------------------------------------------- */
 
-#customers-page #customer-appointments {
+#customers-page #customer-appointments,
+#customers-page #customer-pets {
     height: 370px;
     max-width: 330px;
     width: 100%;
@@ -547,22 +548,26 @@ body .form-horizontal .controls {
     outline: none;
 }
 
-#customers-page #customer-appointments .appointment-row {
+#customers-page #customer-appointments .appointment-row, 
+#customers-page #customer-pets .pet-row {
     padding: 7px;
     border-bottom: 1px solid #E2E2E2;
     border-right: none;
 }
 
-#customers-page #customer-appointments .appointment-row:last-child {
+#customers-page #customer-appointments .appointment-row:last-child,
+#customers-page #customer-pets .pet-row:last-child {
     border-bottom: none;
 }
 
-#customers-page #customer-appointments .appointment-row:hover:not(.selected) {
+#customers-page #customer-appointments .appointment-row:hover:not(.selected),
+#customers-page #customer-pets .pet-row:hover:not(.selected) {
     background-color: #F3F3F3;
     cursor: pointer;
 }
 
-#customers-page #customer-appointments .appointment-row.selected {
+#customers-page #customer-appointments .appointment-row.selected,
+#customers-page #customer-pets .pet-row.selected {
     background-color: #E2E2E2;
 }
 

@@ -29,6 +29,7 @@ $lang['user_notes'] = 'Notes';
 $lang['fields_are_required'] = 'Fields with * are required!';
 $lang['step_five_title'] = 'Fill In Pet Details';
 $lang['pet'] = 'Dog';
+$lang['pets'] = 'Dogs';
 $lang['pet_select'] = 'Selection';
 $lang['pet_name'] = 'Dog Name';
 $lang['pet_breed'] = 'Breed';

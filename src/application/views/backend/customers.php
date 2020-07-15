@@ -88,7 +88,7 @@
             <input id="customer-id" type="hidden">
 
             <div class="row">
-                <div class="col-xs-12 col-sm-6" style="margin-left: 0;">
+                <div class="col-xs-12 col-sm-4" style="margin-left: 0;">
                     <h3><?= lang('details') ?></h3>
 
                     <div id="form-message" class="alert" style="display:none;"></div>
@@ -138,10 +138,16 @@
                     </p>
                 </div>
 
-                <div class="col-xs-12 col-sm-6">
+                <div class="col-xs-12 col-sm-4">
                     <h3><?= lang('appointments') ?></h3>
                     <div id="customer-appointments" class="well"></div>
                     <div id="appointment-details" class="well hidden"></div>
+                </div>
+
+                <div class="col-xs-12 col-sm-4">
+                    <h3><?= lang('pets') ?></h3>
+                    <div id="customer-pets" class="well"></div>
+                    <div id="pet-details" class="well hidden"></div>
                 </div>
             </div>
     	</div>

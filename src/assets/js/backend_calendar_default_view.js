@@ -367,10 +367,7 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                 + '<br>' +
                 ( event.data.pet ? 
                 '<strong>' + EALang.pet + '</strong> '
-                + event.data.pet.name + ', '
-                + event.data.pet.breed + ', '
-                + event.data.pet.colours + ', '
-                + event.data.pet.age
+                + event.data.pet.title
                 + '<br>' : '' ) +
                 '<strong>' + EALang.email + '</strong> '
                 + event.data.customer.email
