@@ -1,202 +1,173 @@
-<?php
- $conn = mysqli_connect(Config::DB_HOST, Config::DB_USERNAME, Config::DB_PASSWORD, Config::DB_NAME);
- 
- $post_at = "";
- $post_at_to_date = "";
- 
- $queryCondition = "";
- if(!empty($_POST["search"]["post_at"])) {   
-  $post_at = $_POST["search"]["post_at"];
-  list($fid,$fim,$fiy) = explode("/",$post_at);
-  
-  $post_at_todate = date('Y-m-d');
-  if(!empty($_POST["search"]["post_at_to_date"])) {
-   $post_at_to_date = $_POST["search"]["post_at_to_date"];
-   list($tid,$tim,$tiy) = explode("/",$_POST["search"]["post_at_to_date"]);
-   $post_at_todate = "$tiy-$tim-$tid";
-  }
+<script src="<?= asset_url('assets/ext/jquery-ui/jquery-ui-timepicker-addon.js') ?>"></script>
+<script>
+    var GlobalVariables = {
+        csrfToken          : <?= json_encode($this->security->get_csrf_hash()) ?>,
+        dateFormat         : <?= json_encode($date_format) ?>,
+        timeFormat         : <?= json_encode($time_format) ?>,
+        baseUrl            : <?= json_encode($base_url) ?>,
+        user               : {
+            id         : <?= $user_id ?>,
+            email      : <?= json_encode($user_email) ?>,
+            role_slug  : <?= json_encode($role_slug) ?>,
+            privileges : <?= json_encode($privileges) ?>
+        }
+    };
 
-  $service = $_POST["search"]["service"];
-  $provider = $_POST["search"]["provider"];
-  
-  $queryCondition .= "WHERE start_datetime BETWEEN '$fiy-$fim-$fid 00:00:00' AND '" . $post_at_todate . " 23:59:59'";
-  if ($service && $service !== "all")
-    $queryCondition .= " AND id_services = " . $service;
-  if ($provider && $provider !== "all")
-    $queryCondition .= " AND id_users_provider = " . $provider;
- }
- $sql = "SELECT ea_appointments.*, customer.*, CONCAT(customer.first_name, \" \", customer.last_name) customer_name, ea_appointments.notes appointment_notes, CONCAT(provider.first_name, \" \", provider.last_name) provider_name, service.name service_name FROM ea_appointments INNER JOIN ea_users AS customer ON ea_appointments.id_users_customer=customer.id INNER JOIN ea_users AS provider ON ea_appointments.id_users_provider=provider.id INNER JOIN ea_services AS service ON ea_appointments.id_services=service.id " . $queryCondition . " ORDER BY service.name, start_datetime asc";
- 
-//echo $sql;
-?>
-<html>
-<head>
-<title>Print Appointments</title>  
-<!-- <script src="http://code.jquery.com/jquery-1.9.1.js"></script> -->
-    <script src="<?= asset_url('assets/ext/jquery/jquery.min.js') ?>"></script>
-<script src="<?= asset_url('assets/ext/jquery-ui/jquery-ui.min.js') ?>"></script>
-<link rel="stylesheet" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    $(document).ready(function() {
+      $(function() {
+        switch (GlobalVariables.dateFormat) {
+            case 'DMY':
+                dateFormat = 'dd/mm/yy';
+                break;
+            case 'MDY':
+                dateFormat = 'mm/dd/yy';
+                break;
+            case 'YMD':
+                dateFormat = 'yy/mm/dd';
+                break;
+            default:
+                throw new Error('Invalid GlobalVariables.dateFormat value.');
+        }
+
+        $(".input-date").datepicker({
+            dateFormat: dateFormat,
+            timeFormat: GlobalVariables.timeFormat === 'regular' ? 'h:mm TT' : 'HH:mm',
+            changeYear: true,
+            changeMonth: true,
+            yearRange: "-10:+0",
+
+            // Translation
+            dayNames: [EALang.sunday, EALang.monday, EALang.tuesday, EALang.wednesday,
+                EALang.thursday, EALang.friday, EALang.saturday],
+            dayNamesShort: [EALang.sunday.substr(0, 3), EALang.monday.substr(0, 3),
+                EALang.tuesday.substr(0, 3), EALang.wednesday.substr(0, 3),
+                EALang.thursday.substr(0, 3), EALang.friday.substr(0, 3),
+                EALang.saturday.substr(0, 3)],
+            dayNamesMin: [EALang.sunday.substr(0, 2), EALang.monday.substr(0, 2),
+                EALang.tuesday.substr(0, 2), EALang.wednesday.substr(0, 2),
+                EALang.thursday.substr(0, 2), EALang.friday.substr(0, 2),
+                EALang.saturday.substr(0, 2)],
+            monthNames: [EALang.january, EALang.february, EALang.march, EALang.april,
+                EALang.may, EALang.june, EALang.july, EALang.august, EALang.september,
+                EALang.october, EALang.november, EALang.december],
+            prevText: EALang.previous,
+            nextText: EALang.next,
+            currentText: EALang.now,
+            closeText: EALang.close,
+            firstDay: 0
+        });
+      });
+
+      $('#footer').addClass('no-print');
+    });
+</script>
+
 <style>
-.table, tr, th, td{border: 1px solid black; font-size: 14px;}
-.table-content{ width:80%;}
-.table-content tr:hover {background-color: #f5f5f5;}
-.table-content th {padding:5px 20px; background: #F0F0F0;vertical-align:top;text-align: left;background-color: #4CAF50;
-color: white;}
-.table-content td {padding:5px 20px; vertical-align:top;}
-#customers {
+.print {
+  font-size: 14px;
   font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
   border-collapse: collapse;
   width: 80%;
+  margin: 0 auto;
 }
-#customers td, #customers th {
+.print td, .print th {
   border: 1px solid #ddd;
   padding: 8px;
+  white-space: nowrap;
+  text-align: center;
 }
-#customers tr:nth-child(even){background-color: #f2f2f2;}
-#customers tr:hover {background-color: #ddd;}
-#customers th {
+.print tr td:nth-child(6) {
+  text-align: left;
+}
+.print th {
   padding-top: 12px;
   padding-bottom: 12px;
-  text-align: left;
   background-color: #4CAF50;
-  color: black;
+  color: white;
 }
+.print tr:nth-child(even){background-color: #f2f2f2;}
+.print tr:hover {background-color: #ddd;}
 @media print
 {   
     .no-print, .no-print *
     {
         display: none !important;
     }
+    .print th {
+      text-align: left;
+    }
     h2 { 
         page-break-before: always;
     }
 }
-table.center {
-    margin-left:auto;
-    margin-right:auto;
-  }
 .returned-content{text-align: center;}
-#footer {
-    position: fixed;
-    bottom: 100;
-    width: 100%;
-    text-align: center;
-}
-#nav-block{display:inline-block;}
-.button {
-  padding: 15px 25px;
-  font-size: 24px;
-  text-align: center;
-  cursor: pointer;
-  outline: none;
-  color: #fff;
-  background-color: #4CAF50;
-  border: none;
-  border-radius: 15px;
-  box-shadow: 0 9px #999;
-}
-.button:hover {background-color: #3e8e41;}
-.button:active {
-  background-color: #3e8e41;
-  box-shadow: 0 5px #666;
-  transform: translateY(4px);
-}
 h2 {
-  font-size: 18px;
+  font-size: 1.5em;
 }
 </style>
-<script>
-$.datepicker.setDefaults({
-dateFormat: 'dd/mm/yy' 
-});
-$(function() {
-$("#post_at").datepicker();
-$("#post_at_to_date").datepicker();
-});
-</script>
-</head>
- 
-<body>
 <div class="returned-content">
 <div class="no-print"><h4>Please select date range of bookings</h4> 
   <!-- <form name="frmSearch" method="post" action="" > -->
  <?php echo form_open('') ?>
   <p class="search_input">
-   <input type="text" placeholder="From Date" id="post_at" name="search[post_at]"  value="<?php echo $post_at; ?>" class="input-control" />
-   <input type="text" placeholder="To Date" id="post_at_to_date" name="search[post_at_to_date]" style="margin-left:10px"  value="<?php echo $post_at_to_date; ?>" class="input-control"  />   
-   <select name="search[service]" class="input-control">
+   <input type="text" placeholder="From Date" name="post_at" value="<?php echo isset($post_at) ? $post_at : ''; ?>" autocomplete="off" class="input-control input-date" />
+   <input type="text" placeholder="To Date" name="post_at_to_date" style="margin-left:10px" value="<?php echo isset($post_at_to_date) ? $post_at_to_date : ''; ?>" class="input-control input-date" autocomplete="off" />   
+   <select name="service" class="input-control">
     <option value="all">All Services</option>
    <?php
-    $service_result = mysqli_query($conn,"SELECT id, name FROM ea_services");
-    while ($row = $service_result->fetch_assoc()) {
-      echo '<option value="' . $row['id'] . '" ' . ($row['id'] == $service ? 'selected' : '') . '>' . $row['name'] . '</option>';
+    foreach ($available_services as $iservice) {
+      echo '<option value="' . $iservice['id'] . '" ' . (isset($service) && $iservice['id'] == $service ? 'selected' : '') . '>' . $iservice['name'] . '</option>';
     }
     ?>
    </select>
-   <select name="search[provider]" class="input-control">
+   <select name="provider" class="input-control">
     <option value="all">All Providers</option>
    <?php
-    $provider_result = mysqli_query($conn,"SELECT user.id, CONCAT(user.first_name, \" \", user.last_name) as name FROM ea_users user WHERE user.id IN(SELECT id_users FROM ea_services_providers)");
-    while ($row = $provider_result->fetch_assoc()) {
-      echo '<option value="' . $row['id'] . '" ' . ($row['id'] == $provider ? 'selected' : '') . '>' . $row['name'] . '</option>';
+    foreach ($available_providers as $iprovider) {
+      echo '<option value="' . $iprovider['id'] . '" ' . (isset($provider) && $iprovider['id'] == $provider ? 'selected' : '') . '>' . $iprovider['first_name'] . ' ' . $iprovider['last_name'] . '</option>';
     }
     ?>
    </select>
-   <input type="submit" name="go" value="Search" >
+   <input type="submit" name="search" value="Search" >
   </p>
  </form> 
+ <button class="button" onclick="window.print();">Print bookings</button>
 </div>
 <?php
-if( isset($_POST["search"]["post_at"]) )
-{
-$result = mysqli_query($conn,$sql);
-};
 $service_name = null;
-if(!empty($result)){
-  if (mysqli_query($conn,$sql)) {
-    while ($row = $result->fetch_assoc()) {
+if(!empty($appointments)){
+    foreach ($appointments as $appointment) {
 
-$new_service = $service_name !== $row['service_name'];
+$new_service = $service_name !== $appointment['service_name'];
 if($new_service && !is_null($service_name))
   echo '</tbody></table>';
-$service_name = $row['service_name'];
+$service_name = $appointment['service_name'];
 if($new_service)
 {
-  echo '<h2 class=""> ' . $service_name . ' (' . $row['provider_name'] . ') bookings between ' . $_POST["search"]["post_at"] . ' and ' . $_POST["search"]["post_at_to_date"] . '</h2>';
+  echo '<h2 class=""> ' . $service_name . ' (' . $appointment['provider_name'] . ') bookings between ' . $post_at . ' and ' . $post_at_to_date . '</h2>';
 ?>
-<table id="customers" class="center">
-    <thead>
-  <tr>                     
-   <th width="15%"><span>Date</span></th>
-   <th width="15%"><span>Start Time</span></th>
-   <th width="15%"><span>End Time</span></th>
-   <th width="30%"><span>Name</span></th>
-   <th width="15%"><span>Phone</span></th>         
-   <th width="20%"><span>Dogs Name</span></th>  
-        </tr>
-    </thead>
- <tbody>
+<table class="center print">
+  <thead>
+    <tr>                     
+      <th width="15%"><span><?= lang('date') ?></span></th>
+      <th width="15%"><span><?= lang('time_start') ?></span></th>
+      <th width="15%"><span><?= lang('time_end') ?></span></th>
+      <th width="30%"><span><?= lang('customer') ?></span></th>
+      <th width="15%"><span><?= lang('phone_number') ?></span></th>         
+      <th width="20%"><span><?= lang('pet') ?></span></th>  
+      </tr>
+  </thead>
+<tbody>
 <?php   
 }
-   $start_date = strtotime($row["start_datetime"]);
-   $end_date = strtotime($row["end_datetime"]);
-   $field1name = $row["customer_name"];
-   $field2name = $row["phone_number"];
-   $field3name = date('d/m/y',$start_date);
-   $field4name = date('h:i',$start_date);
-   $field5name = date('h:i',$end_date);
-   $field6name = $row["appointment_notes"];
-        
        echo '<tr>
-              <td>'.$field3name.'</td>
-              <td>'.$field4name.'</td>
-              <td>'.$field5name.'</td>
-              <td>'.$field1name.'</td>
-              <td>'.$field2name.'</td>
-              <td>'.$field6name.'</td>
+              <td>'.date($php_date_format,strtotime($appointment["start_datetime"])).'</td>
+              <td>'.date($php_time_format,strtotime($appointment["start_datetime"])).'</td>
+              <td>'.date($php_time_format,strtotime($appointment["end_datetime"])).'</td>
+              <td>'.$appointment["customer_name"].'</td>
+              <td>'.$appointment["phone_number"].'</td>
+              <td>'.(isset($appointment["pet_title"]) ? $appointment["pet_title"] : '').'</td>
             </tr>';
-}
- $result->free();
 }
  
 ?>
@@ -205,12 +176,3 @@ if($new_service)
 <?php } ?>
  
 </div>
-<div id="footer" class="no-print">
- <div id="nav-block">
-  <button class="button" onclick="window.print();">Print bookings</button>
-  <button class="button" onclick="window.location.href='/index.php/backend';">Go back</button>
- </div> 
-</div>
-
-</body>
-</html>

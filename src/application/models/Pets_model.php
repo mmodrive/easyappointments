@@ -309,7 +309,7 @@ class Pets_Model extends CI_Model {
      *
      * @throws Exception If $pet_id argumnet is invalid.
      */
-    public function get_row($pet_id)
+    public function get_row($pet_id, $get_subs = TRUE)
     {
         if ( ! is_numeric($pet_id))
         {

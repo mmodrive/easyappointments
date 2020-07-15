@@ -248,24 +248,102 @@ class Backend extends CI_Controller {
 
         $this->load->model('customers_model');
         $this->load->model('services_model');
+        $this->load->model('providers_model');
         $this->load->model('settings_model');
         $this->load->model('user_model');
+        $this->load->model('pets_model');
+        $this->load->helper('form');
 
+        $view['available_services'] = $this->services_model->get_available_services();
+        $view['available_providers'] = $this->providers_model->get_available_providers();
+        $view['company_name'] = $this->settings_model->get_setting('company_name');
         $view['base_url'] = $this->config->item('base_url');
         $view['user_display_name'] = $this->user_model->get_user_display_name($this->session->userdata('user_id'));
         $view['active_menu'] = PRIV_PRINT_APPOINTMENTS;
-        $view['company_name'] = $this->settings_model->get_setting('company_name');
         $view['date_format'] = $this->settings_model->get_setting('date_format');
         $view['time_format'] = $this->settings_model->get_setting('time_format');
-        $view['services'] = $this->services_model->get_batch();
-        $view['categories'] = $this->services_model->get_all_categories();
+
+        $dateFormat = '';
+        switch ($view['date_format']) {
+            case 'DMY':
+                $dateFormat = 'd/m/Y';
+                break;
+            case 'MDY':
+                $dateFormat = 'm/d/Y';
+                break;
+            case 'YMD':
+                $dateFormat = 'Y/m/d';
+                break;
+        }
+        $view['php_date_format'] = $dateFormat;
+
+        $time_format = '';
+        switch ($view['time_format']) {
+            case TIME_FORMAT_REGULAR:
+                $time_format = 'g:i A';
+                break;
+            case TIME_FORMAT_MILITARY:
+                $time_format = 'H:i';
+                break;
+        }
+        $view['php_time_format'] = $time_format;
+
+        $view['post_at'] = $this->input->post('post_at') ? $this->input->post('post_at') : date($dateFormat, strtotime("-7 days"));
+        $view['post_at_to_date'] = $this->input->post('post_at_to_date') ? $this->input->post('post_at_to_date') : date($dateFormat, time());
+
+        $queryCondition = "";
+        $appointments = [];
+        if($this->input->post('search')) {
+            $post_at = DateTime::createFromFormat($dateFormat, $view['post_at']);
+            $post_at_to_date = DateTime::createFromFormat($dateFormat, $view['post_at_to_date']);
+
+            $view['service'] = $service = $this->input->post('service');
+            $view['provider'] = $provider = $this->input->post('provider');
+
+            $this->db
+                ->select('CONCAT(customer.first_name, " ", customer.last_name) customer_name, CONCAT(provider.first_name, " ", provider.last_name) provider_name, service.name service_name, app.start_datetime, app.end_datetime, customer.phone_number, pet.id pet_id ')
+                ->from('ea_appointments AS app')
+                ->join('ea_users AS customer', 'app.id_users_customer=customer.id', 'inner')
+                ->join('ea_users AS provider', 'app.id_users_provider=provider.id', 'inner')
+                ->join('ea_services AS service', 'app.id_services=service.id', 'inner')
+                ->join('ea_pets AS pet', 'app.id_pets=pet.id', 'left')
+                ->where("start_datetime BETWEEN '" . date_format($post_at, "Y-m-d") . " 00:00:00' AND '" . date_format($post_at_to_date, "Y-m-d") . " 23:59:59'");
+            if ($service && $service !== "all")
+                $this->db->where('app.id_services', $service);
+            if ($provider && $provider !== "all")
+                $this->db->where('app.id_users_provider', $provider);
+            $appointments = $this->db->order_by('service.name')
+                ->order_by('app.start_datetime')
+                ->get()->result_array();
+
+            $pet_ids = array_values(
+                array_filter(
+                    array_unique(
+                        array_map(function($value){ return $value['pet_id']; },
+                            $appointments)
+                    ),
+                    function($value){ return isset($value); }
+                )
+            );
+
+            $pets_raw = $this->db
+                ->where_in('id', $pet_ids )
+                ->get('ea_pets')->result_array();
+            $pets = [];
+            foreach ($pets_raw as $pet) 
+                $pets[$pet['id']] = $this->pets_model->compute_details($pet);
+
+            foreach ($appointments as &$appointment)
+                if (isset($appointment['pet_id'])) 
+                    $appointment['pet_title'] = $pets[$appointment['pet_id']]['title'];
+        }
+        $view['appointments'] = $appointments;
+
         $this->set_user_data($view);
 
-        $this->load->helper('form');
-
-        // $this->load->view('backend/header', $view);
+        $this->load->view('backend/header', $view);
         $this->load->view('backend/print_appointments', $view);
-        // $this->load->view('backend/footer', $view);
+        $this->load->view('backend/footer', $view);
     }
 
     /**

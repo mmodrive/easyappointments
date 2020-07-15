@@ -306,7 +306,7 @@
                             <div class="col-xs-12 col-sm-6">
                                 <div class="form-group">
                                     <label for="pet_dob" class="control-label"><?= lang('pet_dob') ?> *</label>
-                                    <input type="text" id="pet_dob" class="required form-control" maxlength="120" />
+                                    <input type="text" id="pet_dob" class="required form-control" maxlength="120" autocomplete="off" />
                                 </div>
                                 <div class="form-group">
                                     <label for="pet_age" class="control-label"><?= lang('pet_age') ?></label>
