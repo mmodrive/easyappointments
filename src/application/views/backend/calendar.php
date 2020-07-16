@@ -387,6 +387,8 @@
                                     <thead>
                                         <tr>
                                             <th><?= lang('date') ?></th>
+                                            <th><?= lang('service') ?></th>
+                                            <th><?= lang('provider') ?></th>
                                             <th><?= lang('depth') ?></th>
                                             <th><?= lang('speed') ?></th>
                                             <th><?= lang('time') ?></th>
