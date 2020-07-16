@@ -35,7 +35,7 @@ class Appointments_Model extends CI_Model {
 
         foreach ($appointment as $key => $value) 
             if($value === '')
-                unset($appointment[$key]);
+                $appointment[$key] = NULL;
 
         // Perform insert() or update() operation.
         if ( ! isset($appointment['id']))
