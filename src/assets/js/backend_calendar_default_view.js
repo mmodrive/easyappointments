@@ -97,40 +97,16 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                 $dialog.find('#time').val(appointment.time);
                 $dialog.find('#comments').val(appointment.comments);
 
-                var pet = appointment.pet;
-                $.each(pet, function (key, value) {
-                    if(key == 'dob')
-                        $('.form-control[id="pet_' + key + '"]').datepicker('setDate',
-                            Date.parseExact(value, 'yyyy-MM-dd HH:mm:ss'));
-                    else
-                        $('.form-control[id="pet_' + key + '"]').val(value);
-                });
-
-                var history_table = $('#pet_history');
-                history_table.find('tbody').empty();
-                if( pet && pet.appointments )
-                    $.each(pet.appointments, function(i, app){
-                        var tr = $("<tr></tr>").appendTo(history_table.find('tbody'));
-                        tr.append("<td>" + (app.start_datetime ? 
-                            GeneralFunctions.formatDate(app.start_datetime, GlobalVariables.dateFormat, false) :
-                            '') + "</td>");
-                        tr.append("<td>" + (app.depth ? app.depth : '') + "</td>");
-                        tr.append("<td>" + (app.speed ? app.speed : '') + "</td>");
-                        tr.append("<td>" + (app.time ? app.time : '') + "</td>");
-                        tr.append("<td>" + (app.comments ? app.comments : '') + "</td>");
-                    });
-
-                var pet_attachments = $('#pet_attachments');
-                pet_attachments.empty();
-                if( pet && pet.attachments )
-                    $.each(pet.attachments, function(i, att){
-                        var tr = $("<a></a>")
-                            .attr('href', GlobalVariables.baseUrl + '/index.php/api/v1/attachments/open_attachment/' + att.id)
-                            .attr('target', '_blank')
-                            .text(att.filename)
-                            .appendTo(pet_attachments);
-                    });
-
+                var pet_select = $('#pet_id');
+                pet_select.find('option:not(:first)').remove();
+                $.each(customer.pets, function(iPet, pet){
+                    pet_select.append($('<option>', { 
+                        value: pet.id,
+                        text : pet.name,
+                        'data-pet': JSON.stringify(pet)
+                    }));
+                } );
+                pet_select.val(appointment.pet.id).change();
             } else {
                 var unavailable = lastFocusedEventData.data;
 
@@ -154,6 +130,45 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
 
             // :: DISPLAY EDIT DIALOG
             $dialog.modal('show');
+        });
+
+        $('#pet_id').change( function(event){
+            var pet = $(this).find('option:selected').data('pet');
+            if( pet )
+                $.each(pet, function (key, value) {
+                    if(key == 'dob')
+                        $('.form-control[id="pet_' + key + '"]').datepicker('setDate',
+                            Date.parseExact(value, 'yyyy-MM-dd HH:mm:ss'));
+                    else
+                        $('.form-control[id="pet_' + key + '"]').val(value);
+                });
+            else
+                $('.form-control[id^="pet_"]:not([id="pet_id"])').val('');
+
+            var history_table = $('#pet_history');
+            history_table.find('tbody').empty();
+            if( pet && pet.appointments )
+                $.each(pet.appointments, function(i, app){
+                    var tr = $("<tr></tr>").appendTo(history_table.find('tbody'));
+                    tr.append("<td>" + (app.start_datetime ? 
+                        GeneralFunctions.formatDate(app.start_datetime, GlobalVariables.dateFormat, false) :
+                        '') + "</td>");
+                    tr.append("<td>" + (app.depth ? app.depth : '') + "</td>");
+                    tr.append("<td>" + (app.speed ? app.speed : '') + "</td>");
+                    tr.append("<td>" + (app.time ? app.time : '') + "</td>");
+                    tr.append("<td>" + (app.comments ? app.comments : '') + "</td>");
+                });
+
+            var pet_attachments = $('#pet_attachments');
+            pet_attachments.empty();
+            if( pet && pet.attachments )
+                $.each(pet.attachments, function(i, att){
+                    var tr = $("<a></a>")
+                        .attr('href', GlobalVariables.baseUrl + '/index.php/api/v1/attachments/open_attachment/' + att.id)
+                        .attr('target', '_blank')
+                        .text(att.filename)
+                        .appendTo(pet_attachments);
+                });
         });
 
         /**

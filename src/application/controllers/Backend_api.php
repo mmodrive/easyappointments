@@ -217,7 +217,7 @@ class Backend_api extends CI_Controller {
             {
                 $appointment['provider'] = $this->providers_model->get_row($appointment['id_users_provider']);
                 $appointment['service'] = $this->services_model->get_row($appointment['id_services']);
-                $appointment['customer'] = $this->customers_model->get_row($appointment['id_users_customer']);
+                $appointment['customer'] = $this->customers_model->get_row($appointment['id_users_customer'], TRUE);
                 if( isset($appointment['id_pets']) )
                     $appointment['pet'] = $this->pets_model->get_row($appointment['id_pets']);
             }

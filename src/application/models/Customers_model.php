@@ -357,7 +357,7 @@ class Customers_Model extends CI_Model {
      *
      * @throws Exception If $customer_id argumnet is invalid.
      */
-    public function get_row($customer_id)
+    public function get_row($customer_id, $loadRelated = FALSE)
     {
         if ( ! is_numeric($customer_id))
         {
@@ -370,8 +370,16 @@ class Customers_Model extends CI_Model {
             ['id_users' => $customer_id])->row_array();
         unset($customer['settings']['id_users']);
 
-        $customer['pets'] = $this->db->get_where('ea_pets',
-            ['id_users' => $customer_id])->row_array();
+        if ($loadRelated) {
+            $this->load->model('pets_model');
+            $pet_ids = $this->db->select('id')->get_where('ea_pets',
+                ['id_users' => $customer_id])->result_array();
+            if (!empty($pet_ids)) {
+                $customer['pets'] = [];
+                foreach ($pet_ids as $pet_id)
+                    $customer['pets'][$pet_id['id']] = $this->pets_model->get_row($pet_id['id']);
+            }
+        }
 
         return $customer;
     }

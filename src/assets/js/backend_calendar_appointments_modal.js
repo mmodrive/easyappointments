@@ -82,7 +82,7 @@ window.BackendCalendarAppointmentsModal = window.BackendCalendarAppointmentsModa
             };
 
             var pet = null;
-            $('.form-control[id^="pet_"]:visible, #pet_id').each(function () {
+            $('.form-control[id^="pet_"]:visible').each(function () {
                 if ($(this).val() != ''){ 
                     if(!pet)
                         pet = {};

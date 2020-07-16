@@ -270,9 +270,10 @@
                     <fieldset>
                         <legend>
                             <?= lang('pet_details_title') ?>
+                            <select id="pet_id" class="form-control" >
+                                <option selected value> -- enter new pet -- </option>
+                            </select>
                         </legend>
-
-                        <input id="pet_id" type="hidden" class="form-control">
 
                         <div class="row">
                             <div class="col-xs-12 col-sm-6">
@@ -331,6 +332,22 @@
                                     <input type="text" id="pet_pathology" class="form-control" maxlength="250" />
                                 </div>
                             </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-xs-24 col-sm-12">
+                                <label class="control-label"><?= lang('attachment') ?></label>
+                                <div class="col-xs-24 col-sm-12">
+                                    <div id="pet_attachments"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <legend>
+                            <?= lang('pet_appointment_details_title') ?>
+                        </legend>
+
+                        <div class="row">
                             <div class="col-xs-12 col-sm-6">
                                 <div class="form-group">
                                     <label for="depth" class="control-label"><?= lang('depth') ?></label>
@@ -354,6 +371,11 @@
                                 </div>
                             </div>
                         </div>
+                        
+                        <legend>
+                            <?= lang('pet_history_title') ?>
+                        </legend>
+
                         <div class="row">
                             <div class="col-xs-24 col-sm-12">
                                 <table id="pet_history">
@@ -370,14 +392,6 @@
                                         
                                     </tbody>
                                 </table>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-xs-24 col-sm-12">
-                                <label class="control-label"><?= lang('attachment') ?></label>
-                                <div class="col-xs-24 col-sm-12">
-                                    <div id="pet_attachments"></div>
-                                </div>
                             </div>
                         </div>
 

@@ -33,6 +33,10 @@ class Appointments_Model extends CI_Model {
         // Validate the appointment data before doing anything.
         $this->validate($appointment);
 
+        foreach ($appointment as $key => $value) 
+            if($value === '')
+                unset($appointment[$key]);
+
         // Perform insert() or update() operation.
         if ( ! isset($appointment['id']))
         {
