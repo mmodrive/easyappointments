@@ -106,7 +106,8 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                         'data-pet': JSON.stringify(pet)
                     }));
                 } );
-                pet_select.val(appointment.pet.id).change();
+                if( appointment.pet )
+                    pet_select.val(appointment.pet.id).change();
             } else {
                 var unavailable = lastFocusedEventData.data;
 
