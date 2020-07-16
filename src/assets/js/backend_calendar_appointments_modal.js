@@ -232,6 +232,17 @@ window.BackendCalendarAppointmentsModal = window.BackendCalendarAppointmentsModa
                     $('#city').val(c.city);
                     $('#zip-code').val(c.zip_code);
                     $('#customer-notes').val(c.notes);
+
+                    var pet_select = $('#pet_id');
+                    pet_select.find('option:not(:first)').remove();
+                    $.each(c.pets, function(iPet, pet){
+                        pet_select.append($('<option>', { 
+                            value: pet.id,
+                            text : pet.name,
+                            'data-pet': JSON.stringify(pet)
+                        }));
+                    } );
+                    pet_select.change();
                     return false;
                 }
             });
