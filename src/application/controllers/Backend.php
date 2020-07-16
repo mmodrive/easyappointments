@@ -326,16 +326,18 @@ class Backend extends CI_Controller {
                 )
             );
 
-            $pets_raw = $this->db
-                ->where_in('id', $pet_ids )
-                ->get('ea_pets')->result_array();
-            $pets = [];
-            foreach ($pets_raw as $pet) 
-                $pets[$pet['id']] = $this->pets_model->compute_details($pet);
+            if(!empty($pet_ids)){
+                $pets = [];
+                $pets_raw = $this->db
+                    ->where_in('id', $pet_ids )
+                    ->get('ea_pets')->result_array();
+                foreach ($pets_raw as $pet) 
+                    $pets[$pet['id']] = $this->pets_model->compute_details($pet);
 
-            foreach ($appointments as &$appointment)
-                if (isset($appointment['pet_id'])) 
-                    $appointment['pet_title'] = $pets[$appointment['pet_id']]['title'];
+                foreach ($appointments as &$appointment)
+                    if (isset($appointment['pet_id'])) 
+                        $appointment['pet_title'] = $pets[$appointment['pet_id']]['title'];
+            }
         }
         $view['appointments'] = $appointments;
 
