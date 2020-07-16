@@ -46,7 +46,6 @@ class Attachments extends CI_Controller {
     public function open_attachment($attachment_id)
     {
         $this->load->model('attachments_model');
-        // $category = json_decode($this->input->post('category'), TRUE);
 
         if ($this->privileges[PRIV_APPOINTMENTS]['view'] == FALSE)
         {
@@ -67,13 +66,26 @@ class Attachments extends CI_Controller {
         // dump the file and stop the script
         fpassthru($fp);
         exit;
+    }
 
+    public function delete_attachment($attachment_id)
+    {
+        $this->load->model('attachments_model');
 
-        // $this->output
-        //     ->set_content_type('application/json')
-        //     ->set_output(json_encode([
-        //         'status' => AJAX_SUCCESS,
-        //         'id' => $category_id
-        //     ]));
+        if ($this->privileges[PRIV_APPOINTMENTS]['view'] == FALSE)
+        {
+            throw new Exception('You do not have the required privileges for this task.');
+        }
+
+        $attachment = $this->attachments_model->get_row($attachment_id);
+        $target_path = FCPATH.'storage/uploads/'.$attachment['storage_name'];
+
+        $this->attachments_model->delete($attachment_id);
+
+        unlink($target_path);
+
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode(AJAX_SUCCESS));
     }
 }

@@ -163,12 +163,34 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
             pet_attachments.empty();
             if( pet && pet.attachments )
                 $.each(pet.attachments, function(i, att){
-                    var tr = $("<a></a>")
+                    var container = $("<div></div>")
+                        .appendTo(pet_attachments);
+                    $("<a></a>")
                         .attr('href', GlobalVariables.baseUrl + '/index.php/api/v1/attachments/open_attachment/' + att.id)
                         .attr('target', '_blank')
                         .text(att.filename)
-                        .appendTo(pet_attachments);
+                        .appendTo(container);
+                    $("<button></button>")
+                        .attr('type', 'button')
+                        .attr('aria-hidden', 'true')
+                        .data('attachment_id', att.id)
+                        .text('×')
+                        .addClass('close')
+                        .appendTo(container);
                 });
+            pet_attachments.find('button.close').click(function(event){
+                if (confirm('Are you sure you want to delete "' + $(this).closest('div').find('a').text() + '"? This action is not reversible!')) {
+                    var url = GlobalVariables.baseUrl + '/index.php/api/v1/attachments/delete_attachment/' + $(this).data('attachment_id');
+                    var data = {
+                        csrfToken: GlobalVariables.csrfToken
+                    };
+
+                    $.post(url, data, function (response) {
+                        $(this).closest('div').remove();
+                    }.bind(this), 'json').fail(GeneralFunctions.ajaxFailureHandler);
+                }
+                event.preventDefault();
+            });
         });
 
         /**

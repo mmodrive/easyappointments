@@ -246,9 +246,10 @@ body legend {
 
 }
 
-#pet_attachments a{
+#pet_attachments div{
     margin: 0 0.5em;
     float: left;
+    display: inline-block;
 }
 
 /* BACKEND COMPONENTS
