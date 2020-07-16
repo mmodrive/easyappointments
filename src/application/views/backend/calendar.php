@@ -337,6 +337,11 @@
                         <div class="row">
                             <div class="col-xs-24 col-sm-12">
                                 <label class="control-label"><?= lang('attachment') ?></label>
+                                <div class="form-group">
+                                    <form enctype="multipart/form-data">
+                                        <input type="file" id="pet_attachment" class="form-control" maxlength="120" multiple />
+                                    </form>
+                                </div>
                                 <div class="col-xs-24 col-sm-12">
                                     <div id="pet_attachments"></div>
                                 </div>

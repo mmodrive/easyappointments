@@ -35,24 +35,32 @@ window.BackendCalendarApi = window.BackendCalendarApi || {};
      */
     exports.saveAppointment = function (appointment, customer, pet, successCallback, errorCallback) {
         var url = GlobalVariables.baseUrl + '/index.php/backend_api/ajax_save_appointment';
-        var data = {
-            csrfToken: GlobalVariables.csrfToken,
-            appointment_data: JSON.stringify(appointment)
-        };
+        var postData = new FormData();
+        postData.append("csrfToken", GlobalVariables.csrfToken);
+        postData.append("appointment_data", JSON.stringify(appointment));
 
         if (customer !== undefined) {
-            data.customer_data = JSON.stringify(customer);
+            postData.append("customer_data", JSON.stringify(customer));
         }
 
         if (pet !== undefined && pet != null) {
-            data.pet_data = JSON.stringify(pet);
+            if( pet["attachment"] ){
+                var files_el = $('#' + pet["attachment"]).get(0);
+                $.each(files_el.files,function(iFile,file){
+                        postData.append(pet["attachment"] + '['+iFile+']', file);
+                        });
+                pet["attachment"] = files_el.files.length;
+            }
+            postData.append("pet_data", JSON.stringify(pet));
         }
 
         $.ajax({
             url: url,
             type: 'POST',
-            data: data,
-            dataType: 'json'
+            data: postData,
+            dataType: 'json',
+            processData: false,
+            contentType: false,
         })
             .done(function (response) {
                 if (successCallback !== undefined) {
