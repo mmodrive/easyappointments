@@ -376,6 +376,8 @@
             $('#customer-pets').append(html);
         });
         $('#pet-details').empty();
+
+        $('#pet_history').find('tbody').empty();
     };
 
     /**
@@ -510,6 +512,24 @@
             '</div>';
 
         $('#pet-details').html(html).removeClass('hidden');
+
+        var history_table = $('#pet_history');
+        history_table.find('tbody').empty();
+        if( pet && pet.appointments )
+            $.each(pet.appointments, function(i, app){
+                var tr = $("<tr></tr>").appendTo(history_table.find('tbody'));
+                tr.append("<td>" + (app.start_datetime ? 
+                    GeneralFunctions.formatDate(app.start_datetime, GlobalVariables.dateFormat, false) :
+                    '') + "</td>");
+                tr.append("<td>" + (app.service_name ? app.service_name : '') + "</td>");
+                tr.append("<td>" + (app.provider_name ? app.provider_name : '') + "</td>");
+                tr.append("<td>" + (app.depth ? app.depth : '') + "</td>");
+                tr.append("<td>" + (app.speed ? app.speed : '') + "</td>");
+                tr.append("<td>" + (app.time ? app.time : '') + "</td>");
+                tr.append("<td>" + (app.comments ? app.comments : '') + "</td>");
+            });
+
+        $('#pet_history').removeClass('hidden');
     };
 
     window.CustomersHelper = CustomersHelper;

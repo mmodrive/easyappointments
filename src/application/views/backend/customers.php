@@ -26,7 +26,7 @@
 
 <div id="customers-page" class="container-fluid backend-page">
     <div class="row">
-    	<div id="filter-customers" class="filter-records column col-xs-12 col-sm-5">
+    	<div id="filter-customers" class="filter-records column col-xs-12 col-sm-5 col-lg-2">
     		<form>
                 <div class="input-group">
                     <input type="text" class="key form-control">
@@ -48,7 +48,7 @@
             <div class="results"></div>
     	</div>
 
-    	<div class="record-details col-xs-12 col-sm-7">
+    	<div class="record-details col-xs-12 col-sm-7 col-lg-10">
             <div class="btn-toolbar">
                 <div id="add-edit-delete-group" class="btn-group">
                     <?php if ($privileges[PRIV_CUSTOMERS]['add'] === TRUE): ?>
@@ -88,7 +88,7 @@
             <input id="customer-id" type="hidden">
 
             <div class="row">
-                <div class="col-xs-12 col-sm-4" style="margin-left: 0;">
+                <div class="col-xs-12 col-sm-3 col-lg-3" style="margin-left: 0;">
                     <h3><?= lang('details') ?></h3>
 
                     <div id="form-message" class="alert" style="display:none;"></div>
@@ -138,16 +138,35 @@
                     </p>
                 </div>
 
-                <div class="col-xs-12 col-sm-4">
+                <div class="col-xs-12 col-sm-3 col-lg-2">
                     <h3><?= lang('appointments') ?></h3>
                     <div id="customer-appointments" class="well"></div>
                     <div id="appointment-details" class="well hidden"></div>
                 </div>
 
-                <div class="col-xs-12 col-sm-4">
+                <div class="col-xs-12 col-sm-3 col-lg-2">
                     <h3><?= lang('pets') ?></h3>
                     <div id="customer-pets" class="well"></div>
                     <div id="pet-details" class="well hidden"></div>
+                </div>
+                <div class="col-xs-12 col-sm-3 col-lg-5">
+                    <h3><?= lang('pet_history_title') ?></h3>
+                    <table id="pet_history" class="">
+                        <thead>
+                            <tr>
+                                <th><?= lang('date') ?></th>
+                                <th><?= lang('service') ?></th>
+                                <th><?= lang('provider') ?></th>
+                                <th><?= lang('depth') ?></th>
+                                <th><?= lang('speed') ?></th>
+                                <th><?= lang('time') ?></th>
+                                <th><?= lang('comments') ?></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                        </tbody>
+                    </table>
                 </div>
             </div>
     	</div>

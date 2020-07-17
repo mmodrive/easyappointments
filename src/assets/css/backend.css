@@ -237,9 +237,14 @@ body legend {
     border-bottom: 4px solid #c0f1d6;
     color: #FFF;
 }
-#pet_history tr>:nth-child(5) {
+#pet_history th:last-of-type,
+#pet_history td:last-of-type {
     text-align: left;
     padding-left: 0.5em;
+}
+
+#pet_history tr:nth-child(even) {
+    background-color: #fafafa;
 }
 
 #pet_attachments{
@@ -296,7 +301,7 @@ body legend {
 }
 
 .record-details {
-    max-width: 1200px;
+    /*max-width: 1200px;*/
     margin-bottom: 20px;
 }
 
