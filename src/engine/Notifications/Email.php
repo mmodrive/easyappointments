@@ -189,6 +189,11 @@ class Email {
         }
     }
 
+// TODO:
+// 1 for new customer welcome
+// 1 for making an appointment
+// and 1 for appointment changes
+
     /**
      * Send an email notification to both provider and customer on appointment removal.
      *
