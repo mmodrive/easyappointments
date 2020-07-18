@@ -539,6 +539,9 @@ class Backend extends CI_Controller {
             $customer_message,
             $customer_link);
         
+        if ($template_name == 'sms_reminder') 
+            $html = nl2br($html);
+
         // $this->output
         //     ->set_content_type('text/html; charset=utf-8')
         //     ->set_output($html);

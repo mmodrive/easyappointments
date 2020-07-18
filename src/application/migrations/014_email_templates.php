@@ -21,10 +21,10 @@ class Migration_Email_templates extends CI_Migration {
         $old_notification_html = trim($old_notification_html);
         $old_notification_html = preg_replace('/[\x00-\x1F\x7F-\xFF]/', '', $old_notification_html);
 
-        $this->db->insert('ea_settings', ['name' => 'email_customer_registration', 'value' => 'Dear $customer_name, Thank you for registering $provider_name. Regards, $company_name $company_link' ]);
+        $this->db->insert('ea_settings', ['name' => 'email_customer_registration', 'value' => 'Dear $customer_name,<br/>Thank you for registering with us.<br/>Regards,<br/>$company_name<br/><a href="$company_link">$company_link</a>' ]);
         $this->db->insert('ea_settings', ['name' => 'email_appointment_new', 'value' => $old_notification_html ]);
         $this->db->insert('ea_settings', ['name' => 'email_appointment_change', 'value' => $old_notification_html ]);
-        $this->db->insert('ea_settings', ['name' => 'sms_reminder', 'value' => 'Dear $customer_name, You have appointment tomorrow at $appointment_start_date with $provider_name. Regards, $company_name' ]);
+        $this->db->insert('ea_settings', ['name' => 'sms_reminder', 'value' => 'Dear $customer_name,'."\n".'You have appointment tomorrow at $appointment_start_date with $provider_name.'."\n".'Regards, $company_name' ]);
     }
 
     public function down()
