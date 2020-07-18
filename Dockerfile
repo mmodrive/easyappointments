@@ -1,4 +1,4 @@
-FROM php:7.3-apache
+FROM php:7.1-apache
 
 ENV PROJECT_DIR=/var/www/html \
     APP_URL=localhost

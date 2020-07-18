@@ -51,6 +51,9 @@
             $('.breaks tbody').empty();
             BackendSettings.wp.setup(workingPlan);
             BackendSettings.wp.timepickers(false);
+            $('iframe.preview').each(function(el){
+                this.src = this.src;
+            });
         }, 'json').fail(GeneralFunctions.ajaxFailureHandler);
     };
 
@@ -122,6 +125,26 @@
         settings.push({
             name: 'privacy_policy_content',
             value: $('#privacy-policy-content').trumbowyg('html')
+        });
+
+        settings.push({
+            name: 'email_customer_registration',
+            value: $('#email_customer_registration').trumbowyg('html')
+        });
+
+        settings.push({
+            name: 'email_appointment_new',
+            value: $('#email_appointment_new').trumbowyg('html')
+        });
+
+        settings.push({
+            name: 'email_appointment_change',
+            value: $('#email_appointment_change').trumbowyg('html')
+        });
+
+        settings.push({
+            name: 'sms_reminder',
+            value: $('#sms_reminder').val()
         });
 
         return settings;

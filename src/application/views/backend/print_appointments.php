@@ -110,13 +110,13 @@ h2 {
   <!-- <form name="frmSearch" method="post" action="" > -->
  <?php echo form_open('') ?>
   <p class="search_input">
-   <input type="text" placeholder="From Date" name="post_at" value="<?php echo isset($post_at) ? $post_at : ''; ?>" autocomplete="off" class="input-control input-date" />
-   <input type="text" placeholder="To Date" name="post_at_to_date" style="margin-left:10px" value="<?php echo isset($post_at_to_date) ? $post_at_to_date : ''; ?>" class="input-control input-date" autocomplete="off" />   
+   <input type="text" placeholder="From Date" name="post_at" value="<?= $post_at ?? ''; ?>" autocomplete="off" class="input-control input-date" />
+   <input type="text" placeholder="To Date" name="post_at_to_date" style="margin-left:10px" value="<?= $post_at_to_date ?? ''; ?>" class="input-control input-date" autocomplete="off" />   
    <select name="service" class="input-control">
     <option value="all">All Services</option>
    <?php
     foreach ($available_services as $iservice) {
-      echo '<option value="' . $iservice['id'] . '" ' . (isset($service) && $iservice['id'] == $service ? 'selected' : '') . '>' . $iservice['name'] . '</option>';
+      echo '<option value="' . $iservice['id'] . '" ' . ($iservice['id'] == $service ? 'selected' : '') . '>' . $iservice['name'] . '</option>';
     }
     ?>
    </select>
@@ -124,7 +124,7 @@ h2 {
     <option value="all">All Providers</option>
    <?php
     foreach ($available_providers as $iprovider) {
-      echo '<option value="' . $iprovider['id'] . '" ' . (isset($provider) && $iprovider['id'] == $provider ? 'selected' : '') . '>' . $iprovider['first_name'] . ' ' . $iprovider['last_name'] . '</option>';
+      echo '<option value="' . $iprovider['id'] . '" ' . ($iprovider['id'] == $provider ? 'selected' : '') . '>' . $iprovider['first_name'] . ' ' . $iprovider['last_name'] . '</option>';
     }
     ?>
    </select>
@@ -164,9 +164,9 @@ if($new_service)
               <td>'.date($php_date_format,strtotime($appointment["start_datetime"])).'</td>
               <td>'.date($php_time_format,strtotime($appointment["start_datetime"])).'</td>
               <td>'.date($php_time_format,strtotime($appointment["end_datetime"])).'</td>
-              <td>'.$appointment["customer_name"].'</td>
-              <td>'.$appointment["phone_number"].'</td>
-              <td>'.(isset($appointment["pet_title"]) ? $appointment["pet_title"] : '').'</td>
+              <td>'.($appointment["customer_name"] ?? '').'</td>
+              <td>'.($appointment["phone_number"] ?? '').'</td>
+              <td>'.($appointment["pet_title"] ?? '').'</td>
             </tr>';
 }
  

@@ -521,12 +521,12 @@
                 tr.append("<td>" + (app.start_datetime ? 
                     GeneralFunctions.formatDate(app.start_datetime, GlobalVariables.dateFormat, false) :
                     '') + "</td>");
-                tr.append("<td>" + (app.service_name ? app.service_name : '') + "</td>");
-                tr.append("<td>" + (app.provider_name ? app.provider_name : '') + "</td>");
-                tr.append("<td>" + (app.depth ? app.depth : '') + "</td>");
-                tr.append("<td>" + (app.speed ? app.speed : '') + "</td>");
-                tr.append("<td>" + (app.time ? app.time : '') + "</td>");
-                tr.append("<td>" + (app.comments ? app.comments : '') + "</td>");
+                tr.append("<td>" + (app.service_name ?? '') + "</td>");
+                tr.append("<td>" + (app.provider_name ?? '') + "</td>");
+                tr.append("<td>" + (app.depth ?? '') + "</td>");
+                tr.append("<td>" + (app.speed ?? '') + "</td>");
+                tr.append("<td>" + (app.time ?? '') + "</td>");
+                tr.append("<td>" + (app.comments ?? '') + "</td>");
             });
 
         $('#pet_history').removeClass('hidden');

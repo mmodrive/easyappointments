@@ -480,57 +480,6 @@ class Appointments extends CI_Controller {
     }
 
     /**
-     * Regenerate a new password for the current user, only if the username and
-     * email address given correspond to an existing user in db.
-     *
-     * Required POST Parameters:
-     *
-     * - string $_POST['username'] Username to be validated.
-     * - string $_POST['email'] Email to be validated.
-     */
-    public function ajax_forgot_password()
-    {
-        try
-        {
-            if ( ! $this->input->post('username') || ! $this->input->post('email'))
-            {
-                throw new Exception('You must enter a valid username and email address in '
-                    . 'order to get a new password!');
-            }
-
-            $this->load->model('user_model');
-            $this->load->model('settings_model');
-
-            $new_password = $this->user_model->regenerate_password($this->input->post('username'),
-                $this->input->post('email'));
-
-            if ($new_password != FALSE)
-            {
-                $this->config->load('email');
-                $email = new \EA\Engine\Notifications\Email($this, $this->config->config);
-                $company_settings = [
-                    'company_name' => $this->settings_model->get_setting('company_name'),
-                    'company_link' => $this->settings_model->get_setting('company_link'),
-                    'company_email' => $this->settings_model->get_setting('company_email')
-                ];
-
-                $email->sendPassword(new NonEmptyText($new_password), new Email($this->input->post('email')),
-                    $company_settings);
-            }
-
-            $this->output
-                ->set_content_type('application/json')
-                ->set_output(json_encode($new_password != FALSE ? AJAX_SUCCESS : AJAX_FAILURE));
-        }
-        catch (Exception $exc)
-        {
-            $this->output
-                ->set_content_type('application/json')
-                ->set_output(json_encode(['exceptions' => [exceptionToJavaScript($exc)]]));
-        }
-    }
-
-    /**
      * [AJAX] Register the appointment to the database.
      *
      * Outputs a JSON string with the appointment ID.
@@ -570,7 +519,7 @@ class Appointments extends CI_Controller {
 
             $appointment = $post_data['appointment'];
             $customer = $post_data['customer'];
-            $pet = isset($post_data['pet']) ? $post_data['pet'] : null;
+            $pet = $post_data['pet'] ?? null;
             $is_existing_customer = false;
 
             if ($this->customers_model->exists($customer))

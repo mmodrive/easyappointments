@@ -63,21 +63,22 @@ class Pets_Model extends CI_Model {
         }
 
         if( $attachments > 0 ){
+            $files = $_FILES['pet_attachment'];
 
-            for($i=0; $i<count($_FILES['pet_attachment']['name']); $i++){
+            for($i=0; $i<count($files['name']); $i++){
                 $target_path = FCPATH.'storage/uploads/';
-                $ext = explode('.', basename( $_FILES['pet_attachment']['name'][$i]));
-                $storage_name = md5(uniqid()) . "." . $ext[count($ext)-1];
-                $target_path = $target_path . $storage_name; 
-                $tmp_path = $_FILES['pet_attachment']['tmp_name'][$i];
+                $ext = strtolower(pathinfo($files['name'][$i],PATHINFO_EXTENSION));
+                $storage_name = md5(uniqid()) . "." . $ext;
+                $target_path = $target_path . $storage_name;
+                $tmp_path = $files['tmp_name'][$i];
 
                 if(!move_uploaded_file($tmp_path, $target_path))
                     throw new Exception("There was an error uploading the file, please try again!");
 
                 $attachment = [ 
                     'id_pets' => $pet['id'], 
-                    'type' => $_FILES['pet_attachment']['type'][$i],
-                    'filename' => $_FILES['pet_attachment']['name'][$i],
+                    'type' => $files['type'][$i],
+                    'filename' => $files['name'][$i],
                     'storage_name' => $storage_name
                 ];
 

@@ -49,11 +49,13 @@ window.BackendSettings = window.BackendSettings || {};
     exports.initialize = function (bindEventHandlers) {
         bindEventHandlers = bindEventHandlers || true;
 
-        $('#cookie-notice-content, #terms-and-conditions-content, #privacy-policy-content').trumbowyg();
+        $('#cookie-notice-content, #terms-and-conditions-content, #privacy-policy-content, \
+            #email_customer_registration, #email_appointment_new, #email_appointment_change').trumbowyg();
 
         // Apply setting values from database.
         $.each(GlobalVariables.settings.system, function (index, setting) {
             $('input[data-field="' + setting.name + '"]').val(setting.value);
+            $('textarea[data-field="' + setting.name + '"]').val(setting.value);
             $('select[data-field="' + setting.name + '"]').val(setting.value);
         });
 
@@ -93,6 +95,18 @@ window.BackendSettings = window.BackendSettings || {};
 
             if (setting.name === 'privacy_policy_content') {
                 $('#privacy-policy-content').trumbowyg('html', setting.value);
+            }
+
+            if (setting.name === 'email_customer_registration') {
+                $('#email_customer_registration').trumbowyg('html', setting.value);
+            }
+
+            if (setting.name === 'email_appointment_new') {
+                $('#email_appointment_new').trumbowyg('html', setting.value);
+            }
+
+            if (setting.name === 'email_appointment_change') {
+                $('#email_appointment_change').trumbowyg('html', setting.value);
             }
         });
 
@@ -144,6 +158,16 @@ window.BackendSettings = window.BackendSettings || {};
         }
 
         Backend.placeFooterToBottom();
+
+        $('.show-replaced-template').each(function(el){
+            var ifrm = $("<iframe />",{
+                        name: this.id + 'preview',
+                        id: this.id + 'preview',
+                        src: GlobalVariables.baseUrl + '/index.php/backend/GetTemplate/' + this.id,
+                        class: 'preview'
+                    });
+            $(this).closest('.form-group').append(ifrm);
+        });
     };
 
     /**
@@ -169,6 +193,8 @@ window.BackendSettings = window.BackendSettings || {};
             if (href === '#general') {
                 settings = new SystemSettings();
             } else if (href === '#business-logic') {
+                settings = new SystemSettings();
+            } else if (href === '#notification-templates') {
                 settings = new SystemSettings();
             } else if (href === '#legal-contents') {
                 settings = new SystemSettings();

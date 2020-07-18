@@ -79,10 +79,10 @@ class Attachments extends CI_Controller {
 
         $attachment = $this->attachments_model->get_row($attachment_id);
         $target_path = FCPATH.'storage/uploads/'.$attachment['storage_name'];
+        if (file_exists($target_path)) 
+            unlink($target_path);
 
         $this->attachments_model->delete($attachment_id);
-
-        unlink($target_path);
 
         $this->output
             ->set_content_type('application/json')

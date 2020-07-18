@@ -83,6 +83,7 @@ class Email {
      * @param array $provider Contains the provider data.
      * @param array $service Contains the service data.
      * @param array $customer Contains the customer data.
+     * @param array $pet Contains the pet data.
      * @param array $company Contains settings of the company. By the time the
      * "company_name", "company_link" and "company_email" values are required in the array.
      * @param \EA\Engine\Types\Text $title The email title may vary depending the receiver.
@@ -105,6 +106,46 @@ class Email {
         EmailAddress $recipientEmail,
         Text $icsStream
     ) {
+        $html = $this->getHtml('email_appointment_new', $appointment, $provider, $service, $customer, $pet, $title, $message, $appointmentLink);
+
+        $mailer = $this->_createMailer();
+
+        $mailer->From = $company['company_email'];
+        $mailer->FromName = $company['company_name'];
+        $mailer->AddAddress($recipientEmail->get());
+        $mailer->Subject = $title->get();
+        $mailer->Body = $html;
+
+        $mailer->addStringAttachment($icsStream->get(), 'invitation.ics');
+
+        if ( ! $mailer->Send())
+        {
+            throw new \RuntimeException('Email could not been sent. Mailer Error (Line ' . __LINE__ . '): '. $mailer->ErrorInfo);
+        }
+    }
+
+    public function getHtml(
+        $controller,
+        string $template_name,
+        array $appointment,
+        array $provider,
+        array $service,
+        array $customer,
+        array $pet=null,
+        Text $title,
+        Text $message,
+        Url $appointmentLink
+    ) {
+        $controller->load->model('settings_model');
+
+        $company = [
+            'company_name' => $controller->settings_model->get_setting('company_name'),
+            'company_link' => $controller->settings_model->get_setting('company_link'),
+            'company_email' => $controller->settings_model->get_setting('company_email'),
+            'date_format' => $controller->settings_model->get_setting('date_format'),
+            'time_format' => $controller->settings_model->get_setting('time_format')
+        ];
+
         switch ($company['date_format'])
         {
             case 'DMY':
@@ -170,29 +211,14 @@ class Email {
                     $replaceArray['pet_'.$key] = $value;
             }
 
-        $html = file_get_contents(__DIR__ . '/../../application/views/emails/appointment_details.php');
+        $html = $controller->settings_model->get_setting($template_name);
         $html = $this->_replaceTemplateVariables($replaceArray, $html);
+        $html = "<html><head><title>{$title->get()}</title></head><bodystyle=\"font: 13px arial, helvetica, tahoma;\">" .
+            $html .
+            "</body></html>";
 
-        $mailer = $this->_createMailer();
-
-        $mailer->From = $company['company_email'];
-        $mailer->FromName = $company['company_name'];
-        $mailer->AddAddress($recipientEmail->get());
-        $mailer->Subject = $title->get();
-        $mailer->Body = $html;
-
-        $mailer->addStringAttachment($icsStream->get(), 'invitation.ics');
-
-        if ( ! $mailer->Send())
-        {
-            throw new \RuntimeException('Email could not been sent. Mailer Error (Line ' . __LINE__ . '): '. $mailer->ErrorInfo);
-        }
+        return $html;
     }
-
-// TODO:
-// 1 for new customer welcome
-// 1 for making an appointment
-// and 1 for appointment changes
 
     /**
      * Send an email notification to both provider and customer on appointment removal.

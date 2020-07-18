@@ -42,6 +42,11 @@
         <?php endif ?>
         <?php if ($privileges[PRIV_SYSTEM_SETTINGS]['view'] == TRUE): ?>
             <li role="presentation">
+                <a href="#notification-templates" aria-controls="notification-templates" role="tab" data-toggle="tab"><?= lang('notification_templates') ?></a>
+            </li>
+        <?php endif ?>
+        <?php if ($privileges[PRIV_SYSTEM_SETTINGS]['view'] == TRUE): ?>
+            <li role="presentation">
                 <a href="#legal-contents" aria-controls="legal-contents" role="tab" data-toggle="tab"><?= lang('legal_contents') ?></a>
             </li>
         <?php endif ?>
@@ -323,6 +328,54 @@
                                 </thead>
                                 <tbody><!-- Dynamic Content --></tbody>
                             </table>
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+
+        <!-- NOTIFICATION TEMPLATES TAB -->
+
+        <?php $hidden = ($privileges[PRIV_SYSTEM_SETTINGS]['view'] == TRUE) ? '' : 'hidden' ?>
+        <div role="tabpanel" class="tab-pane <?= $hidden ?>" id="notification-templates">
+            <form>
+                <fieldset>
+                    <legend>
+                        <?= lang('notification_templates') ?>
+                        <?php if ($privileges[PRIV_SYSTEM_SETTINGS]['edit'] == TRUE): ?>
+                            <button type="button" class="save-settings btn btn-primary btn-xs"
+                                    title="<?= lang('save') ?>">
+                                <span class="glyphicon glyphicon-floppy-disk"></span>
+                                <?= lang('save') ?>
+                            </button>
+                        <?php endif ?>
+                    </legend>
+
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-11 col-md-10 col-lg-9">
+                            <h4><?= lang('email_customer_registration') ?></h4>
+
+                            <div class="form-group">
+                                <textarea id="email_customer_registration" cols="30" rows="10" class="form-control show-replaced-template"></textarea>
+                            </div>
+
+                            <h4><?= lang('email_appointment_new') ?></h4>
+
+                            <div class="form-group">
+                                <textarea id="email_appointment_new" cols="30" rows="10" class="form-control show-replaced-template"></textarea>
+                            </div>
+
+                            <h4><?= lang('email_appointment_change') ?></h4>
+
+                            <div class="form-group">
+                                <textarea id="email_appointment_change" cols="30" rows="10" class="form-control show-replaced-template"></textarea>
+                            </div>
+
+                            <h4><?= lang('sms_reminder') ?></h4>
+
+                            <div class="form-group">
+                                <textarea id="sms_reminder" data-field="sms_reminder" class="form-control show-replaced-template" cols="30" rows="10"></textarea>
+                            </div>
                         </div>
                     </div>
                 </fieldset>

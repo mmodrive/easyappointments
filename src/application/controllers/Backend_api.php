@@ -1474,7 +1474,7 @@ class Backend_api extends CI_Controller {
                     throw new Exception('You do not have the required privileges for this task.');
                 }
                 $this->load->model('settings_model');
-                $settings = json_decode($this->input->post('settings'), TRUE);
+                $settings = json_decode($this->input->post('settings', FALSE), TRUE, 512);
                 $this->settings_model->save_settings($settings);
             }
             else
