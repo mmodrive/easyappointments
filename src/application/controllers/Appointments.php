@@ -519,13 +519,13 @@ class Appointments extends CI_Controller {
 
             $appointment = $post_data['appointment'];
             $customer = $post_data['customer'];
-            $pet = $post_data['pet'] ?? null;
-            $is_existing_customer = false;
+            $pet = $post_data['pet'] ?? NULL;
+            $is_existing_customer = FALSE;
 
             if ($this->customers_model->exists($customer))
             {
                 $customer['id'] = $this->customers_model->find_record_id($customer);
-                $is_existing_customer = true;
+                $is_existing_customer = TRUE;
             }
 
             $customer_id = $this->customers_model->add($customer);
@@ -533,7 +533,7 @@ class Appointments extends CI_Controller {
             $appointment['is_unavailable'] = (int)$appointment['is_unavailable']; // needs to be type casted
             if( isset($pet) ) {
                 $pet['id_users'] = $customer_id;
-                $appointment['id_pets'] = $this->pets_model->add($pet, $is_existing_customer);
+                $appointment['id_pets'] = $this->pets_model->add($pet);
             }
             $appointment['id'] = $this->appointments_model->add($appointment);
             $appointment['hash'] = $this->appointments_model->get_value('hash', $appointment['id']);
@@ -613,10 +613,17 @@ class Appointments extends CI_Controller {
 
                 if ($send_customer === TRUE)
                 {
+                    if(!$is_existing_customer){
+                        $notification = $this->settings_model->getNotification(
+                            'email_customer_registration',$appointment, $provider, $service, $customer, $pet, TRUE
+                        );
+                        $email->sendEmail($notification, new Email($customer['email']));
+                    }
+
                     $notification = $this->settings_model->getNotification(
                         $notification_type,$appointment, $provider, $service, $customer, $pet, TRUE
                     );
-                    $email->sendAppointmentDetails($notification, new Email($customer['email']), new Text($ics_stream));
+                    $email->sendEmail($notification, new Email($customer['email']), new Text($ics_stream));
                 }
 
                 $send_provider = filter_var($this->providers_model->get_setting('notifications', $provider['id']),
@@ -627,7 +634,7 @@ class Appointments extends CI_Controller {
                     $notification = $this->settings_model->getNotification(
                         $notification_type,$appointment, $provider, $service, $customer, $pet, FALSE
                     );
-                    $email->sendAppointmentDetails($notification, new Email($provider['email']), new Text($ics_stream));
+                    $email->sendEmail($notification, new Email($provider['email']), new Text($ics_stream));
                 }
             }
             catch (Exception $exc)

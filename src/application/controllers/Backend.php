@@ -372,6 +372,7 @@ class Backend extends CI_Controller {
 
         $view['base_url'] = $this->config->item('base_url');
         $view['user_display_name'] = $this->user_model->get_user_display_name($user_id);
+        $view['user_phone_number'] = $this->user_model->get_settings($this->session->userdata('user_id'))['phone_number'] ?? '';
         $view['active_menu'] = PRIV_SYSTEM_SETTINGS;
         $view['company_name'] = $this->settings_model->get_setting('company_name');
         $view['date_format'] = $this->settings_model->get_setting('date_format');
@@ -480,6 +481,7 @@ class Backend extends CI_Controller {
             throw new Exception('You do not have the required privileges for this task.');
         }
 
+        $this->load->model('settings_model');
         $this->load->model('appointments_model');
         $this->load->model('providers_model');
         $this->load->model('services_model');
@@ -489,15 +491,15 @@ class Backend extends CI_Controller {
         $app_id = $this->db
             ->select('id')
             ->from('ea_appointments')
-            ->where('id_pets IS NOT NULL')
             ->order_by('id', 'DESC')
+            ->order_by('id_pets', 'ASC')
             ->limit(1)
             ->get()->row()->id;
         $appointment = $this->appointments_model->get_row($app_id);
         $provider = $this->providers_model->get_row($appointment['id_users_provider']);
         $service = $this->services_model->get_row($appointment['id_services']);
         $customer = $this->customers_model->get_row($appointment['id_users_customer']);
-        $pet = $this->pets_model->get_row($appointment['id_pets']);
+        $pet = $appointment['id_pets'] ? $this->pets_model->get_row($appointment['id_pets']) : NULL;
 
         $html = $this->settings_model->getNotification(
             $template_name,
@@ -506,6 +508,7 @@ class Backend extends CI_Controller {
             $service,
             $customer,
             $pet,
+            TRUE,
             TRUE)->body;
         
         if (strpos($template_name, 'sms_') === 0)

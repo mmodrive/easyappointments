@@ -28,7 +28,7 @@ class Customers_Model extends CI_Model {
      *
      * @return int Returns the customer id.
      */
-    public function add($customer)
+    public function add(&$customer)
     {
         // Validate the customer data before doing anything.
         $this->validate($customer);
@@ -132,7 +132,7 @@ class Customers_Model extends CI_Model {
 
         $this->db->trans_complete();
 
-        return (int)$this->db->insert_id();
+        return (int)$customer['id'];
     }
 
     /**
@@ -512,25 +512,31 @@ class Customers_Model extends CI_Model {
         $this->load->helper('general');
 
         $customer = [ 'email' => $email ];
-        $customer_id = $this->customers_model->find_record_id($customer);
 
-        $salt = $this->customers_model->get_salt($customer_id);
-        if ( !$salt )
-            return [ 'email' => $email ];
+        if($this->customers_model->exists($customer)){
+            $customer_id = $this->customers_model->find_record_id($customer);
 
-        $password = hash_password($salt, $password);
+            $salt = $this->customers_model->get_salt($customer_id);
+            if ( !$salt )
+                return [ 'email' => $email ];
 
-        $customer = $this->db
-            ->select('ea_users.*')
-            ->from('ea_users')
-            ->join('ea_user_settings', 'ea_user_settings.id_users = ea_users.id', 'inner')
-            ->where('ea_users.email', $email)
-            ->where('ea_user_settings.password', $password)
-            ->get()->row_array();
+            $password = hash_password($salt, $password);
 
-        $customer['pets'] = $this->db->get_where('ea_pets',
-            ['id_users' => $customer_id])->result_array();
+            $customer = $this->db
+                ->select('ea_users.*')
+                ->from('ea_users')
+                ->join('ea_user_settings', 'ea_user_settings.id_users = ea_users.id', 'inner')
+                ->where('ea_users.email', $email)
+                ->where('ea_user_settings.password', $password)
+                ->get()->row_array();
 
-        return ($customer) ? $customer : NULL;
+            if (!empty($customer)) 
+                $customer['pets'] = $this->db->get_where('ea_pets',
+                    ['id_users' => $customer_id])->result_array();
+
+            return $customer;
+        }
+        else
+            return $customer;
     }
 }

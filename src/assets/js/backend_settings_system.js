@@ -68,7 +68,7 @@
         var settings = [];
 
         // General Settings Tab
-        $('#general').find('input, select').each(function () {
+        $('#general, #notification-templates').find('input.form-control, select.form-control').each(function () {
             settings.push({
                 name: $(this).attr('data-field'),
                 value: $(this).val()

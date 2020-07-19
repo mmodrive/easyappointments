@@ -72,10 +72,10 @@ class Email {
      * @param \EA\Engine\Types\Email $recipientEmail The recipient email address.
      * @param \EA\Engine\Types\Text $icsStream Stream contents of the ICS file.
      */
-    public function sendAppointmentDetails(
+    public function sendEmail(
         \stdClass $notification,
         EmailAddress $recipientEmail,
-        Text $icsStream
+        Text $icsStream = NULL
     ) {
         $mailer = $this->_createMailer();
 
@@ -85,7 +85,8 @@ class Email {
         $mailer->Subject = $notification->subject;
         $mailer->Body = $notification->body;
 
-        $mailer->addStringAttachment($icsStream->get(), 'invitation.ics');
+        if(isset($icsStream))
+            $mailer->addStringAttachment($icsStream->get(), 'invitation.ics');
 
         if ( ! $mailer->Send())
         {

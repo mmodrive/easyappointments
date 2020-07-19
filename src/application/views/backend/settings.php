@@ -164,6 +164,16 @@
                                     <?= lang('require_captcha_hint') ?>
                                 </span>
                             </div>
+
+                            <div class="form-group">
+                                <label for="sms_username"><?= lang('sms_username') ?> *</label>
+                                <input id="sms_username" data-field="sms_username" class="required form-control">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="sms_password"><?= lang('sms_password') ?> *</label>
+                                <input id="sms_password" data-field="sms_password" class="required form-control">
+                            </div>
                         </div>
                     </div>
                 </fieldset>
@@ -356,25 +366,51 @@
                             <h4><?= lang('email_customer_registration') ?></h4>
 
                             <div class="form-group">
+                                <label for="email_customer_registration_subject"><?= lang('subject') ?> *</label>
+                                <input id="email_customer_registration_subject" data-field="email_customer_registration_subject" class="required form-control">
+                            </div>
+
+                            <div class="form-group">
                                 <textarea id="email_customer_registration" cols="30" rows="10" class="form-control show-replaced-template"></textarea>
                             </div>
 
+                            <hr>
                             <h4><?= lang('email_appointment_new') ?></h4>
+
+                            <div class="form-group">
+                                <label for="email_appointment_new_subject"><?= lang('subject') ?> *</label>
+                                <input id="email_appointment_new_subject" data-field="email_appointment_new_subject" class="required form-control">
+                            </div>
 
                             <div class="form-group">
                                 <textarea id="email_appointment_new" cols="30" rows="10" class="form-control show-replaced-template"></textarea>
                             </div>
 
+                            <hr>
                             <h4><?= lang('email_appointment_change') ?></h4>
+
+                            <div class="form-group">
+                                <label for="email_appointment_change_subject"><?= lang('subject') ?> *</label>
+                                <input id="email_appointment_change_subject" data-field="email_appointment_change_subject" class="required form-control">
+                            </div>
 
                             <div class="form-group">
                                 <textarea id="email_appointment_change" cols="30" rows="10" class="form-control show-replaced-template"></textarea>
                             </div>
 
+                            <hr>
                             <h4><?= lang('sms_reminder') ?></h4>
 
                             <div class="form-group">
                                 <textarea id="sms_reminder" data-field="sms_reminder" class="form-control show-replaced-template" cols="30" rows="10"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <input id="test_sms_number" class="" value="<?= $user_phone_number ?? '' ?>">
+                                <button type="button" class="test_sms btn btn-xs"
+                                        title="<?= lang('test_sms') ?>">
+                                    <span class="glyphicon"></span>
+                                    <?= lang('test_sms') ?>
+                                </button>
                             </div>
                         </div>
                     </div>

@@ -257,6 +257,24 @@ window.BackendSettings = window.BackendSettings || {};
                 }
             }, 'json').fail(GeneralFunctions.ajaxFailureHandler);
         });
+
+        $('.test_sms').click(function () {
+            var postUrl = GlobalVariables.baseUrl + '/index.php/backend_api/ajax_test_sms';
+            var postData = {
+                csrfToken: GlobalVariables.csrfToken,
+                phone_number: $('#test_sms_number').val(),
+            };
+
+            $.post(postUrl, postData, function (response) {
+                if (!GeneralFunctions.handleAjaxExceptions(response)) {
+                    return;
+                }
+
+                Backend.displayNotification(EALang.sms_sent);
+
+            }, 'json').fail(GeneralFunctions.ajaxFailureHandler);
+        });
+
     }
 
 })(window.BackendSettings);

@@ -265,6 +265,7 @@ class Backend_api extends CI_Controller {
             $this->load->model('customers_model');
             $this->load->model('pets_model');
             $this->load->model('settings_model');
+            $is_existing_customer = TRUE;
 
             // :: SAVE CUSTOMER CHANGES TO DATABASE
             if ($this->input->post('customer_data'))
@@ -279,6 +280,7 @@ class Backend_api extends CI_Controller {
                     throw new Exception('You do not have the required privileges for this task.');
                 }
 
+                $is_existing_customer = $this->customers_model->exists($customer);
                 $customer['id'] = $this->customers_model->add($customer);
             }
 
@@ -398,10 +400,17 @@ class Backend_api extends CI_Controller {
 
                 if ((bool)$send_customer === TRUE)
                 {
+                    if(!$is_existing_customer){
+                        $notification = $this->settings_model->getNotification(
+                            'email_customer_registration',$appointment, $provider, $service, $customer, $pet, TRUE
+                        );
+                        $email->sendEmail($notification, new Email($customer['email']));
+                    }
+
                     $notification = $this->settings_model->getNotification(
                         $notification_type,$appointment, $provider, $service, $customer, $pet, TRUE
                     );
-                    $email->sendAppointmentDetails($notification, new Email($customer['email']), new Text($ics_stream));
+                    $email->sendEmail($notification, new Email($customer['email']), new Text($ics_stream));
                 }
 
                 if ($send_provider == TRUE)
@@ -409,7 +418,7 @@ class Backend_api extends CI_Controller {
                     $notification = $this->settings_model->getNotification(
                         $notification_type,$appointment, $provider, $service, $customer, $pet, FALSE
                     );
-                    $email->sendAppointmentDetails($notification, new Email($provider['email']), new Text($ics_stream));
+                    $email->sendEmail($notification, new Email($provider['email']), new Text($ics_stream));
                 }
 
             }
@@ -1465,7 +1474,7 @@ class Backend_api extends CI_Controller {
                     throw new Exception('You do not have the required privileges for this task.');
                 }
                 $this->load->model('settings_model');
-                $settings = json_decode($this->input->post('settings', FALSE), TRUE, 512);
+                $settings = json_decode($this->input->post('settings', FALSE), TRUE);
                 $this->settings_model->save_settings($settings);
             }
             else
@@ -1652,4 +1661,37 @@ class Backend_api extends CI_Controller {
         }
     }
 
+    public function ajax_test_sms()
+    {
+        try
+        {
+            if ($this->privileges[PRIV_USERS]['edit'] == FALSE
+                && $this->session->userdata('user_id') != $this->input->post('provider_id'))
+            {
+                throw new Exception('You do not have the required privileges for this task.');
+            }
+
+            // $email = new \EA\Engine\Notifications\Email($this, $this->config->config);
+
+            $this->load->model('settings_model');
+            $phone_number = $this->input->post('phone_number');
+            $notification_type = 'sms_reminder';
+            $result = $this->settings_model->set_setting('google_calendar', $this->input->post('calendar_id'));
+
+            $notification = $this->settings_model->getNotification(
+                $notification_type,$appointment, $provider, $service, $customer, $pet, TRUE
+            );
+            $email->sendEmail($notification, new Email($customer['email']), new Text($ics_stream));
+
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode($result ? AJAX_SUCCESS : AJAX_FAILURE));
+        }
+        catch (Exception $exc)
+        {
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode(['exceptions' => [exceptionToJavaScript($exc)]]));
+        }
+    }
 }

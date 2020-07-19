@@ -165,19 +165,18 @@ class Settings_Model extends CI_Model {
 
     public function getNotification(
         string $template_name,
-        array $appointment,
-        array $provider,
-        array $service,
-        array $customer,
-        array $pet,
-        bool $is_customer_notification
+        $appointment,
+        $provider,
+        $service,
+        $customer,
+        $pet,
+        bool $is_customer_notification,
+        bool $displayHeader = FALSE
     ) {
-        // $email = new \EA\Engine\Notifications\Email($this, $this->config->config);
-
         if ($template_name == 'email_appointment_new')
         {
             if ($is_customer_notification) {
-                $title = new Text($this->lang->line('appointment_booked'));
+                $title = new Text($this->get_setting('email_appointment_new_subject') ?? $this->lang->line('appointment_booked'));
                 $message = new Text($this->lang->line('thank_you_for_appointment'));
             }
             else{
@@ -189,13 +188,18 @@ class Settings_Model extends CI_Model {
         elseif ($template_name == 'email_appointment_change')
         {
             if ($is_customer_notification) {
-                $title = new Text($this->lang->line('appointment_changes_saved'));
+                $title = new Text($this->get_setting('email_appointment_change_subject') ?? $this->lang->line('appointment_changes_saved'));
                 $message = new Text('');
             }
             else{
                 $title = new Text($this->lang->line('appointment_details_changed'));
                 $message = new Text('');
             }
+        }
+        elseif ($template_name == 'email_customer_registration')
+        {
+            $title = new Text($this->get_setting('email_customer_registration_subject') ?? $this->lang->line('customer_registered'));
+            $message = new Text($this->lang->line('thank_you_for_registering'));
         }
         else
         {
@@ -238,6 +242,7 @@ class Settings_Model extends CI_Model {
 
         if (strpos($template_name, 'email_') === 0)
             $body = "<html><head><title>{$title->get()}</title></head><bodystyle=\"font: 13px arial, helvetica, tahoma;\">" .
+                ($displayHeader ? "From: {$company['company_name']} &lt;{$company['company_email']}&gt;<br/>Subject: {$title->get()}<hr>" : '') .
                 $body . "</body></html>";
         
         return (object)[
@@ -250,12 +255,12 @@ class Settings_Model extends CI_Model {
 
     public function _replaceTemplateBody(
         string $template_name,
-        array $company,
-        array $appointment,
-        array $provider,
-        array $service,
-        array $customer,
-        array $pet,
+        $company,
+        $appointment,
+        $provider,
+        $service,
+        $customer,
+        $pet,
         Text $title,
         Text $message,
         Url $appointmentLink
@@ -294,11 +299,14 @@ class Settings_Model extends CI_Model {
             '$appointment_service' => $service['name'],
             '$appointment_provider' => $provider['first_name'] . ' ' . $provider['last_name'],
             '$appointment_start_date' => date($date_format . ' ' . $timeFormat, strtotime($appointment['start_datetime'])),
+            '$appointment_start_time' => date($timeFormat, strtotime($appointment['start_datetime'])),
             '$appointment_end_date' => date($date_format . ' ' . $timeFormat, strtotime($appointment['end_datetime'])),
+            '$appointment_end_time' => date($timeFormat, strtotime($appointment['end_datetime'])),
             '$appointment_link' => $appointmentLink->get(),
             '$company_link' => $company['company_link'],
             '$company_name' => $company['company_name'],
             '$customer_name' => $customer['first_name'] . ' ' . $customer['last_name'],
+            '$provider_name' => $provider['first_name'] . ' ' . $provider['last_name'],
             '$customer_email' => $customer['email'],
             '$customer_phone' => $customer['phone_number'],
             '$customer_address' => $customer['address'],
@@ -320,9 +328,9 @@ class Settings_Model extends CI_Model {
         if( isset($pet) )
             foreach ($pet as $key => $value) {
                 if( $key === 'dob' )
-                    $replaceArray['pet_'.$key] = date($date_format, strtotime($value));
+                    $replaceArray['$pet_'.$key] = date($date_format, strtotime($value));
                 elseif( $value === null || is_scalar($value) || (is_object($value) && method_exists($value, '__toString')) )
-                    $replaceArray['pet_'.$key] = $value;
+                    $replaceArray['$pet_'.$key] = $value;
             }
 
         $body = $this->get_setting($template_name);
