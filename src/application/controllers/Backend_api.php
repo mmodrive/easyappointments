@@ -299,6 +299,9 @@ class Backend_api extends CI_Controller {
                     throw new Exception('You do not have the required privileges for this task.');
                 }
 
+                if(!isset($pet['id_users']))
+                    $pet['id_users'] = $customer['id'];
+
                 $pet['id'] = $this->pets_model->add($pet);
             }
 

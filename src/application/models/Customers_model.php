@@ -108,7 +108,7 @@ class Customers_Model extends CI_Model {
             ->get()->row()->id;
 
         $customer['id_roles'] = $customer_role_id;
-        $settings = $customer['settings'];
+        $settings = $customer['settings'] ?? [];
         unset($customer['settings']);
 
         $this->db->trans_begin();
@@ -121,7 +121,8 @@ class Customers_Model extends CI_Model {
         $customer['id'] = (int)$this->db->insert_id();
         $settings['id_users'] = $customer['id'];
         $settings['salt'] = generate_salt();
-        $settings['password'] = hash_password($settings['salt'], $settings['password']);
+        if(isset($settings['password']))
+            $settings['password'] = hash_password($settings['salt'], $settings['password']);
 
         // Insert customer settings. 
         if ( ! $this->db->insert('ea_user_settings', $settings))
@@ -527,7 +528,10 @@ class Customers_Model extends CI_Model {
                 ->from('ea_users')
                 ->join('ea_user_settings', 'ea_user_settings.id_users = ea_users.id', 'inner')
                 ->where('ea_users.email', $email)
-                ->where('ea_user_settings.password', $password)
+                ->group_start()
+                    ->where('ea_user_settings.password', $password)
+                    ->or_where('ea_user_settings.password', NULL)
+                ->group_end()
                 ->get()->row_array();
 
             if (!empty($customer)) 
