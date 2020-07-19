@@ -483,38 +483,28 @@ class Backend extends CI_Controller {
 
         $this->load->model('settings_model');
         $this->load->model('appointments_model');
-        $this->load->model('providers_model');
-        $this->load->model('services_model');
-        $this->load->model('customers_model');
-        $this->load->model('pets_model');
 
-        $app_id = $this->db
-            ->select('id')
-            ->from('ea_appointments')
-            ->order_by('id', 'DESC')
-            ->order_by('id_pets', 'ASC')
-            ->limit(1)
-            ->get()->row()->id;
-        $appointment = $this->appointments_model->get_row($app_id);
-        $provider = $this->providers_model->get_row($appointment['id_users_provider']);
-        $service = $this->services_model->get_row($appointment['id_services']);
-        $customer = $this->customers_model->get_row($appointment['id_users_customer']);
-        $pet = $appointment['id_pets'] ? $this->pets_model->get_row($appointment['id_pets']) : NULL;
+        $appointment = $this->appointments_model->get_sample_appointment();
 
-        $html = $this->settings_model->getNotification(
-            $template_name,
-            $appointment,
-            $provider,
-            $service,
-            $customer,
-            $pet,
-            TRUE,
-            TRUE)->body;
-        
-        if (strpos($template_name, 'sms_') === 0)
-            $html = '<pre>'.$html.'</pre>';
+        if($appointment){
 
-        echo $html;
+            $html = $this->settings_model->getNotification(
+                $template_name,
+                $appointment->appointment,
+                $appointment->provider,
+                $appointment->service,
+                $appointment->customer,
+                $appointment->pet,
+                TRUE,
+                TRUE)->body;
+            
+            if (strpos($template_name, 'sms_') === 0)
+                $html = '<pre>'.$html.'</pre>';
+
+            echo $html;
+        }
+        else
+            echo 'No Appointments Found To Demonstrate!';
     }
 
     /**

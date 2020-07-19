@@ -347,3 +347,4 @@ $lang['sms_password'] = 'SMSBroadcast Password';
 $lang['subject'] = 'Subject';
 $lang['test_sms'] = 'Send Test SMS';
 $lang['sms_sent'] = 'Message successfully sent!';
+$lang['sms_sender'] = 'SMS FROM Sender Name';

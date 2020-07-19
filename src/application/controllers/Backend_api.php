@@ -14,6 +14,7 @@
 use \EA\Engine\Types\Text;
 use \EA\Engine\Types\Email;
 use \EA\Engine\Types\Url;
+use \EA\Engine\Types\NonEmptyText as NonEmptyText;
 
 /**
  * Backend API Controller
@@ -1671,22 +1672,40 @@ class Backend_api extends CI_Controller {
                 throw new Exception('You do not have the required privileges for this task.');
             }
 
-            // $email = new \EA\Engine\Notifications\Email($this, $this->config->config);
-
             $this->load->model('settings_model');
-            $phone_number = $this->input->post('phone_number');
-            $notification_type = 'sms_reminder';
-            $result = $this->settings_model->set_setting('google_calendar', $this->input->post('calendar_id'));
+            $this->load->model('appointments_model');
 
-            $notification = $this->settings_model->getNotification(
-                $notification_type,$appointment, $provider, $service, $customer, $pet, TRUE
-            );
-            $email->sendEmail($notification, new Email($customer['email']), new Text($ics_stream));
+            $config = [
+                'sms_sender' => $this->settings_model->get_setting('sms_sender'),
+                'sms_username' => $this->settings_model->get_setting('sms_username'),
+                'sms_password' => $this->settings_model->get_setting('sms_password'),
+                ];
 
-            $this->output
-                ->set_content_type('application/json')
-                ->set_output(json_encode($result ? AJAX_SUCCESS : AJAX_FAILURE));
-        }
+            $sms = new \EA\Engine\Notifications\SMS($this, $config);
+
+            $appointment = $this->appointments_model->get_sample_appointment();
+
+            if($appointment){
+                $notification_type = 'sms_reminder';
+
+                $notification = $this->settings_model->getNotification(
+                    $notification_type,
+                    $appointment->appointment,
+                    $appointment->provider,
+                    $appointment->service,
+                    $appointment->customer,
+                    $appointment->pet,
+                    TRUE);
+                
+                $sms->sendText($notification, new NonEmptyText($this->input->post('phone_number')));
+
+                $this->output
+                    ->set_content_type('application/json')
+                    ->set_output(json_encode(AJAX_SUCCESS));
+            }
+            else
+                throw new Exception('No Appointments Found To Demonstrate!');
+            }
         catch (Exception $exc)
         {
             $this->output

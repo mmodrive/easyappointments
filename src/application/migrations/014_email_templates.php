@@ -28,8 +28,17 @@ class Migration_Email_templates extends CI_Migration {
         $this->db->insert('ea_settings', ['name' => 'email_appointment_change', 'value' => $old_notification_html ]);
         $this->db->insert('ea_settings', ['name' => 'email_appointment_change_subject', 'value' => $this->lang->line('appointment_changes_saved') ]);
         $this->db->insert('ea_settings', ['name' => 'sms_reminder', 'value' => 'Dear $customer_name,'."\n".'You have appointment tomorrow at $appointment_start_time with $provider_name.'."\n".'Regards, $company_name' ]);
+        $this->db->insert('ea_settings', ['name' => 'sms_sender', 'value' => '' ]);
         $this->db->insert('ea_settings', ['name' => 'sms_username', 'value' => '' ]);
         $this->db->insert('ea_settings', ['name' => 'sms_password', 'value' => '' ]);
+
+        $fields = [
+            'sms_notification' => [
+                'type' => 'TEXT'
+            ],
+        ];
+
+        $this->dbforge->add_column('ea_appointments', $fields);
     }
 
     public function down()
@@ -41,7 +50,9 @@ class Migration_Email_templates extends CI_Migration {
         $this->db->delete('ea_settings', ['name' => 'email_appointment_change']);
         $this->db->delete('ea_settings', ['name' => 'email_appointment_change_subject']);
         $this->db->delete('ea_settings', ['name' => 'sms_reminder']);
+        $this->db->delete('ea_settings', ['name' => 'sms_sender']);
         $this->db->delete('ea_settings', ['name' => 'sms_username']);
         $this->db->delete('ea_settings', ['name' => 'sms_password']);
+        $this->dbforge->drop_column('ea_appointments', 'sms_notification');
     }
 }

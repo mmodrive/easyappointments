@@ -166,13 +166,18 @@
                             </div>
 
                             <div class="form-group">
+                                <label for="sms_sender"><?= lang('sms_sender') ?> *</label>
+                                <input id="sms_sender" data-field="sms_sender" maxlength="11" class="required form-control">
+                            </div>
+
+                            <div class="form-group">
                                 <label for="sms_username"><?= lang('sms_username') ?> *</label>
                                 <input id="sms_username" data-field="sms_username" class="required form-control">
                             </div>
 
                             <div class="form-group">
                                 <label for="sms_password"><?= lang('sms_password') ?> *</label>
-                                <input id="sms_password" data-field="sms_password" class="required form-control">
+                                <input id="sms_password" type="password" data-field="sms_password" class="required form-control">
                             </div>
                         </div>
                     </div>

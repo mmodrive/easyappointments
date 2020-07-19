@@ -534,4 +534,39 @@ class Appointments_Model extends CI_Model {
             ['id' => $appointment['id_users_customer']])->row_array();
         return $appointment;
     }
+
+    public function get_sample_appointment()
+    {
+        $app_id = $this->db
+        ->select('id')
+        ->from('ea_appointments')
+        ->where('id_pets IS NOT NULL')
+        ->order_by('id', 'DESC')
+        ->limit(1)
+        ->get()->row()->id ?? 
+        $this->db
+        ->select('id')
+        ->from('ea_appointments')
+        ->order_by('id', 'DESC')
+        ->limit(1)
+        ->get()->row()->id ?? NULL;
+
+        if( $app_id ){
+            $this->load->model('providers_model');
+            $this->load->model('services_model');
+            $this->load->model('customers_model');
+            $this->load->model('pets_model');
+
+            $result = new stdclass;
+            $result->appointment = $appointment = $this->get_row($app_id);
+            $result->provider = $this->providers_model->get_row($appointment['id_users_provider']);
+            $result->service = $this->services_model->get_row($appointment['id_services']);
+            $result->customer = $this->customers_model->get_row($appointment['id_users_customer']);
+            $result->pet = $appointment['id_pets'] ? $this->pets_model->get_row($appointment['id_pets']) : NULL;
+
+            return $result;
+        }
+        else
+            return NULL;
+    }
 }
