@@ -14,7 +14,7 @@
 class Migration_Email_templates extends CI_Migration {
     public function up()
     {
-        $old_notification_html = file_get_contents(FCPATH.'application/views/emails/appointment_details.php');
+        $old_notification_html = file_get_contents(VIEWPATH.'emails/appointment_details.php');
         $old_notification_html = preg_replace('/(<html>|<\/html>|<head>|<\/head>|<title.*?\/title>)/', '', $old_notification_html);
         $old_notification_html = preg_replace('/<body/', '<div', $old_notification_html);
         $old_notification_html = preg_replace('/<\/body>/', '</div>', $old_notification_html);

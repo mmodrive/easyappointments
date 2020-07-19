@@ -11,6 +11,10 @@
  * @since       v1.0.0
  * ---------------------------------------------------------------------------- */
 
+use \EA\Engine\Types\Text;
+use \EA\Engine\Types\Email;
+use \EA\Engine\Types\Url;
+
 /**
  * Settings Model
  *
@@ -157,5 +161,195 @@ class Settings_Model extends CI_Model {
     public function get_settings()
     {
         return $this->db->get('ea_settings')->result_array();
+    }
+
+    public function getNotification(
+        string $template_name,
+        array $appointment,
+        array $provider,
+        array $service,
+        array $customer,
+        array $pet,
+        bool $is_customer_notification
+    ) {
+        // $email = new \EA\Engine\Notifications\Email($this, $this->config->config);
+
+        if ($template_name == 'email_appointment_new')
+        {
+            if ($is_customer_notification) {
+                $title = new Text($this->lang->line('appointment_booked'));
+                $message = new Text($this->lang->line('thank_you_for_appointment'));
+            }
+            else{
+                $title = new Text($this->lang->line('appointment_added_to_your_plan'));
+                $message = new Text($this->lang->line('appointment_link_description'));
+            }
+
+        }
+        elseif ($template_name == 'email_appointment_change')
+        {
+            if ($is_customer_notification) {
+                $title = new Text($this->lang->line('appointment_changes_saved'));
+                $message = new Text('');
+            }
+            else{
+                $title = new Text($this->lang->line('appointment_details_changed'));
+                $message = new Text('');
+            }
+        }
+        else
+        {
+            $title = new Text('');
+            $message = new Text('');
+        }
+
+        if (isset($appointment['hash'])) {
+            if ($is_customer_notification) {
+                $link = new Url(site_url('appointments/index/' . $appointment['hash']));
+            }
+            else{
+                $link = new Url(site_url('backend/index/' . $appointment['hash']));
+            }
+        }
+        else {
+            $link = new Url();
+        }
+
+        $company = [
+            'company_name' => $this->get_setting('company_name'),
+            'company_link' => $this->get_setting('company_link'),
+            'company_email' => $this->get_setting('company_email'),
+            'date_format' => $this->get_setting('date_format'),
+            'time_format' => $this->get_setting('time_format')
+        ];
+
+        $body = $this->_replaceTemplateBody(
+            $template_name,
+            $company,
+            $appointment,
+            $provider,
+            $service,
+            $customer,
+            $pet,
+            $title,
+            $message,
+            $link
+            );
+
+        if (strpos($template_name, 'email_') === 0)
+            $body = "<html><head><title>{$title->get()}</title></head><bodystyle=\"font: 13px arial, helvetica, tahoma;\">" .
+                $body . "</body></html>";
+        
+        return (object)[
+            "from" => $company['company_email'],
+            "fromName" => $company['company_name'],
+            "subject" => $title->get(),
+            "body" => $body,
+            ];
+    }
+
+    public function _replaceTemplateBody(
+        string $template_name,
+        array $company,
+        array $appointment,
+        array $provider,
+        array $service,
+        array $customer,
+        array $pet,
+        Text $title,
+        Text $message,
+        Url $appointmentLink
+    ) {
+        switch ($company['date_format'])
+        {
+            case 'DMY':
+                $date_format = 'd/m/Y';
+                break;
+            case 'MDY':
+                $date_format = 'm/d/Y';
+                break;
+            case 'YMD':
+                $date_format = 'Y/m/d';
+                break;
+            default:
+                throw new \Exception('Invalid date_format value: ' . $company['date_format']);
+        }
+
+        switch ($company['time_format'])
+        {
+            case 'military':
+                $timeFormat = 'H:i';
+                break;
+            case 'regular':
+                $timeFormat = 'g:i A';
+                break;
+            default:
+                throw new \Exception('Invalid time_format value: ' . $company['time_format']);
+        }
+
+        // Prepare template replace array.
+        $replaceArray = [
+            '$email_title' => $title->get(),
+            '$email_message' => $message->get(),
+            '$appointment_service' => $service['name'],
+            '$appointment_provider' => $provider['first_name'] . ' ' . $provider['last_name'],
+            '$appointment_start_date' => date($date_format . ' ' . $timeFormat, strtotime($appointment['start_datetime'])),
+            '$appointment_end_date' => date($date_format . ' ' . $timeFormat, strtotime($appointment['end_datetime'])),
+            '$appointment_link' => $appointmentLink->get(),
+            '$company_link' => $company['company_link'],
+            '$company_name' => $company['company_name'],
+            '$customer_name' => $customer['first_name'] . ' ' . $customer['last_name'],
+            '$customer_email' => $customer['email'],
+            '$customer_phone' => $customer['phone_number'],
+            '$customer_address' => $customer['address'],
+
+            // Translations
+            'Appointment Details' => $this->lang->line('appointment_details_title'),
+            'Service' => $this->lang->line('service'),
+            'Provider' => $this->lang->line('provider'),
+            'Start' => $this->lang->line('start'),
+            'End' => $this->lang->line('end'),
+            'Customer Details' => $this->lang->line('customer_details_title'),
+            'Name' => $this->lang->line('name'),
+            'Email' => $this->lang->line('email'),
+            'Phone' => $this->lang->line('phone'),
+            'Address' => $this->lang->line('address'),
+            'Appointment Link' => $this->lang->line('appointment_link_title')
+        ];
+
+        if( isset($pet) )
+            foreach ($pet as $key => $value) {
+                if( $key === 'dob' )
+                    $replaceArray['pet_'.$key] = date($date_format, strtotime($value));
+                elseif( $value === null || is_scalar($value) || (is_object($value) && method_exists($value, '__toString')) )
+                    $replaceArray['pet_'.$key] = $value;
+            }
+
+        $body = $this->get_setting($template_name);
+        $body = $this->_replaceTemplateVariables($replaceArray, $body);
+
+        return $body;
+    }
+
+
+    /**
+     * Replace the email template variables.
+     *
+     * This method finds and replaces the html variables of an email template. It is used to
+     * generate dynamic HTML emails that are send as notifications to the system users.
+     *
+     * @param array $replaceArray Array that contains the variables to be replaced.
+     * @param string $templateHtml The email template HTML.
+     *
+     * @return string Returns the new email html that contain the variables of the $replaceArray.
+     */
+    protected function _replaceTemplateVariables(array $replaceArray, $templateHtml)
+    {
+        foreach ($replaceArray as $name => $value)
+        {
+            $templateHtml = str_replace($name, $value, $templateHtml);
+        }
+
+        return $templateHtml;
     }
 }

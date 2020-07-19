@@ -11,10 +11,6 @@
  * @since       v1.0.0
  * ---------------------------------------------------------------------------- */
 
-use \EA\Engine\Types\Text;
-use \EA\Engine\Types\Email;
-use \EA\Engine\Types\Url;
-
 /**
  * Backend Controller
  *
@@ -484,11 +480,6 @@ class Backend extends CI_Controller {
             throw new Exception('You do not have the required privileges for this task.');
         }
 
-        $this->config->load('email');
-        $email = new \EA\Engine\Notifications\Email($this, $this->config->config);
-
-        // $template_name = $this->db->escape_str($this->input->post('template_name'));
-
         $this->load->model('appointments_model');
         $this->load->model('providers_model');
         $this->load->model('services_model');
@@ -507,44 +498,19 @@ class Backend extends CI_Controller {
         $service = $this->services_model->get_row($appointment['id_services']);
         $customer = $this->customers_model->get_row($appointment['id_users_customer']);
         $pet = $this->pets_model->get_row($appointment['id_pets']);
-        // if ($post_data['manage_mode'] == FALSE)
-        // {
-            $customer_title = new Text($this->lang->line('appointment_booked'));
-            $customer_message = new Text($this->lang->line('thank_you_for_appointment'));
-        //     $provider_title = new Text($this->lang->line('appointment_added_to_your_plan'));
-        //     $provider_message = new Text($this->lang->line('appointment_link_description'));
 
-        // }
-        // else
-        // {
-        //     $customer_title = new Text($this->lang->line('appointment_changes_saved'));
-        //     $customer_message = new Text('');
-        //     $provider_title = new Text($this->lang->line('appointment_details_changed'));
-        //     $provider_message = new Text('');
-        // }
-
-        $customer_link = new Url(site_url('appointments/index/' . $appointment['hash']));
-        // $provider_link = new Url(site_url('backend/index/' . $appointment['hash']));
-
-
-        $html = $email->getHtml(
-            $this,
+        $html = $this->settings_model->getNotification(
             $template_name,
             $appointment,
             $provider,
             $service,
             $customer,
             $pet,
-            $customer_title,
-            $customer_message,
-            $customer_link);
+            TRUE)->body;
         
-        if ($template_name == 'sms_reminder') 
-            $html = nl2br($html);
+        if (strpos($template_name, 'sms_') === 0)
+            $html = '<pre>'.$html.'</pre>';
 
-        // $this->output
-        //     ->set_content_type('text/html; charset=utf-8')
-        //     ->set_output($html);
         echo $html;
     }
 

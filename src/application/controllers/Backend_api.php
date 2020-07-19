@@ -379,28 +379,17 @@ class Backend_api extends CI_Controller {
             try
             {
                 $this->config->load('email');
+                $this->load->model('settings_model');
+
                 $email = new \EA\Engine\Notifications\Email($this, $this->config->config);
 
                 $send_provider = $this->providers_model
                     ->get_setting('notifications', $provider['id']);
 
                 if ( ! $manage_mode)
-                {
-                    $customer_title = new Text($this->lang->line('appointment_booked'));
-                    $customer_message = new Text($this->lang->line('thank_you_for_appointment'));
-                    $provider_title = new Text($this->lang->line('appointment_added_to_your_plan'));
-                    $provider_message = new Text($this->lang->line('appointment_link_description'));
-                }
+                    $notification_type = 'email_appointment_new';
                 else
-                {
-                    $customer_title = new Text($this->lang->line('appointment_changes_saved'));
-                    $customer_message = new Text('');
-                    $provider_title = new Text($this->lang->line('appointment_details_changed'));
-                    $provider_message = new Text('');
-                }
-
-                $customer_link = new Url(site_url('appointments/index/' . $appointment['hash']));
-                $provider_link = new Url(site_url('backend/index/' . $appointment['hash']));
+                    $notification_type = 'email_appointment_change';
 
                 $send_customer = $this->settings_model->get_setting('customer_notifications');
 
@@ -409,16 +398,18 @@ class Backend_api extends CI_Controller {
 
                 if ((bool)$send_customer === TRUE)
                 {
-                    $email->sendAppointmentDetails($appointment, $provider,
-                        $service, $customer, $pet, $company_settings, $customer_title,
-                        $customer_message, $customer_link, new Email($customer['email']), new Text($ics_stream));
+                    $notification = $this->settings_model->getNotification(
+                        $notification_type,$appointment, $provider, $service, $customer, $pet, TRUE
+                    );
+                    $email->sendAppointmentDetails($notification, new Email($customer['email']), new Text($ics_stream));
                 }
 
                 if ($send_provider == TRUE)
                 {
-                    $email->sendAppointmentDetails($appointment, $provider,
-                        $service, $customer, $pet, $company_settings, $provider_title,
-                        $provider_message, $provider_link, new Email($provider['email']), new Text($ics_stream));
+                    $notification = $this->settings_model->getNotification(
+                        $notification_type,$appointment, $provider, $service, $customer, $pet, FALSE
+                    );
+                    $email->sendAppointmentDetails($notification, new Email($provider['email']), new Text($ics_stream));
                 }
 
             }

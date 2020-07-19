@@ -53,27 +53,6 @@ class Email {
     }
 
     /**
-     * Replace the email template variables.
-     *
-     * This method finds and replaces the html variables of an email template. It is used to
-     * generate dynamic HTML emails that are send as notifications to the system users.
-     *
-     * @param array $replaceArray Array that contains the variables to be replaced.
-     * @param string $templateHtml The email template HTML.
-     *
-     * @return string Returns the new email html that contain the variables of the $replaceArray.
-     */
-    protected function _replaceTemplateVariables(array $replaceArray, $templateHtml)
-    {
-        foreach ($replaceArray as $name => $value)
-        {
-            $templateHtml = str_replace($name, $value, $templateHtml);
-        }
-
-        return $templateHtml;
-    }
-
-    /**
      * Send an email with the appointment details.
      *
      * This email template also needs an email title and an email text in order to complete
@@ -94,27 +73,17 @@ class Email {
      * @param \EA\Engine\Types\Text $icsStream Stream contents of the ICS file.
      */
     public function sendAppointmentDetails(
-        array $appointment,
-        array $provider,
-        array $service,
-        array $customer,
-        array $pet=null,
-        array $company,
-        Text $title,
-        Text $message,
-        Url $appointmentLink,
+        \stdClass $notification,
         EmailAddress $recipientEmail,
         Text $icsStream
     ) {
-        $html = $this->getHtml('email_appointment_new', $appointment, $provider, $service, $customer, $pet, $title, $message, $appointmentLink);
-
         $mailer = $this->_createMailer();
 
-        $mailer->From = $company['company_email'];
-        $mailer->FromName = $company['company_name'];
+        $mailer->From = $notification->from;
+        $mailer->FromName = $notification->fromName;
         $mailer->AddAddress($recipientEmail->get());
-        $mailer->Subject = $title->get();
-        $mailer->Body = $html;
+        $mailer->Subject = $notification->subject;
+        $mailer->Body = $notification->body;
 
         $mailer->addStringAttachment($icsStream->get(), 'invitation.ics');
 
@@ -122,102 +91,6 @@ class Email {
         {
             throw new \RuntimeException('Email could not been sent. Mailer Error (Line ' . __LINE__ . '): '. $mailer->ErrorInfo);
         }
-    }
-
-    public function getHtml(
-        $controller,
-        string $template_name,
-        array $appointment,
-        array $provider,
-        array $service,
-        array $customer,
-        array $pet=null,
-        Text $title,
-        Text $message,
-        Url $appointmentLink
-    ) {
-        $controller->load->model('settings_model');
-
-        $company = [
-            'company_name' => $controller->settings_model->get_setting('company_name'),
-            'company_link' => $controller->settings_model->get_setting('company_link'),
-            'company_email' => $controller->settings_model->get_setting('company_email'),
-            'date_format' => $controller->settings_model->get_setting('date_format'),
-            'time_format' => $controller->settings_model->get_setting('time_format')
-        ];
-
-        switch ($company['date_format'])
-        {
-            case 'DMY':
-                $date_format = 'd/m/Y';
-                break;
-            case 'MDY':
-                $date_format = 'm/d/Y';
-                break;
-            case 'YMD':
-                $date_format = 'Y/m/d';
-                break;
-            default:
-                throw new \Exception('Invalid date_format value: ' . $company['date_format']);
-        }
-
-        switch ($company['time_format'])
-        {
-            case 'military':
-                $timeFormat = 'H:i';
-                break;
-            case 'regular':
-                $timeFormat = 'g:i A';
-                break;
-            default:
-                throw new \Exception('Invalid time_format value: ' . $company['time_format']);
-        }
-
-        // Prepare template replace array.
-        $replaceArray = [
-            '$email_title' => $title->get(),
-            '$email_message' => $message->get(),
-            '$appointment_service' => $service['name'],
-            '$appointment_provider' => $provider['first_name'] . ' ' . $provider['last_name'],
-            '$appointment_start_date' => date($date_format . ' ' . $timeFormat, strtotime($appointment['start_datetime'])),
-            '$appointment_end_date' => date($date_format . ' ' . $timeFormat, strtotime($appointment['end_datetime'])),
-            '$appointment_link' => $appointmentLink->get(),
-            '$company_link' => $company['company_link'],
-            '$company_name' => $company['company_name'],
-            '$customer_name' => $customer['first_name'] . ' ' . $customer['last_name'],
-            '$customer_email' => $customer['email'],
-            '$customer_phone' => $customer['phone_number'],
-            '$customer_address' => $customer['address'],
-
-            // Translations
-            'Appointment Details' => $this->framework->lang->line('appointment_details_title'),
-            'Service' => $this->framework->lang->line('service'),
-            'Provider' => $this->framework->lang->line('provider'),
-            'Start' => $this->framework->lang->line('start'),
-            'End' => $this->framework->lang->line('end'),
-            'Customer Details' => $this->framework->lang->line('customer_details_title'),
-            'Name' => $this->framework->lang->line('name'),
-            'Email' => $this->framework->lang->line('email'),
-            'Phone' => $this->framework->lang->line('phone'),
-            'Address' => $this->framework->lang->line('address'),
-            'Appointment Link' => $this->framework->lang->line('appointment_link_title')
-        ];
-
-        if( isset($pet) )
-            foreach ($pet as $key => $value) {
-                if( $key === 'dob' )
-                    $replaceArray['pet_'.$key] = date($date_format, strtotime($value));
-                elseif( $value === null || is_scalar($value) || (is_object($value) && method_exists($value, '__toString')) )
-                    $replaceArray['pet_'.$key] = $value;
-            }
-
-        $html = $controller->settings_model->get_setting($template_name);
-        $html = $this->_replaceTemplateVariables($replaceArray, $html);
-        $html = "<html><head><title>{$title->get()}</title></head><bodystyle=\"font: 13px arial, helvetica, tahoma;\">" .
-            $html .
-            "</body></html>";
-
-        return $html;
     }
 
     /**
