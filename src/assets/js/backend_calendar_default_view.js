@@ -856,10 +856,10 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
             $.each(response.appointments, function (index, appointment) {
                 var event = {
                     id: appointment.id,
-                    title: appointment.service.name + ' - ' +
-                    (appointment.pet ? appointment.pet.name : 
+                    title: /*appointment.service.name + ' - ' +*/
                         appointment.customer.first_name + ' ' +
-                        appointment.customer.last_name),
+                        appointment.customer.last_name +
+                    (appointment.pet ? ' - ' + appointment.pet.name : ''),
                     start: moment(appointment.start_datetime),
                     end: moment(appointment.end_datetime),
                     allDay: false,

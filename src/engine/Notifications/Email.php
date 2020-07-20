@@ -232,6 +232,27 @@ class Email {
     }
 
     /**
+     * Replace the email template variables.
+     *
+     * This method finds and replaces the html variables of an email template. It is used to
+     * generate dynamic HTML emails that are send as notifications to the system users.
+     *
+     * @param array $replaceArray Array that contains the variables to be replaced.
+     * @param string $templateHtml The email template HTML.
+     *
+     * @return string Returns the new email html that contain the variables of the $replaceArray.
+     */
+    protected function _replaceTemplateVariables(array $replaceArray, $templateHtml)
+    {
+        foreach ($replaceArray as $name => $value)
+        {
+            $templateHtml = str_replace($name, $value, $templateHtml);
+        }
+
+        return $templateHtml;
+    }
+    
+    /**
      * Create PHP Mailer Instance
      *
      * @return \PHPMailer
