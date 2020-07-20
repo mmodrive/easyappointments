@@ -59,7 +59,7 @@ class Cron extends CI_Controller {
             $this->load->helper('date_helper');
             $this->load->model('appointments_model');
 
-            $from = date_timestamp_set(new DateTime(), strtotime("+12 hours", now()));
+            $from = date_timestamp_set(new DateTime(), strtotime("+0 hours", now()));
             $to = date_timestamp_set(new DateTime(), strtotime("+24 hours", now()));
             $appointments = $this->db
                 ->select('a.id')
@@ -69,6 +69,7 @@ class Cron extends CI_Controller {
                 ->where('start_datetime >=', $from->format('Y-m-d H:i:s'))
                 ->where('start_datetime <', $to->format('Y-m-d H:i:s'))
                 ->get()->result();
+            var_dump($this->db->last_query());
 
             $config = [
                 'sms_sender' => $this->settings_model->get_setting('sms_sender'),
@@ -95,8 +96,8 @@ class Cron extends CI_Controller {
                     
                     $ref = $sms->sendText($notification, 
                         new NonEmptyText($appointment->customer['phone_number']), 
-                        TRUE);
-                        //ENVIRONMENT === 'development');
+                        //TRUE);
+                        ENVIRONMENT === 'development');
 
                     $this->db->where(['id' => $appointment->appointment['id']]);
                     $this->db->update('ea_appointments', ['sms_notification' => $ref]);
