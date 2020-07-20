@@ -51,28 +51,19 @@ class SMS {
 
     public function sendText(
         \stdClass $notification,
-        NonEmptyText $recipient
+        NonEmptyText $recipient,
+        bool $testOnly = FALSE
     ) {
-
-        function callAPI($content) {
-            $ch = curl_init('https://api.smsbroadcast.com.au/api-adv.php');
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $content);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            $output = curl_exec ($ch);
-            curl_close ($ch);
-            return $output;    
-        }
-
         $ref = md5(uniqid(mt_rand(), true));
         $content =  'username='.rawurlencode($this->config['sms_username']).
                     '&password='.rawurlencode($this->config['sms_password']).
                     '&to='.rawurlencode($recipient->get()).
                     '&from='.rawurlencode($this->config['sms_sender']).
                     '&message='.rawurlencode($notification->body).
+                    '&maxsplit=5'.
                     '&ref='.rawurlencode($ref);
       
-        $smsbroadcast_response = callAPI($content);
+        $smsbroadcast_response = $testOnly ? "OK:{$recipient->get()}:{$ref}" : $this->callAPI($content);
         $response_lines = explode("\n", $smsbroadcast_response);
         
         foreach( $response_lines as $data_line){
@@ -88,4 +79,15 @@ class SMS {
 
         return $ref;
     }
+
+    protected function callAPI($content) {
+        $ch = curl_init('https://api.smsbroadcast.com.au/api-adv.php');
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $content);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $output = curl_exec ($ch);
+        curl_close ($ch);
+        return $output;    
+    }
+
 }

@@ -387,7 +387,7 @@ $config['compress_output'] = FALSE;
 | regarding date handling.
 |
 */
-$config['time_reference'] = 'local';
+$config['time_reference'] = defined('Config::TIME_ZONE') ? Config::TIME_ZONE : 'local';
 
 
 /*

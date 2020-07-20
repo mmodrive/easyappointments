@@ -537,36 +537,50 @@ class Appointments_Model extends CI_Model {
 
     public function get_sample_appointment()
     {
-        $app_id = $this->db
-        ->select('id')
-        ->from('ea_appointments')
-        ->where('id_pets IS NOT NULL')
-        ->order_by('id', 'DESC')
-        ->limit(1)
-        ->get()->row()->id ?? 
-        $this->db
-        ->select('id')
-        ->from('ea_appointments')
-        ->order_by('id', 'DESC')
-        ->limit(1)
-        ->get()->row()->id ?? NULL;
+        $appointment_id = $this->db
+            ->select('id')
+            ->from('ea_appointments')
+            ->where('id_pets IS NOT NULL')
+            ->order_by('id', 'DESC')
+            ->limit(1)
+            ->get()->row()->id ?? 
+            $this->db
+            ->select('id')
+            ->from('ea_appointments')
+            ->order_by('id', 'DESC')
+            ->limit(1)
+            ->get()->row()->id ?? NULL;
 
-        if( $app_id ){
-            $this->load->model('providers_model');
-            $this->load->model('services_model');
-            $this->load->model('customers_model');
-            $this->load->model('pets_model');
-
-            $result = new stdclass;
-            $result->appointment = $appointment = $this->get_row($app_id);
-            $result->provider = $this->providers_model->get_row($appointment['id_users_provider']);
-            $result->service = $this->services_model->get_row($appointment['id_services']);
-            $result->customer = $this->customers_model->get_row($appointment['id_users_customer']);
-            $result->pet = $appointment['id_pets'] ? $this->pets_model->get_row($appointment['id_pets']) : NULL;
-
-            return $result;
+        if( $appointment_id ){
+            return $this->get_appointment($appointment_id);
         }
         else
             return NULL;
+    }
+
+    /**
+     * Retrieve an appointment with all related data. If no appointment_id is provided then a best candidate,
+     existing appointment is returned
+     */
+    public function get_appointment($appointment_id)
+    {
+        if ( ! is_numeric($appointment_id))
+        {
+            throw new Exception('Invalid argument type $appointment_id (value:"' . $appointment_id . '")');
+        }
+
+        $this->load->model('providers_model');
+        $this->load->model('services_model');
+        $this->load->model('customers_model');
+        $this->load->model('pets_model');
+
+        $result = new stdclass;
+        $result->appointment = $appointment = $this->get_row($appointment_id);
+        $result->provider = $this->providers_model->get_row($appointment['id_users_provider']);
+        $result->service = $this->services_model->get_row($appointment['id_services']);
+        $result->customer = $this->customers_model->get_row($appointment['id_users_customer']);
+        $result->pet = $appointment['id_pets'] ? $this->pets_model->get_row($appointment['id_pets']) : NULL;
+
+        return $result;
     }
 }
