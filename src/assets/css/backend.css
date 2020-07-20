@@ -257,6 +257,27 @@ body legend {
     display: inline-block;
 }
 
+#cron_active{
+    padding: 0.2em 1em;
+}
+
+#cron_active.active{
+    background-color: green;
+    color: white;
+}
+
+#cron_active.inactive{
+    background-color: red;
+    color: white;
+    animation: blinker 1s linear infinite;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}
+
 /* BACKEND COMPONENTS
    -------------------------------------------------------------------- */
 

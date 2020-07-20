@@ -51,6 +51,32 @@ class Settings_Model extends CI_Model {
     }
 
     /**
+     * Get setting value from database.
+     *
+     * This method returns a system setting from the database.
+     *
+     * @param string $name The database setting name.
+     *
+     * @return string Returns the database value for the selected setting or NULL if settings does not exist.
+     *
+     * @throws Exception If the $name argument is invalid.
+     * @throws Exception If the requested $name setting does not exist in the database.
+     */
+    public function find_setting($name)
+    {
+        if ( ! is_string($name))
+        { // Check argument type.
+            throw new Exception('$name argument is not a string: ' . $name);
+        }
+
+        if ($this->db->get_where('ea_settings', ['name' => $name])->num_rows() == 0)
+            return NULL;
+
+        $query = $this->db->get_where('ea_settings', ['name' => $name]);
+        return $query->num_rows() > 0 ? $query->row()->value : NULL;
+    }
+
+    /**
      * This method sets the value for a specific setting on the database.
      *
      * If the setting doesn't exist, it is going to be created, otherwise updated.

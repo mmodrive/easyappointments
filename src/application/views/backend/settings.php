@@ -104,17 +104,6 @@
                                     <?= lang('company_link_hint') ?>
                                 </span>
                             </div>
-                        </div>
-                        <div class="col-xs-12 col-sm-6">
-                            <div class="form-group">
-                                <label for="google-analytics-code">
-                                    Google Analytics ID</label>
-                                <input id="google-analytics-code" placeholder="UA-XXXXXXXX-X"
-                                       data-field="google_analytics_code" class="form-control">
-                                <span class="help-block">
-                                    <?= lang('google_analytics_code_hint') ?>
-                                </span>
-                            </div>
                             <div class="form-group">
                                 <label for="date-format">
                                     <?= lang('date_format') ?>
@@ -140,15 +129,15 @@
                                     <?= lang('time_format_hint') ?>
                                 </span>
                             </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-6">
                             <div class="form-group">
-                                <label><?= lang('customer_notifications') ?></label>
-                                <br>
-                                <button type="button" id="customer-notifications" class="btn btn-default" data-toggle="button" aria-pressed="false">
-                                    <span class="glyphicon glyphicon-envelope"></span>
-                                    <?= lang('receive_notifications') ?>
-                                </button>
+                                <label for="google-analytics-code">
+                                    Google Analytics ID</label>
+                                <input id="google-analytics-code" placeholder="UA-XXXXXXXX-X"
+                                       data-field="google_analytics_code" class="form-control">
                                 <span class="help-block">
-                                    <?= lang('customer_notifications_hint') ?>
+                                    <?= lang('google_analytics_code_hint') ?>
                                 </span>
                             </div>
                             <div class="form-group">
@@ -164,20 +153,32 @@
                                     <?= lang('require_captcha_hint') ?>
                                 </span>
                             </div>
-
+                            <div class="form-group">
+                                <label><?= lang('customer_notifications') ?></label>
+                                <br>
+                                <button type="button" id="customer-notifications" class="btn btn-default" data-toggle="button" aria-pressed="false">
+                                    <span class="glyphicon glyphicon-envelope"></span>
+                                    <?= lang('receive_notifications') ?>
+                                </button>
+                                <span class="help-block">
+                                    <?= lang('customer_notifications_hint') ?>
+                                </span>
+                            </div>
                             <div class="form-group">
                                 <label for="sms_sender"><?= lang('sms_sender') ?> *</label>
                                 <input id="sms_sender" data-field="sms_sender" maxlength="11" class="required form-control">
                             </div>
-
                             <div class="form-group">
                                 <label for="sms_username"><?= lang('sms_username') ?> *</label>
                                 <input id="sms_username" data-field="sms_username" class="required form-control">
                             </div>
-
                             <div class="form-group">
                                 <label for="sms_password"><?= lang('sms_password') ?> *</label>
                                 <input id="sms_password" type="password" data-field="sms_password" class="required form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="cron_active"><?= lang('cron_active_title') ?></label>
+                                <span id="cron_active" class="<?= $cron_active ? 'active' : 'inactive' ?>"><?= $cron_active ? lang('cron_active') : lang('cron_inactive') ?></span>
                             </div>
                         </div>
                     </div>

@@ -380,6 +380,8 @@ class Backend extends CI_Controller {
         $view['role_slug'] = $this->session->userdata('role_slug');
         $view['system_settings'] = $this->settings_model->get_settings();
         $view['user_settings'] = $this->user_model->get_settings($user_id);
+        $cron_last_run = date_create_from_format(DATE_ATOM, $this->settings_model->find_setting('last_cron_date'));
+        $view['cron_active'] = $cron_last_run ? ((time() - $cron_last_run->getTimestamp()) / 60) <= 2 : FALSE;
         $this->set_user_data($view);
 
         $this->load->view('backend/header', $view);
