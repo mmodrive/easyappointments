@@ -70,7 +70,9 @@ class Cron extends CI_Controller {
                 ->where('start_datetime >=', $from->format('Y-m-d H:i:s'))
                 ->where('start_datetime <', $to->format('Y-m-d H:i:s'))
                 ->get()->result();
-            var_dump($this->db->last_query());
+                
+            if (ENVIRONMENT === 'development')
+                var_dump($this->db->last_query());
 
             $config = [
                 'sms_sender' => $this->settings_model->get_setting('sms_sender'),
