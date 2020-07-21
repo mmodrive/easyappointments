@@ -95,8 +95,8 @@ class Cron extends CI_Controller {
                     
                     $ref = $sms->sendText($notification, 
                         new NonEmptyText($appointment->customer['phone_number']), 
-                        //TRUE);
-                        ENVIRONMENT === 'development');
+                        TRUE);
+                        //ENVIRONMENT === 'development');
 
                     $this->db->where(['id' => $appointment->appointment['id']]);
                     $this->db->update('ea_appointments', ['sms_notification' => $ref]);
