@@ -65,10 +65,12 @@ class Cron extends CI_Controller {
                 ->select('a.id')
                 ->from('ea_appointments AS a')
                 ->join('ea_users AS c', 'a.id_users_customer=c.id', 'inner')
+                ->where('a.sms_notification IS NULL')
                 ->where('c.phone_number IS NOT NULL')
                 ->where('start_datetime >=', $from->format('Y-m-d H:i:s'))
                 ->where('start_datetime <', $to->format('Y-m-d H:i:s'))
                 ->get()->result();
+            var_dump($this->db->last_query());
 
             $config = [
                 'sms_sender' => $this->settings_model->get_setting('sms_sender'),
@@ -95,8 +97,8 @@ class Cron extends CI_Controller {
                     
                     $ref = $sms->sendText($notification, 
                         new NonEmptyText($appointment->customer['phone_number']), 
-                        TRUE);
-                        //ENVIRONMENT === 'development');
+                        //TRUE);
+                        ENVIRONMENT === 'development');
 
                     $this->db->where(['id' => $appointment->appointment['id']]);
                     $this->db->update('ea_appointments', ['sms_notification' => $ref]);
