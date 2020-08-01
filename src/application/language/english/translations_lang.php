@@ -351,3 +351,4 @@ $lang['sms_sender'] = 'SMS FROM Sender Name';
 $lang['cron_active_title'] = 'Scheduler Activity:';
 $lang['cron_active'] = 'Working Normally';
 $lang['cron_inactive'] = 'NOT Working!';
+$lang['default_provider'] = 'Default Provider';

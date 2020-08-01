@@ -175,6 +175,7 @@ class Backend extends CI_Controller {
         $this->load->model('services_model');
         $this->load->model('settings_model');
         $this->load->model('user_model');
+        $this->load->model('providers_model');
 
         $view['base_url'] = $this->config->item('base_url');
         $view['user_display_name'] = $this->user_model->get_user_display_name($this->session->userdata('user_id'));
@@ -184,6 +185,7 @@ class Backend extends CI_Controller {
         $view['time_format'] = $this->settings_model->get_setting('time_format');
         $view['services'] = $this->services_model->get_batch();
         $view['categories'] = $this->services_model->get_all_categories();
+        $view['providers'] = $this->providers_model->get_available_providers();
         $this->set_user_data($view);
 
         $this->load->view('backend/header', $view);

@@ -78,6 +78,13 @@
                 .end()
                 .append(linkHtml);
 
+            $('#service-default-provider option[data-services]').each(function() {
+                if( $(this).data('services').includes(serviceId) )
+                    $(this).show();
+                else
+                    $(this).hide();
+            });
+
             instance.display(service);
             $('#filter-services .selected').removeClass('selected');
             $(this).addClass('selected');
@@ -120,6 +127,7 @@
                 duration: $('#service-duration').val(),
                 price: $('#service-price').val(),
                 currency: $('#service-currency').val(),
+                id_users_default_provider: $('#service-default-provider').val(),
                 pets_option: $('#pets_option').val(),
                 description: $('#service-description').val(),
                 availabilities_type: $('#service-availabilities-type').val(),
@@ -288,6 +296,7 @@
         $('#service-duration').val(service.duration);
         $('#service-price').val(service.price);
         $('#service-currency').val(service.currency);
+        $('#service-default-provider').val(service.id_users_default_provider);
         $('#pets_option').val(service.pets_option);
         $('#service-description').val(service.description);
         $('#service-availabilities-type').val(service.availabilities_type);
@@ -330,7 +339,6 @@
             if (response.length === 0) {
                 $('#filter-services .results').html('<em>' + EALang.no_records_found + '</em>');
             }
-
             if (selectId !== undefined) {
                 this.select(selectId, display);
             }

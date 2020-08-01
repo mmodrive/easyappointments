@@ -112,6 +112,19 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="service-default-provider"><?= lang('default_provider') ?></label>
+                        <select id="service-default-provider" class="form-control" >
+                            <?php
+                                echo '<option value="">[Not Set]</option>';
+                                foreach($providers as $provider) {
+                                    $service_ids = json_encode($provider['services']);
+                                    echo '<option value="' . $provider['id'] . '" data-services=\'' . $service_ids . '\'>' . $provider['first_name'] . ' ' . $provider['last_name'] . '</option>';
+                                }
+                            ?>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
                         <label for="service-category"><?= lang('category') ?></label>
                         <select id="service-category" class="form-control"></select>
                     </div>

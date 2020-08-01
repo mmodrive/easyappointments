@@ -420,10 +420,12 @@ class Appointments extends CI_Controller {
             $available_hours = array_values($available_hours);
             sort($available_hours, SORT_STRING);
             $available_hours = array_values($available_hours);
+            $data = (object)[ 'provider_id' => $provider['id'],
+                    'hours' => $available_hours ];
 
             $this->output
                 ->set_content_type('application/json')
-                ->set_output(json_encode($available_hours));
+                ->set_output(json_encode($data));
         }
         catch (Exception $exc)
         {

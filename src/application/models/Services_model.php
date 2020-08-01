@@ -28,6 +28,9 @@ class Services_Model extends CI_Model {
     {
         $this->validate($service);
 
+        if($service['id_users_default_provider'] === "")
+            $service['id_users_default_provider'] = NULL;
+
         if ( ! isset($service['id']))
         {
             $service['id'] = $this->_insert($service);

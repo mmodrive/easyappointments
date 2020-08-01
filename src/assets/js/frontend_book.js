@@ -240,7 +240,14 @@ window.FrontendBook = window.FrontendBook || {};
             var currServiceId = $('#select-service').val();
             $('#select-provider').empty();
 
-            $.each(GlobalVariables.availableProviders, function (indexProvider, provider) {
+            $.each(GlobalVariables.availableProviders.sort(function(a,b) {
+                    var x = a.first_name + ' ' + a.last_name;
+                    var y = b.first_name + ' ' + b.last_name;
+                    if (x < y) {return -1;}
+                    if (x > y) {return 1;}
+                    return 0;
+                }), 
+                function (indexProvider, provider) {
                 $.each(provider.services, function (indexService, serviceId) {
                     // If the current provider is able to provide the selected service,
                     // add him to the listbox.
@@ -255,13 +262,27 @@ window.FrontendBook = window.FrontendBook || {};
 
             // Add the "Any Provider" entry.
             if ($('#select-provider option').length >= 1) {
-                $('#select-provider').append(new Option('- ' + EALang.any_provider + ' -', 'any-provider'));
+                $('#select-provider').prepend(new Option('- ' + EALang.any_provider + ' -', 'any-provider'));
+                $('#select-provider').val('any-provider');
             }
 
             FrontendBookApi.getUnavailableDates($('#select-provider').val(), $(this).val(),
                 $('#select-date').datepicker('getDate').toString('yyyy-MM-dd'));
             FrontendBook.updateConfirmFrame();
             _updateServiceDescription($('#select-service').val(), $('#service-description'));
+
+
+            $.each(GlobalVariables.availableServices, function (index, service) {
+                if (service.id == currServiceId && service.id_users_default_provider) {
+                    $('#select-provider').val(service.id_users_default_provider).change();
+                    return false;
+                }
+            });
+
+            if ($('#select-provider option').length <= 2)
+                $('#select-provider').closest('div.form-group').hide();
+            else
+                $('#select-provider').closest('div.form-group').show();
         });
 
         /**
