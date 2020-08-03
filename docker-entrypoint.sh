@@ -6,14 +6,12 @@ createAppSettings() {
     sed -i "s/DB_USERNAME   = ''/DB_USERNAME = '$DB_USERNAME'/g" $PROJECT_DIR/config.php
     sed -i "s/DB_PASSWORD   = ''/DB_PASSWORD = '$DB_PASSWORD'/g" $PROJECT_DIR/config.php
     sed -i "s/DB_NAME       = ''/DB_NAME = '$DB_NAME'/g" $PROJECT_DIR/config.php
-    if [ "$EMAIL_PROTOCOL" = "smtp" ]; then
+    if [ "$MAIL_PROTOCOL" = "smtp" ]; then
         echo "Setting up email..."
-        sed -i "s/\$config\['protocol'\] = 'mail'/\$config['protocol'] = 'smtp'/g" $PROJECT_DIR/application/config/email.php
-        sed -i "s#// \$config\['smtp_host'\] = ''#\$config['smtp_host'] = '$SMTP_HOST'#g" $PROJECT_DIR/application/config/email.php
-        sed -i "s#// \$config\['smtp_user'\] = ''#\$config['smtp_user'] = '$SMTP_USER'#g" $PROJECT_DIR/application/config/email.php
-        sed -i "s#// \$config\['smtp_pass'\] = ''#\$config['smtp_pass'] = '$SMTP_PASS'#g" $PROJECT_DIR/application/config/email.php
-        sed -i "s#// \$config\['smtp_crypto'\] = 'ssl'#\$config['smtp_crypto'] = '$SMTP_CRYPTO'#g" $PROJECT_DIR/application/config/email.php
-        sed -i "s#// \$config\['smtp_port'\] = 25#\$config['smtp_port'] = $SMTP_PORT#g" $PROJECT_DIR/application/config/email.php
+        sed -i "s/MAIL_PROTOCOL       = 'mail'/MAIL_PROTOCOL = '$MAIL_PROTOCOL'/g" $PROJECT_DIR/config.php
+        sed -i "s/MAIL_SMTP_HOST       = ''/MAIL_SMTP_HOST = '$MAIL_SMTP_HOST'/g" $PROJECT_DIR/config.php
+        sed -i "s/MAIL_SMTP_USER       = ''/MAIL_SMTP_USER = '$MAIL_SMTP_USER'/g" $PROJECT_DIR/config.php
+        sed -i "s/MAIL_SMTP_PASS       = ''/MAIL_SMTP_PASS = '$MAIL_SMTP_PASS'/g" $PROJECT_DIR/config.php
     fi
     sed -i "s/url-to-easyappointments-directory/$APP_URL/g" $PROJECT_DIR/config.php
 

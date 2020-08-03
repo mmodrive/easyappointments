@@ -180,7 +180,7 @@ class Customers_Model extends CI_Model {
         if( !empty($settings) ){
             if (isset($settings['password']))
             {
-                if( isset($settings_row) )
+                if( isset($settings_row) && !empty($settings_row->salt) )
                     $salt = $settings_row->salt;
                 else 
                     $settings['salt'] = $salt = generate_salt();
@@ -519,7 +519,7 @@ class Customers_Model extends CI_Model {
 
             $salt = $this->customers_model->get_salt($customer_id);
             if ( !$salt )
-                return [ 'email' => $email ];
+                return NULL;
 
             $password = hash_password($salt, $password);
 
@@ -541,6 +541,6 @@ class Customers_Model extends CI_Model {
             return $customer;
         }
         else
-            return $customer;
+            return NULL;
     }
 }

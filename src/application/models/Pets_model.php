@@ -369,7 +369,7 @@ class Pets_Model extends CI_Model {
             $pet_details['nature_name'] = $natures->{$pet_details['nature']};
         }
 
-        if ( isset($pet_details['sex']) ){
+        if ( !empty($pet_details['sex']) ){
             $sexes = json_decode($this->settings_model->get_setting('pet_sex'));
             $pet_details['sex_name'] = $sexes->{$pet_details['sex']};
         }

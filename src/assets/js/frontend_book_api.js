@@ -147,8 +147,8 @@ window.FrontendBookApi = window.FrontendBookApi || {};
                 $('#button-next-3').click();
                 $('#login_success').val('0');
             } else {
-                FrontendBook.applyCustomerData({});
                 $('#login_success').val('0');
+                $('#password').val('');
                 $('#form-3-message').text(EALang['login_failed']);
             }
         })

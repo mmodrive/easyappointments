@@ -524,6 +524,7 @@ class Appointments extends CI_Controller {
             $pet = $post_data['pet'] ?? NULL;
             $is_existing_customer = FALSE;
 
+            // We retrieve the existing customer here by email to allow for the passcode recovery mode
             if ($this->customers_model->exists($customer))
             {
                 $customer['id'] = $this->customers_model->find_record_id($customer);
@@ -535,6 +536,9 @@ class Appointments extends CI_Controller {
             $appointment['is_unavailable'] = (int)$appointment['is_unavailable']; // needs to be type casted
             if( isset($pet) ) {
                 $pet['id_users'] = $customer_id;
+                //Find existing pet by customer owner and pet name 
+                if ($this->pets_model->exists($pet) && ! isset($pet['id']))
+                    $pet['id'] = $this->pets_model->find_record_id($pet);
                 $appointment['id_pets'] = $this->pets_model->add($pet);
             }
             $appointment['id'] = $this->appointments_model->add($appointment);
