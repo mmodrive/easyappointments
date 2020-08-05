@@ -352,8 +352,9 @@
                             <div class="col-xs-12 col-sm-6">
                                 <div class="form-group">
                                     <label for="pet_id" class="control-label"><?= lang('pet_select') ?></label>
-                                    <select id="pet_id" class="form-control" >
-                                        <option selected value> -- enter new pet -- </option>
+                                    <select id="pet_id" class="required form-control" >
+                                        <option selected value> Click to Select </option>
+                                        <option selected value="new"> -- Enter new pet -- </option>
                                     </select>
                                 </div>
                                 <div class="form-group">

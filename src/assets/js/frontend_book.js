@@ -778,6 +778,7 @@ window.FrontendBook = window.FrontendBook || {};
                         postData.pet[this.id.substr(4)] = this.id;
                     else if(this.id == 'pet_dob')
                         postData.pet[this.id.substr(4)] = $(this).datepicker('getDate').toString('yyyy-MM-dd');
+                    else if(this.id == 'pet_id' && $(this).val() == 'new'){}                        
                     else
                         postData.pet[this.id.substr(4)] = $(this).val();
                 }
@@ -845,7 +846,7 @@ window.FrontendBook = window.FrontendBook || {};
             $('#zip-code').val(customer.zip_code);
 
             var pet_select = $('#pet_id');
-            pet_select.find('option:not(:first)').remove();
+            pet_select.find('option:nth-child(n+3)').remove();
             $.each(customer.pets, function(iPet, pet){
                 pet_select.append($('<option>', { 
                     value: pet.id,
@@ -853,11 +854,18 @@ window.FrontendBook = window.FrontendBook || {};
                     'data-pet': JSON.stringify(pet)
                 }));
             } );
+            if( pet_select.find('option').length <= 2 ){
+                pet_select.val('new');
+                pet_select.closest('.form-group').hide();
+            }
+            else{
+                if( pet_select.find('option').length == 3 )
+                    pet_select.val(pet_select.find('option:nth-child(3)').val());
+                else
+                    pet_select.val('');
+                pet_select.closest('.form-group').show();
+            }
 
-            if( pet_select.find('option').length == 1 )
-                pet_select.val('');
-            else if( pet_select.find('option').length == 2 )
-                pet_select.val(pet_select.find('option:not(:first)').val());
             pet_select.change();
 
             return true;
