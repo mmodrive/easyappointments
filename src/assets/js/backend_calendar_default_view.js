@@ -1256,9 +1256,15 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                     var service = GlobalVariables.availableServices.find(function (service) {
                         return provider.id == service.id_users_default_provider;
                     });
+                    if( !service )
+                        service = GlobalVariables.availableServices.find(function (service) {
+                            return provider.services.indexOf(service.id) !== -1
+                        });
 
-                    $('#select-service').val(service.id).trigger('change');
-                    $('#select-provider').val(provider.id).trigger('change');
+                    if (service)
+                        $('#select-service').val(service.id).trigger('change');
+                    if (provider)
+                        $('#select-provider').val(provider.id).trigger('change');
                 }
 
                 // Preselect time
