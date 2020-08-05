@@ -70,8 +70,9 @@ window.BackendCalendarApi = window.BackendCalendarApi || {};
             .fail(function (jqXHR, textStatus, errorThrown) {
                 if (errorCallback !== undefined) {
                     errorCallback();
-                    console.log(textStatus + " " + errorThrown + " " + jqXHR.responseText);
                 }
+                else
+                    console.log(textStatus + " " + errorThrown + " " + jqXHR.responseText);
             });
     };
 

@@ -33,6 +33,9 @@ class Appointments_Model extends CI_Model {
         // Validate the appointment data before doing anything.
         $this->validate($appointment);
 
+        // Clear direct pet data if any
+        unset($appointment['pet']);
+
         foreach ($appointment as $key => $value) 
             if($value === '')
                 $appointment[$key] = NULL;
