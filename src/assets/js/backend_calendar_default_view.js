@@ -1254,7 +1254,7 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                     });
 
                     var service = GlobalVariables.availableServices.find(function (service) {
-                        return provider.services.indexOf(service.id) !== -1
+                        return provider.id == service.id_users_default_provider;
                     });
 
                     $('#select-service').val(service.id).trigger('change');
