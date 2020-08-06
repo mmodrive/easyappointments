@@ -97,8 +97,8 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                 $dialog.find('#time').val(appointment.time);
                 $dialog.find('#comments').val(appointment.comments);
 
-                var pet_select = $('#pet_id');
-                pet_select.find('option:not(:first)').remove();
+                var pet_select = $dialog.find('#pet_id');
+                pet_select.find('option:nth-child(n+3)').remove();
                 $.each(customer.pets, function(iPet, pet){
                     pet_select.append($('<option>', { 
                         value: pet.id,

@@ -90,6 +90,7 @@ window.BackendCalendarAppointmentsModal = window.BackendCalendarAppointmentsModa
                         pet[this.id.substr(4)] = this.id;
                     else if(this.id == 'pet_dob')
                         pet[this.id.substr(4)] = $(this).datepicker('getDate').toString('yyyy-MM-dd');
+                    else if(this.id == 'pet_id' && $(this).val() == 'new'){}
                     else
                         pet[this.id.substr(4)] = $(this).val();
                 }
@@ -187,6 +188,10 @@ window.BackendCalendarAppointmentsModal = window.BackendCalendarAppointmentsModa
             $dialog.find('#end-datetime').val(GeneralFunctions.formatDate(start.addMinutes(serviceDuration),
                 GlobalVariables.dateFormat, true));
 
+            var pet_select = $dialog.find('#pet_id');
+            pet_select.find('option:nth-child(n+3)').remove();
+            pet_select.val('').change();
+
             // Display modal form.
             $dialog.find('.modal-header h3').text(EALang.new_appointment_title);
             $dialog.modal('show');
@@ -234,7 +239,7 @@ window.BackendCalendarAppointmentsModal = window.BackendCalendarAppointmentsModa
                     $('#customer-notes').val(c.notes);
 
                     var pet_select = $('#pet_id');
-                    pet_select.find('option:not(:first)').remove();
+                    pet_select.find('option:nth-child(n+3)').remove();
                     $.each(c.pets, function(iPet, pet){
                         pet_select.append($('<option>', { 
                             value: pet.id,
@@ -367,7 +372,9 @@ window.BackendCalendarAppointmentsModal = window.BackendCalendarAppointmentsModa
          */
         $('#new-customer').click(function () {
             $('#manage-appointment').find('#customer-id, #first-name, #last-name, #email, '
-                + '#phone-number, #address, #city, #zip-code, #customer-notes').val('');
+                + '#phone-number, #address, #city, #zip-code, #customer-notes, #pet_id').val('');
+            $('#pet_id').find('option:nth-child(n+3)').remove();
+            $('#pet_id').change();
         });
     }
 

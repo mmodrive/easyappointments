@@ -270,8 +270,9 @@
                     <fieldset>
                         <legend>
                             <?= lang('pet_details_title') ?>
-                            <select id="pet_id" class="form-control" >
-                                <option selected value> -- enter new pet -- </option>
+                            <select id="pet_id" class="required form-control" >
+                                <option selected value> Click to Select </option>
+                                <option selected value="new"> -- enter new pet -- </option>
                             </select>
                         </legend>
 
