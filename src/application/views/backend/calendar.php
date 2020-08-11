@@ -272,8 +272,7 @@
                             <?= lang('pet_details_title') ?>
                             <div class="form-group">
                                 <select id="pet_id" class="required form-control" >
-                                    <option selected value> Click to Select * </option>
-                                    <option selected value="new"> -- enter new pet -- </option>
+                                    <option selected value="new"> Click to Select </option>
                                 </select>
                             </div>
                         </legend>

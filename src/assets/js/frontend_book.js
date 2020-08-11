@@ -846,7 +846,7 @@ window.FrontendBook = window.FrontendBook || {};
             $('#zip-code').val(customer.zip_code);
 
             var pet_select = $('#pet_id');
-            pet_select.find('option:nth-child(n+3)').remove();
+            pet_select.find('option:nth-child(n+2)').remove();
             $.each(customer.pets, function(iPet, pet){
                 pet_select.append($('<option>', { 
                     value: pet.id,
@@ -854,15 +854,15 @@ window.FrontendBook = window.FrontendBook || {};
                     'data-pet': JSON.stringify(pet)
                 }));
             } );
-            if( pet_select.find('option').length <= 2 ){
+            if( pet_select.find('option').length <= 1 ){
                 pet_select.val('new');
                 pet_select.closest('.form-group').hide();
             }
             else{
-                if( pet_select.find('option').length == 3 )
-                    pet_select.val(pet_select.find('option:nth-child(3)').val());
+                if( pet_select.find('option').length == 2 )
+                    pet_select.val(pet_select.find('option:nth-child(2)').val());
                 else
-                    pet_select.val('');
+                    pet_select.val('new');
                 pet_select.closest('.form-group').show();
             }
 

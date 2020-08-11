@@ -189,7 +189,7 @@ window.BackendCalendarAppointmentsModal = window.BackendCalendarAppointmentsModa
                 GlobalVariables.dateFormat, true));
 
             var pet_select = $dialog.find('#pet_id');
-            pet_select.find('option:nth-child(n+3)').remove();
+            pet_select.find('option:nth-child(n+2)').remove();
             pet_select.val('').change();
 
             // Display modal form.
@@ -239,7 +239,7 @@ window.BackendCalendarAppointmentsModal = window.BackendCalendarAppointmentsModa
                     $('#customer-notes').val(c.notes);
 
                     var pet_select = $('#pet_id');
-                    pet_select.find('option:nth-child(n+3)').remove();
+                    pet_select.find('option:nth-child(n+2)').remove();
                     $.each(c.pets, function(iPet, pet){
                         pet_select.append($('<option>', { 
                             value: pet.id,
@@ -373,7 +373,7 @@ window.BackendCalendarAppointmentsModal = window.BackendCalendarAppointmentsModa
         $('#new-customer').click(function () {
             $('#manage-appointment').find('#customer-id, #first-name, #last-name, #email, '
                 + '#phone-number, #address, #city, #zip-code, #customer-notes, #pet_id').val('');
-            $('#pet_id').find('option:nth-child(n+3)').remove();
+            $('#pet_id').find('option:nth-child(n+2)').remove();
             $('#pet_id').change();
         });
     }
