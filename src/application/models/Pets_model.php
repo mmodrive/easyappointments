@@ -364,7 +364,7 @@ class Pets_Model extends CI_Model {
             $pet_details['age'] = $interval->y == 0 ? $interval->m.' '.lang('months') : $interval->y.' '.lang('years');
         }
 
-        if ( isset($pet_details['nature']) ){
+        if ( !empty($pet_details['nature']) ){
             $natures = json_decode($this->settings_model->get_setting('pet_nature'));
             $pet_details['nature_name'] = $natures->{$pet_details['nature']};
         }
