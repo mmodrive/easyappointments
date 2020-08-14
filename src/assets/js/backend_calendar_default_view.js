@@ -1250,7 +1250,8 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                 ..._calendarInitValues(),
                 ...{
                     defaultView: 'agendaDay',
-
+                    defaultDate: $('#calendar').fullCalendar('getDate'),
+                    
                     header: {
                         left: '',
                         center: '',
