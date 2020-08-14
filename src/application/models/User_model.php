@@ -33,6 +33,8 @@ class User_Model extends CI_Model {
         $user = $this->db->get_where('ea_users', ['id' => $user_id])->row_array();
         $user['settings'] = $this->db->get_where('ea_user_settings', ['id_users' => $user_id])->row_array();
         unset($user['settings']['id_users']);
+        if( empty($user['settings']['calendar_selections']) )
+            $user['settings']['calendar_selections'] = json_encode((object)['agendaView' => null, 'calendar_id' => null, 'calendar_id_type' => null, 'additional_calendar_ids' => []]);
         return $user;
     }
 
@@ -65,6 +67,18 @@ class User_Model extends CI_Model {
         }
 
         if ( ! $this->db->update('ea_user_settings', $user_settings, ['id_users' => $user['id']]))
+        {
+            return FALSE;
+        }
+
+        return TRUE;
+    }
+
+    public function save_user_selections($calendar_selections_json)
+    {
+        $user_settings = ['calendar_selections' => $calendar_selections_json];
+
+        if ( ! $this->db->update('ea_user_settings', $user_settings, ['id_users' => $this->session->userdata('user_id')]))
         {
             return FALSE;
         }

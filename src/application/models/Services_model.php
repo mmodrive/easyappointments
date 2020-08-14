@@ -340,6 +340,7 @@ class Services_Model extends CI_Model {
                 'ea_services_providers.id_services = ea_services.id', 'inner')
             ->join('ea_service_categories',
                 'ea_service_categories.id = ea_services.id_service_categories', 'left')
+            ->order_by('ea_services.name')
             ->get()->result_array();
     }
 

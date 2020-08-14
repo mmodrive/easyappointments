@@ -24,6 +24,7 @@
         'customers'             : <?= json_encode($customers) ?>,
         'secretaryProviders'    : <?= json_encode($secretary_providers) ?>,
         'calendarView'          : <?= json_encode($calendar_view) ?>,
+        'calendarSelections'          : <?= json_encode($calendar_selections) ?>,
         'user'                  : {
             'id'        : <?= $user_id ?>,
             'email'     : <?= json_encode($user_email) ?>,
@@ -43,6 +44,11 @@
             <div class="form-group">
                 <label for="select-filter-item"><?= lang('display_calendar') ?></label>
                 <select id="select-filter-item" class="form-control" title="<?= lang('select_filter_item_hint') ?>">
+                </select>
+            </div>
+
+            <div class="form-group" style="display: none;">
+                <select id="select-filter-item-additional" multiple class="form-control" title="<?= lang('select_filter_item_hint') ?>">
                 </select>
             </div>
         </div>
@@ -86,7 +92,9 @@
         </div>
     </div>
 
-    <div id="calendar"><!-- Dynamically Generated Content --></div>
+    <div id="calendars" class="row">
+        <div id="calendar" class="calendar col-sm-12"><!-- Dynamically Generated Content --></div>
+    </div>
 </div>
 
 <!-- MANAGE APPOINTMENT MODAL -->

@@ -384,15 +384,15 @@ iframe.preview {
     margin: 5px 0;
 }
 
-#calendar-page #calendar {
+#calendar-page .calendar {
     margin-bottom: 15px;
 }
 
-#calendar-page #calendar .fc-toolbar.fc-header-toolbar h2 {
+#calendar-page .calendar .fc-toolbar.fc-header-toolbar h2 {
     font-size: 22px;
 }
 
-#calendar-page #calendar .fc-unavailable {
+#calendar-page .calendar .fc-unavailable {
     background-image: url('../img/unavailable.jpg');
     font-size: 14px;
     border-radius: 0;
@@ -402,20 +402,20 @@ iframe.preview {
     opacity: 0.7;
 }
 
-#calendar-page #calendar .fc-event-title small {
+#calendar-page .calendar .fc-event-title small {
     font-weight: normal;
     font-size: 12px;
 }
 
-#calendar-page #calendar .fc-time {
+#calendar-page .calendar .fc-time {
     font-size: 10px;
 }
 
-#calendar-page #calendar .fc-break {
+#calendar-page .calendar .fc-break {
     background-image: url('../img/break.jpg');
 }
 
-#calendar-page #calendar .fc-custom {
+#calendar-page .calendar .fc-custom {
     background-image: url('../img/custom.jpg');
 }
 
@@ -423,40 +423,40 @@ iframe.preview {
     margin-bottom: 10px;
 }
 
-#calendar .fc-time-grid-event.fc-short .fc-title {
+.calendar .fc-time-grid-event.fc-short .fc-title {
     font-size: .7em;
 }
 
-#calendar .fc-header-title h2 {
+.calendar .fc-header-title h2 {
     font-size: 16px;
     margin: 0px;
     line-height: 26px;
 }
 
-#calendar .fc-header .fc-button {
+.calendar .fc-header .fc-button {
     margin-bottom: 8px;
     background-image: none !important;
 }
 
-#calendar .fc-agenda-allday .fc-day-content {
+.calendar .fc-agenda-allday .fc-day-content {
     min-height: 19px;
 }
 
-#calendar .fc-agenda-divider-inner {
+.calendar .fc-agenda-divider-inner {
     height: 3px;
 }
 
-#calendar table thead .fc-first {
+.calendar table thead .fc-first {
     background: #F5F5F5;
 }
 
-#calendar table thead .fc-first th {
+.calendar table thead .fc-first th {
     vertical-align: middle;
     padding: 2px 0;
     color: #555;
 }
 
-#calendar .fc-event {
+.calendar .fc-event {
     border: 1px solid #4790CA;
     background-color: #4790CA;
 }
@@ -499,36 +499,36 @@ body .form-horizontal .controls {
     margin-left: 158px;
 }
 
-#calendar .calendar-header {
+.calendar .calendar-header {
     padding-bottom: 15px;
 }
 
-#calendar .calendar-header input {
+.calendar .calendar-header input {
     width: 120px;
 }
 
-#calendar .calendar-header .btn,
-#calendar .calendar-header input {
+.calendar .calendar-header .btn,
+.calendar .calendar-header input {
     margin: 10px 10px 10px 0;
 }
 
-#calendar .calendar-view {
+.calendar .calendar-view {
     overflow-x: auto;
 }
 
-#calendar .calendar-view > div {
+.calendar .calendar-view > div {
     width: 100%;
     min-width: 1000%;
     overflow: auto;
 }
 
-#calendar .calendar-view .date-column {
+.calendar .calendar-view .date-column {
     overflow: auto;
     float: left;
     margin-right: 20px;
 }
 
-#calendar .calendar-view .date-column .provider-column .not-working {
+.calendar .calendar-view .date-column .provider-column .not-working {
     width: 115px;
     background: #eaeaea;
     border-radius: 3px;
@@ -538,17 +538,17 @@ body .form-horizontal .controls {
     opacity: 0.7;
 }
 
-#calendar .calendar-view .date-column .provider-column {
+.calendar .calendar-view .date-column .provider-column {
     overflow: auto;
     float: left;
     margin-right: 10px;
 }
 
-#calendar .calendar-view .date-column .provider-column table thead {
+.calendar .calendar-view .date-column .provider-column table thead {
     background-color: #FFF;
 }
 
-#calendar .calendar-view .date-column .provider-column .event {
+.calendar .calendar-view .date-column .provider-column .event {
     font-size: 10px;
     border-radius: 3px;
     padding: 2px 3px;
@@ -556,12 +556,12 @@ body .form-horizontal .controls {
     margin: 1px 25px 1px 1px;
 }
 
-#calendar .calendar-view .date-column .provider-column .event.appointment {
+.calendar .calendar-view .date-column .provider-column .event.appointment {
     background: #4790CA;
     color: #fff;
 }
 
-#calendar .calendar-view .date-column .provider-column .event.unavailability {
+.calendar .calendar-view .date-column .provider-column .event.unavailability {
     background: #409482;
     color: #fff;
 

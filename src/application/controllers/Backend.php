@@ -76,6 +76,7 @@ class Backend extends CI_Controller {
         $view['customers'] = $this->customers_model->get_batch();
         $user = $this->user_model->get_settings($this->session->userdata('user_id'));
         $view['calendar_view'] = $user['settings']['calendar_view'];
+        $view['calendar_selections'] = json_decode($user['settings']['calendar_selections']);
         $this->set_user_data($view);
 
         if ($this->session->userdata('role_slug') === DB_SLUG_SECRETARY)
@@ -243,7 +244,7 @@ class Backend extends CI_Controller {
     {
         $this->session->set_userdata('dest_url', site_url('backend/print_appointments'));
 
-        if ( ! $this->_has_privileges(PRIV_SERVICES))
+        if ( ! $this->_has_privileges(PRIV_PRINT_APPOINTMENTS))
         {
             return;
         }

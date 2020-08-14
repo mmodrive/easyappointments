@@ -1506,6 +1506,25 @@ class Backend_api extends CI_Controller {
         }
     }
 
+    public function ajax_save_user_calendar_selections()
+    {
+        try
+        {
+            $this->load->model('user_model');
+            $this->user_model->save_user_selections($this->input->post('selections'));
+
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode(AJAX_SUCCESS));
+        }
+        catch (Exception $exc)
+        {
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode(['exceptions' => [exceptionToJavaScript($exc)]]));
+        }
+    }
+
     /**
      * [AJAX] This method checks whether the username already exists in the database.
      *
