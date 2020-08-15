@@ -392,7 +392,11 @@ iframe.preview {
     font-size: 22px;
 }
 
-#calendar-page .calendar .fc-unavailable {
+#calendar-page .calendar .fc-daygrid a {
+    color: #fff;
+}
+
+#calendar-page .calendar .fc-unavailable .fc-event-main {
     background-image: url('../img/unavailable.jpg');
     font-size: 14px;
     border-radius: 0;

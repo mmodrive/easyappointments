@@ -9,6 +9,9 @@
  * @since       v1.2.0
  * ---------------------------------------------------------------------------- */
 
+//import { Calendar } from '@fullcalendar/core';
+//import interactionPlugin from '@fullcalendar/interaction';
+
 /**
  * Backend Calendar
  *
@@ -27,7 +30,6 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
 
     // Variables
     var lastFocusedEventData; // Contains event data for later use.
-    var skipCalendarRender = false;
 
     /**
      * Bind event handlers for the calendar view.
@@ -299,18 +301,15 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
             GlobalVariables.calendarSelections.calendar_id_type = $('#select-filter-item option:selected').attr('type');
             _saveUserSelections();
 
+            var calendar = $('#calendar').fullCalendar();
             if ($('#select-filter-item option:selected').attr('type') === FILTER_TYPE_SERVICE) {
                 $('#google-sync, #enable-sync, #insert-appointment, #insert-unavailable').prop('disabled', true);
-                skipCalendarRender = true;
-                $('#calendar').fullCalendar('option', 'selectable', false);
-                skipCalendarRender = false;
-                $('#calendar').fullCalendar('option', 'editable', false);
+                calendar.setOption('selectable', false);
+                calendar.setOption('editable', false);
             } else {
                 $('#google-sync, #enable-sync, #insert-appointment, #insert-unavailable').prop('disabled', false);
-                skipCalendarRender = true;
-                $('#calendar').fullCalendar('option', 'selectable', true);
-                skipCalendarRender = false;
-                $('#calendar').fullCalendar('option', 'editable', true);
+                calendar.setOption('selectable', true);
+                calendar.setOption('editable', true);
 
                 // If the user has already the sync enabled then apply the proper style changes.
                 if ($('#select-filter-item option:selected').attr('google-sync') === 'true') {
@@ -325,6 +324,9 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
 
                 $('#select-filter-item-additional option').show().filter('option[value="' + $('#select-filter-item option:selected').attr('value') + '"]').hide();
             }
+
+            _calendarViewRender();
+            _mainCalendarViewChanged({view: calendar.view});
         });
 
         $('#select-filter-item-additional').change(function () {
@@ -620,8 +622,8 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
      *
      * @see _getCalendarHeight()
      */
-    function _calendarWindowResize(view) {
-        $(this).fullCalendar('option', 'height', _getCalendarHeight());
+    function _calendarWindowResize(arg) {
+        this.setOption('height', _getCalendarHeight());
     }
 
     /**
@@ -632,7 +634,7 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
      */
     function _calendarDayClick(date, jsEvent, view) {
         if (!date.hasTime()) {
-            $('#calendar').fullCalendar('changeView', 'agendaDay');
+            $('#calendar').fullCalendar('changeView', 'timeGridDay');
             $('#calendar').fullCalendar('gotoDate', date);
         }
     }
@@ -801,20 +803,22 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
      * display proper information to the user.
      */
     function _calendarViewRender() {
-        if ($('#select-filter-item').val() === null || skipCalendarRender) {
+        if ($('#select-filter-item').val() === null ) {
             return;
         }
 
-        var $calendar = $(this.el).closest('.calendar');
+        var $calendar = $('#calendar'); // $(this.el).closest('.calendar');
+        var calendar = $calendar.fullCalendar();
 
-        _refreshCalendarAppointments(
-            $calendar,
+        _loadCalendarEvents(
+            $calendar.fullCalendar(),
             $calendar.data('calendar-id'),
             $calendar.data('calendar-id-type'),
-            $calendar.fullCalendar('getView').start,
-            $calendar.fullCalendar('getView').end);
+            calendar.view.activeStart,
+            calendar.view.activeEnd
+            );
 
-        $(window).trigger('resize'); // Places the footer on the bottom.
+        //$(window).trigger('resize'); // Places the footer on the bottom.
 
         // Remove all open popovers.
         $('.close-popover').each(function () {
@@ -826,22 +830,26 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
             $(eventHandle).popover();
         });
 
-        // Only for main calendar, the on-view-change event listener
-        if( $('#calendar').get(0) === $calendar.get(0) ){
-            var agendaView = $calendar.fullCalendar('getView').name;
+        calendar.render();
+    }
 
-            if (agendaView == 'agendaDay' && $('#select-filter-item option:selected').attr('type') === FILTER_TYPE_PROVIDER) {
-                $('#select-filter-item-additional').closest('.form-group').show();
-            } else {
-                $('#select-filter-item-additional').closest('.form-group').hide();
-            }
+    function _mainCalendarViewChanged(arg) {
+        var $calendar = $(arg.view.calendar.el).closest('.calendar');
+        var calendar = arg.view.calendar;
 
-            _setupAdditionalCalendars();
+        var agendaView = calendar.view.type;
 
-            if(agendaView !== GlobalVariables.calendarSelections.agendaView) {
-                GlobalVariables.calendarSelections.agendaView = agendaView;
-                _saveUserSelections();
-            }
+        if (agendaView == 'timeGridDay' && $('#select-filter-item option:selected').attr('type') === FILTER_TYPE_PROVIDER) {
+            $('#select-filter-item-additional').closest('.form-group').show();
+        } else {
+            $('#select-filter-item-additional').closest('.form-group').hide();
+        }
+
+        _setupAdditionalCalendars();
+
+        if(agendaView !== GlobalVariables.calendarSelections.agendaView) {
+            GlobalVariables.calendarSelections.agendaView = agendaView;
+            _saveUserSelections();
         }
     }
 
@@ -885,13 +893,13 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
      * @param {Date} startDate Visible start date of the calendar.
      * @param {Date} endDate Visible end date of the calendar.
      */
-    function _refreshCalendarAppointments($calendar, recordId, filterType, startDate, endDate) {
+    function _loadCalendarEvents(calendar, recordId, filterType, startDate, endDate) {
         var url = GlobalVariables.baseUrl + '/index.php/backend_api/ajax_get_calendar_appointments';
         var data = {
             csrfToken: GlobalVariables.csrfToken,
             record_id: recordId,
-            start_date: startDate.format('YYYY-MM-DD'),
-            end_date: endDate.format('YYYY-MM-DD'),
+            start_date: startDate.toString('yyyy-MM-dd'),
+            end_date: endDate.toString('yyyy-MM-dd'),
             filter_type: filterType
         };
 
@@ -910,8 +918,8 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                         appointment.customer.first_name + ' ' +
                         appointment.customer.last_name +
                     (appointment.pet ? ' - ' + appointment.pet.name : ''),
-                    start: moment(appointment.start_datetime),
-                    end: moment(appointment.end_datetime),
+                    start: +moment(appointment.start_datetime),
+                    end: +moment(appointment.end_datetime),
                     allDay: false,
                     data: appointment // Store appointment data for later use.
                 };
@@ -919,8 +927,9 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                 calendarEvents.push(event);
             });
 
-            $calendar.fullCalendar('removeEvents');
-            $calendar.fullCalendar('addEventSource', calendarEvents);
+            $.each(calendar.getEventSources(), function(i, src) { src.remove() });
+            $.each(calendar.getEvents(), function(i, src) { src.remove() });
+            calendar.addEventSource(calendarEvents);
 
             var weekDays = [
                 'sunday', 
@@ -933,9 +942,9 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
             ];
 
             // :: ADD PROVIDER'S UNAVAILABLE TIME PERIODS
-            var calendarView = $calendar.fullCalendar('getView').name;
+            var calendarView = calendar.view.type;
 
-            if (filterType === FILTER_TYPE_PROVIDER && calendarView !== 'month') {
+            if (filterType === FILTER_TYPE_PROVIDER && calendarView !== 'dayGridMonth') {
                 $.each(GlobalVariables.availableProviders, function (index, provider) {
                     if (provider.id == recordId) {
                         var workingPlan = jQuery.parseJSON(provider.settings.working_plan);
@@ -948,8 +957,8 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                                     if (!availableDates)
                                         availableDates = [];
                                     availableDates.push({
-                                        start: moment(rangeString.start, GlobalVariables.dbDateFormat).toDate(),
-                                        end: moment(rangeString.end, GlobalVariables.dbDateFormat).add(1, 'd').subtract(1, 'ms').toDate()
+                                        start: +moment(rangeString.start, GlobalVariables.dbDateFormat).toDate(),
+                                        end: +moment(rangeString.end, GlobalVariables.dbDateFormat).add(1, 'd').subtract(1, 'ms').toDate()
                                     });
                                 });
                             }
@@ -969,8 +978,8 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                         var availableDates = getAvailableDates();
 
                         switch (calendarView) {
-                            case 'agendaDay':
-                                var selectedDayName = weekDays[$calendar.fullCalendar('getView').start.format('d')];
+                            case 'timeGridDay':
+                                var selectedDayName = weekDays[calendar.view.activeStart.getDay()];
 
                                 // Add custom unavailable periods.
                                 $.each(response.unavailables, function (index, unavailable) {
@@ -982,8 +991,8 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
 
                                     var unavailablePeriod = {
                                         title: EALang.unavailable + notes,
-                                        start: moment(unavailable.start_datetime),
-                                        end: moment(unavailable.end_datetime),
+                                        start: +moment(unavailable.start_datetime),
+                                        end: +moment(unavailable.end_datetime),
                                         allDay: false,
                                         color: '#879DB4',
                                         editable: true,
@@ -991,11 +1000,11 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                                         data: unavailable
                                     };
 
-                                    $calendar.fullCalendar('renderEvent', unavailablePeriod, false);
+                                    calendar.addEvent(unavailablePeriod);
                                 });
 
                                 if (availableDates){
-                                    var targetDate = $calendar.fullCalendar('getView').start;
+                                    var targetDate = calendar.view.activeStart;
                                     if (!availableDates.isInRange(targetDate))
                                         workingPlan[selectedDayName] = null;
                                 }
@@ -1004,21 +1013,21 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                                 if (workingPlan[selectedDayName] == null) {
                                     unavailablePeriod = {
                                         title: EALang.not_working,
-                                        start: $calendar.fullCalendar('getView').intervalStart.clone(),
-                                        end: $calendar.fullCalendar('getView').intervalEnd.clone(),
+                                        start: +moment(calendar.view.activeStart),
+                                        end: +moment(calendar.view.activeEnd),
                                         allDay: false,
                                         color: '#BEBEBE',
                                         editable: false,
                                         className: 'fc-unavailable'
                                     };
 
-                                    $calendar.fullCalendar('renderEvent', unavailablePeriod, false);
+                                    calendar.addEvent(unavailablePeriod);
 
                                     return; // Go to next loop.
                                 }
 
                                 // Add unavailable period before work starts.
-                                var calendarDateStart = moment($calendar.fullCalendar('getView').start.format('YYYY-MM-DD') + ' 00:00:00');
+                                var calendarDateStart = moment(calendar.view.activeStart.toString('yyyy-MM-dd') + ' 00:00:00');
                                 var startHour = workingPlan[selectedDayName].start.split(':');
                                 var workDateStart = calendarDateStart.clone();
                                 workDateStart.hour(parseInt(startHour[0]));
@@ -1027,18 +1036,18 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                                 if (calendarDateStart < workDateStart) {
                                     var unavailablePeriodBeforeWorkStarts = {
                                         title: EALang.not_working,
-                                        start: calendarDateStart,
-                                        end: workDateStart,
+                                        start: +calendarDateStart,
+                                        end: +workDateStart,
                                         allDay: false,
                                         color: '#BEBEBE',
                                         editable: false,
                                         className: 'fc-unavailable'
                                     };
-                                    $calendar.fullCalendar('renderEvent', unavailablePeriodBeforeWorkStarts, false);
+                                    calendar.addEvent(unavailablePeriodBeforeWorkStarts);
                                 }
 
                                 // Add unavailable period after work ends.
-                                var calendarDateEnd = moment($calendar.fullCalendar('getView').end.format('YYYY-MM-DD') + ' 00:00:00');
+                                var calendarDateEnd = moment(calendar.view.activeEnd.toString('yyyy-MM-dd') + ' 00:00:00');
                                 var endHour = workingPlan[selectedDayName].end.split(':');
                                 var workDateEnd = calendarDateStart.clone();
 
@@ -1048,15 +1057,15 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                                 if (calendarDateEnd > workDateEnd) {
                                     var unavailablePeriodAfterWorkEnds = {
                                         title: EALang.not_working,
-                                        start: workDateEnd,
-                                        end: calendarDateEnd,
+                                        start: +workDateEnd,
+                                        end: +calendarDateEnd,
                                         allDay: false,
                                         color: '#BEBEBE',
                                         editable: false,
                                         className: 'fc-unavailable'
                                     };
 
-                                    $calendar.fullCalendar('renderEvent', unavailablePeriodAfterWorkEnds, false);
+                                    calendar.addEvent(unavailablePeriodAfterWorkEnds);
                                 }
 
                                 // Add unavailable periods for breaks.
@@ -1076,22 +1085,22 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
 
                                     var unavailablePeriod = {
                                         title: EALang.break,
-                                        start: breakStart,
-                                        end: breakEnd,
+                                        start: +breakStart,
+                                        end: +breakEnd,
                                         allDay: false,
                                         color: '#BEBEBE',
                                         editable: false,
                                         className: 'fc-unavailable fc-break'
                                     };
 
-                                    $calendar.fullCalendar('renderEvent', unavailablePeriod, false);
+                                    calendar.addEvent(unavailablePeriod);
                                 });
 
                                 break;
 
-                            case 'agendaWeek':
-                                var currentDateStart = $calendar.fullCalendar('getView').start.clone();
-                                var currentDateEnd = currentDateStart.clone().add(1, 'days');
+                            case 'timeGridWeek':
+                                var currentDateStart = calendar.view.activeStart.clone();
+                                var currentDateEnd = currentDateStart.clone().addDays(1);
 
                                 // Add custom unavailable periods (they are always displayed on the calendar, even if
                                 // the provider won't work on that day).
@@ -1104,8 +1113,8 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
 
                                     unavailablePeriod = {
                                         title: EALang.unavailable + notes,
-                                        start: moment(unavailable.start_datetime),
-                                        end: moment(unavailable.end_datetime),
+                                        start: +moment(unavailable.start_datetime),
+                                        end: +moment(unavailable.end_datetime),
                                         allDay: false,
                                         color: '#879DB4',
                                         editable: true,
@@ -1113,7 +1122,7 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                                         data: unavailable
                                     };
 
-                                    $calendar.fullCalendar('renderEvent', unavailablePeriod, false);
+                                    calendar.addEvent(unavailablePeriod);
                                 });
 
                                 $.each(workingPlan, function (index, workingDay) {
@@ -1127,17 +1136,17 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                                         // Add a full day unavailable event.
                                         unavailablePeriod = {
                                             title: EALang.not_working,
-                                            start: moment(currentDateStart.format('YYYY-MM-DD')),
-                                            end: moment(currentDateEnd.format('YYYY-MM-DD')),
+                                            start: +moment(currentDateStart.toString('yyyy-MM-dd')),
+                                            end: +moment(currentDateEnd.toString('yyyy-MM-dd')),
                                             allDay: false,
                                             color: '#BEBEBE',
                                             editable: false,
                                             className: 'fc-unavailable'
                                         };
 
-                                        $calendar.fullCalendar('renderEvent', unavailablePeriod, true);
-                                        currentDateStart.add(1, 'days');
-                                        currentDateEnd.add(1, 'days');
+                                        calendar.addEvent(unavailablePeriod, true);
+                                        currentDateStart.addDays(1);
+                                        currentDateEnd.addDays(1);
 
                                         return; // Go to the next loop.
                                     }
@@ -1154,15 +1163,15 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                                     if (currentDateStart < start) {
                                         unavailablePeriod = {
                                             title: EALang.not_working,
-                                            start: moment(currentDateStart.format('YYYY-MM-DD') + ' 00:00:00'),
-                                            end: moment(currentDateStart.format('YYYY-MM-DD') + ' ' + workingDay.start + ':00'),
+                                            start: +moment(currentDateStart.toString('yyyy-MM-dd') + ' 00:00:00'),
+                                            end: +moment(currentDateStart.toString('yyyy-MM-dd') + ' ' + workingDay.start + ':00'),
                                             allDay: false,
                                             color: '#BEBEBE',
                                             editable: false,
                                             className: 'fc-unavailable'
                                         };
 
-                                        $calendar.fullCalendar('renderEvent', unavailablePeriod, true);
+                                        calendar.addEvent(unavailablePeriod, true);
                                     }
 
                                     // Add unavailable period after work ends.
@@ -1174,15 +1183,15 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                                     if (currentDateEnd > end) {
                                         unavailablePeriod = {
                                             title: EALang.not_working,
-                                            start: moment(currentDateStart.format('YYYY-MM-DD') + ' ' + workingDay.end + ':00'),
-                                            end: moment(currentDateEnd.format('YYYY-MM-DD') + ' 00:00:00'),
+                                            start: +moment(currentDateStart.toString('yyyy-MM-dd') + ' ' + workingDay.end + ':00'),
+                                            end: +moment(currentDateEnd.toString('yyyy-MM-dd') + ' 00:00:00'),
                                             allDay: false,
                                             color: '#BEBEBE',
                                             editable: false,
                                             className: 'fc-unavailable'
                                         };
 
-                                        $calendar.fullCalendar('renderEvent', unavailablePeriod, false);
+                                        calendar.addEvent(unavailablePeriod);
                                     }
 
                                     // Add unavailable periods during day breaks.
@@ -1202,19 +1211,19 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
 
                                         var unavailablePeriod = {
                                             title: EALang.break,
-                                            start: moment(currentDateStart.format('YYYY-MM-DD') + ' ' + currentBreak.start),
-                                            end: moment(currentDateStart.format('YYYY-MM-DD') + ' ' + currentBreak.end),
+                                            start: +moment(currentDateStart.toString('yyyy-MM-dd') + ' ' + currentBreak.start),
+                                            end: +moment(currentDateStart.toString('yyyy-MM-dd') + ' ' + currentBreak.end),
                                             allDay: false,
                                             color: '#BEBEBE',
                                             editable: false,
                                             className: 'fc-unavailable fc-break'
                                         };
 
-                                        $calendar.fullCalendar('renderEvent', unavailablePeriod, false);
+                                        calendar.addEvent(unavailablePeriod);
                                     });
 
-                                    currentDateStart.add(1, 'days');
-                                    currentDateEnd.add(1, 'days');
+                                    currentDateStart.addDays(1);
+                                    currentDateEnd.addDays(1);
                                 });
 
                                 break;
@@ -1239,28 +1248,29 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
 
         var container = $('#calendars');
         $.each(additional_calendar_ids, function (i, pid) {
-            var calendar = $('<div/>', {
+            var $calendar = $('<div/>', {
                 'id': 'calendar-' + pid,
                 'class': 'calendar col-sm-' + bs_add_col_width,
                 'data-calendar-id': pid,
                 'data-calendar-id-type': FILTER_TYPE_PROVIDER,
             });
-            container.append(calendar);
-            calendar.fullCalendar({
+            container.append($calendar);
+            var calendar = $calendar.fullCalendar({
                 ..._calendarInitValues(),
                 ...{
-                    defaultView: 'agendaDay',
-                    defaultDate: $('#calendar').fullCalendar('getDate'),
-                    
-                    header: {
+                    initialView: 'timeGridDay',
+                    initialDate: $('#calendar').fullCalendar().getDate(),
+
+                    headerToolbar: {
                         left: '',
-                        center: '',
+                        center: 'title',
                         right: ''
                     },
                 }
             });
 
-            calendar.find('.fc-header-toolbar .fc-center').append('<h2>' + $('#select-filter-item-additional option[value="' + pid + '"]').text() + '</h2>');
+            calendar.render();
+            $calendar.find('.fc-header-toolbar .fc-toolbar-title').text($('#select-filter-item-additional option[value="' + pid + '"]').text());
         });
     }
 
@@ -1331,11 +1341,11 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
         switch (GlobalVariables.timeFormat) {
             case 'military':
                 timeFormat = 'H:mm';
-                slotTimeFormat = 'H(:mm)';
+                slotTimeFormat = 'H';
                 break;
             case 'regular':
-                timeFormat = 'h:mm a';
-                slotTimeFormat = 'h(:mm) a';
+                timeFormat = 'h:mma';
+                slotTimeFormat = 'ha';
                 break;
             default:
                 throw new Error('Invalid time format setting provided!', GlobalVariables.timeFormat);
@@ -1346,38 +1356,46 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
             editable: true,
             firstDay: 0,
             snapDuration: '00:30:00',
-            timeFormat: timeFormat,
+            titleFormat: 'MMMM YYYY',
+            eventTimeFormat: timeFormat,
             slotLabelFormat: slotTimeFormat,
             allDayText: EALang.all_day,
-            columnFormat: columnFormat,
-            titleFormat: 'MMMM YYYY',
+            views: {
+                timeGridDay: {
+                },
+                timeGridWeek:{
+                    dayHeaderFormat: columnFormat,
+                }
+            },
 
             // Selectable
             selectable: true,
-            selectHelper: true,
-            select: _calendarSelect,
+            //selectHelper: true,
+            //select: _calendarSelect,
+            //plugins: [ FullCalendar.moment ],
+            droppable: true,
 
             // Translations
-            monthNames: [EALang.january, EALang.february, EALang.march, EALang.april,
-                EALang.may, EALang.june, EALang.july, EALang.august,
-                EALang.september, EALang.october, EALang.november,
-                EALang.december],
-            monthNamesShort: [EALang.january.substr(0, 3), EALang.february.substr(0, 3),
-                EALang.march.substr(0, 3), EALang.april.substr(0, 3),
-                EALang.may.substr(0, 3), EALang.june.substr(0, 3),
-                EALang.july.substr(0, 3), EALang.august.substr(0, 3),
-                EALang.september.substr(0, 3), EALang.october.substr(0, 3),
-                EALang.november.substr(0, 3), EALang.december.substr(0, 3)],
-            dayNames: [EALang.sunday, EALang.monday, EALang.tuesday, EALang.wednesday,
-                EALang.thursday, EALang.friday, EALang.saturday],
-            dayNamesShort: [EALang.sunday.substr(0, 3), EALang.monday.substr(0, 3),
-                EALang.tuesday.substr(0, 3), EALang.wednesday.substr(0, 3),
-                EALang.thursday.substr(0, 3), EALang.friday.substr(0, 3),
-                EALang.saturday.substr(0, 3)],
-            dayNamesMin: [EALang.sunday.substr(0, 2), EALang.monday.substr(0, 2),
-                EALang.tuesday.substr(0, 2), EALang.wednesday.substr(0, 2),
-                EALang.thursday.substr(0, 2), EALang.friday.substr(0, 2),
-                EALang.saturday.substr(0, 2)],
+            // monthNames: [EALang.january, EALang.february, EALang.march, EALang.april,
+            //     EALang.may, EALang.june, EALang.july, EALang.august,
+            //     EALang.september, EALang.october, EALang.november,
+            //     EALang.december],
+            // monthNamesShort: [EALang.january.substr(0, 3), EALang.february.substr(0, 3),
+            //     EALang.march.substr(0, 3), EALang.april.substr(0, 3),
+            //     EALang.may.substr(0, 3), EALang.june.substr(0, 3),
+            //     EALang.july.substr(0, 3), EALang.august.substr(0, 3),
+            //     EALang.september.substr(0, 3), EALang.october.substr(0, 3),
+            //     EALang.november.substr(0, 3), EALang.december.substr(0, 3)],
+            // dayNames: [EALang.sunday, EALang.monday, EALang.tuesday, EALang.wednesday,
+            //     EALang.thursday, EALang.friday, EALang.saturday],
+            // dayNamesShort: [EALang.sunday.substr(0, 3), EALang.monday.substr(0, 3),
+            //     EALang.tuesday.substr(0, 3), EALang.wednesday.substr(0, 3),
+            //     EALang.thursday.substr(0, 3), EALang.friday.substr(0, 3),
+            //     EALang.saturday.substr(0, 3)],
+            // dayNamesMin: [EALang.sunday.substr(0, 2), EALang.monday.substr(0, 2),
+            //     EALang.tuesday.substr(0, 2), EALang.wednesday.substr(0, 2),
+            //     EALang.thursday.substr(0, 2), EALang.friday.substr(0, 2),
+            //     EALang.saturday.substr(0, 2)],
             buttonText: {
                 today: EALang.today,
                 day: EALang.day,
@@ -1387,37 +1405,52 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
 
             // Calendar events need to be declared on initialization.
             windowResize: _calendarWindowResize,
-            eventClick: _calendarEventClick,
-            eventResize: _calendarEventResize,
-            eventDrop: _calendarEventDrop,
-            eventAfterAllRender: _convertTitlesToHtml,
-            viewRender: _calendarViewRender,
+            // eventClick: _calendarEventClick,
+            // eventResize: _calendarEventResize,
+            // eventDrop: _calendarEventDrop,
+            //eventAfterAllRender: _convertTitlesToHtml,
         }
     }
 
     exports.initialize = function () {
 
-        var defaultView = GlobalVariables.calendarSelections.agendaView ?? (window.innerWidth < 468 ? 'agendaDay' : 'agendaWeek');
+        var initialView = GlobalVariables.calendarSelections.agendaView ?? (window.innerWidth < 468 ? 'timeGridDay' : 'timeGridWeek');
+
+        $.fn.extend({
+            fullCalendar: function(createInitParams){
+                if( this.length <= 0 )
+                    return;
+
+                if( createInitParams ){
+                    var fullCalendar = new FullCalendar.Calendar(this[0], createInitParams);
+                    $(this[0]).data('fullCalendar-CalendarObject', fullCalendar)
+                    return fullCalendar;
+                }
+                else
+                    return $(this[0]).data('fullCalendar-CalendarObject');
+            }
+        })
 
         // Initialize page calendar
-        $('#calendar').fullCalendar({
+        var calendar = $('#calendar').fullCalendar( {
             ..._calendarInitValues(),
             ...{
-                defaultView: defaultView,
+                initialView: initialView,
 
-                header: {
+                headerToolbar: {
                     left: 'prev,next today',
                     center: 'title',
-                    right: 'agendaDay,agendaWeek,month'
+                    right: 'timeGridDay,timeGridWeek,dayGridMonth'
                 },
 
                 // Calendar events need to be declared on initialization.
-                dayClick: _calendarDayClick,
+                //dayClick: _calendarDayClick,
+                viewClassNames: _mainCalendarViewChanged,
             }
         });
 
         // Trigger once to set the proper footer position after calendar initialization.
-        _calendarWindowResize();
+        //_calendarWindowResize();
 
         // Fill the select list boxes of the page.
         if (GlobalVariables.availableProviders.length > 0) {
