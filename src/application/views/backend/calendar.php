@@ -4,7 +4,6 @@
 <script src="<?= asset_url('assets/ext/jquery-fullcalendar/main.js') ?>"></script>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.3.0/main.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/moment@5.3.0/main.global.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/interaction@5.3.0/main.global.min.js"></script>
 <script src="<?= asset_url('assets/ext/jquery-sticky-table-headers/jquery.stickytableheaders.min.js') ?>"></script>
 <script src="<?= asset_url('assets/ext/jquery-ui/jquery-ui-timepicker-addon.js') ?>"></script>
 <script src="<?= asset_url('assets/js/backend_calendar.js') ?>"></script>
