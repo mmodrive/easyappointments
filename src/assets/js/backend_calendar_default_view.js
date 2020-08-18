@@ -30,12 +30,23 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
 
     // Variables
     var lastFocusedEventData; // Contains event data for later use.
+    var ctrlPressed = false;
 
     /**
      * Bind event handlers for the calendar view.
      */
     function _bindEventHandlers() {
         var $calendarPage = $('#calendar-page');
+
+        $(window).keydown(function(evt) {
+            if (evt.which == 17) { // ctrl
+                ctrlPressed = true;
+            }
+        }).keyup(function(evt) {
+            if (evt.which == 17) { // ctrl
+                ctrlPressed = false;
+            }
+        });
 
         /**
          * Event: Reload Button "Click"
@@ -210,7 +221,7 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
          * deletion then an AJAX call is made to the server and deletes the appointment from the database.
          */
         $calendarPage.on('click', '.delete-popover', function () {
-            $(this).parents().eq(2).remove(); // Hide the popover.
+            $(this).closest('.popover').remove(); // Hide the popover.
 
             if (lastFocusedEventData.extendedProps.data.is_unavailable == false) {
                 var buttons = [
@@ -651,7 +662,8 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
     }
 
     function _calendarEventRemove(eventDropInfo) {
-        eventDropInfo.revert();
+        if( !ctrlPressed )
+            eventDropInfo.revert();
     }
 
     function _calendarEventLeave(eventDropInfo) {
@@ -672,72 +684,139 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
         }
 
         if (event.extendedProps.data.is_unavailable == false) {
-            // Prepare appointment data.
-            var oldAppointment = GeneralFunctions.clone(event.extendedProps.data);
-            var appointment = {
-                start_datetime: event.start.toString('yyyy-MM-dd HH:mm:ss'),
-                end_datetime: event.end.toString('yyyy-MM-dd HH:mm:ss'),
-                id_pets: oldAppointment.id_pets,
-                id_users_customer: oldAppointment.id_users_customer,
-                is_unavailable: false,
-            }
+            if( !ctrlPressed ){ // Copy
+                // Prepare appointment data.
+                var oldAppointment = GeneralFunctions.clone(event.extendedProps.data);
+                var appointment = {
+                    start_datetime: event.start.toString('yyyy-MM-dd HH:mm:ss'),
+                    end_datetime: event.end.toString('yyyy-MM-dd HH:mm:ss'),
+                    id_pets: oldAppointment.id_pets,
+                    id_users_customer: oldAppointment.id_users_customer,
+                    is_unavailable: false,
+                }
 
-            var provider_service = _getProviderService($(eventDropInfo.view.calendar.el).data('calendar-id'));
+                var provider_service = _getProviderService($(eventDropInfo.view.calendar.el).data('calendar-id'));
 
-            appointment.id_users_provider = provider_service.provider;
-            if( !(appointment.id_services = provider_service.default_service) ){
-                eventDropInfo.revert();
-                Backend.displayNotification("Unable to create: Provider offers no services!");
-                return;
-            }
-
-            // Define success callback function.
-            var successCallback = function (response) {
-                if (response.exceptions) {
-                    response.exceptions = GeneralFunctions.parseExceptions(response.exceptions);
-                    GeneralFunctions.displayMessageBox(GeneralFunctions.EXCEPTIONS_TITLE, GeneralFunctions.EXCEPTIONS_MESSAGE);
-                    $('#message_box').append(GeneralFunctions.exceptionsToHtml(response.exceptions));
+                appointment.id_users_provider = provider_service.provider;
+                if( !(appointment.id_services = provider_service.default_service) ){
+                    eventDropInfo.revert();
+                    Backend.displayNotification("Unable to create: Provider offers no services!");
                     return;
                 }
 
-                if (response.warnings) {
-                    // Display warning information to the user.
-                    response.warnings = GeneralFunctions.parseExceptions(response.warnings);
-                    GeneralFunctions.displayMessageBox(GeneralFunctions.WARNINGS_TITLE, GeneralFunctions.WARNINGS_MESSAGE);
-                    $('#message_box').append(GeneralFunctions.exceptionsToHtml(response.warnings));
+                // Define success callback function.
+                var successCallback = function (response) {
+                    if (response.exceptions) {
+                        response.exceptions = GeneralFunctions.parseExceptions(response.exceptions);
+                        GeneralFunctions.displayMessageBox(GeneralFunctions.EXCEPTIONS_TITLE, GeneralFunctions.EXCEPTIONS_MESSAGE);
+                        $('#message_box').append(GeneralFunctions.exceptionsToHtml(response.exceptions));
+                        return;
+                    }
+
+                    if (response.warnings) {
+                        // Display warning information to the user.
+                        response.warnings = GeneralFunctions.parseExceptions(response.warnings);
+                        GeneralFunctions.displayMessageBox(GeneralFunctions.WARNINGS_TITLE, GeneralFunctions.WARNINGS_MESSAGE);
+                        $('#message_box').append(GeneralFunctions.exceptionsToHtml(response.warnings));
+                    }
+
+                    // Define the undo function, if the user needs to reset the last change.
+                    // var undoFunction = function () {
+                    //     var url = GlobalVariables.baseUrl + '/index.php/backend_api/ajax_delete_appointment';
+                    //     var data = {
+                    //         csrfToken: GlobalVariables.csrfToken,
+                    //         appointment_id: response.appointment.id,
+                    //         delete_reason: '',
+                    //     };
+
+                    //     $.post(url, data, function (response) {
+                    //         $('#notification').hide('blind');
+                    //         eventDropInfo.revert();
+                    //     }, 'json').fail(GeneralFunctions.ajaxFailureHandler);
+                    // };
+
+                    Backend.displayNotification(EALang.appointment_updated, [
+                        // {
+                        //     'label': 'Undo',
+                        //     'function': undoFunction
+                        // }
+                    ]);
+
+                    //Refetch appointments, and revert the cached one as it will be a duplicate of the new appointment
+                    $('#reload-appointments').click();
+                    eventDropInfo.revert();
+
+                    $('#footer').css('position', 'static'); // Footer position fix.
+                };
+
+                // Update appointment data.
+                BackendCalendarApi.saveAppointment(appointment, undefined, undefined, successCallback);
+            }
+            else { // Move
+                // Prepare appointment data.
+                var appointment = GeneralFunctions.clone(event.extendedProps.data);
+
+                var provider_service = _getProviderService($(eventDropInfo.view.calendar.el).data('calendar-id'));
+
+                appointment.id_users_provider = provider_service.provider;
+                if( !(appointment.id_services = provider_service.default_service) ){
+                    eventDropInfo.revert();
+                    Backend.displayNotification("Unable to create: Provider offers no services!");
+                    return;
                 }
 
-                // Define the undo function, if the user needs to reset the last change.
-                // var undoFunction = function () {
-                //     var url = GlobalVariables.baseUrl + '/index.php/backend_api/ajax_delete_appointment';
-                //     var data = {
-                //         csrfToken: GlobalVariables.csrfToken,
-                //         appointment_id: response.appointment.id,
-                //         delete_reason: '',
-                //     };
+                delete appointment.customer;
+                delete appointment.provider;
+                delete appointment.service;
 
-                //     $.post(url, data, function (response) {
-                //         $('#notification').hide('blind');
-                //         eventDropInfo.revert();
-                //     }, 'json').fail(GeneralFunctions.ajaxFailureHandler);
-                // };
+                // Define success callback function.
+                var successCallback = function (response) {
+                    if (response.exceptions) {
+                        response.exceptions = GeneralFunctions.parseExceptions(response.exceptions);
+                        GeneralFunctions.displayMessageBox(GeneralFunctions.EXCEPTIONS_TITLE, GeneralFunctions.EXCEPTIONS_MESSAGE);
+                        $('#message_box').append(GeneralFunctions.exceptionsToHtml(response.exceptions));
+                        return;
+                    }
 
-                Backend.displayNotification(EALang.appointment_updated, [
-                    // {
-                    //     'label': 'Undo',
-                    //     'function': undoFunction
-                    // }
-                ]);
+                    if (response.warnings) {
+                        // Display warning information to the user.
+                        response.warnings = GeneralFunctions.parseExceptions(response.warnings);
+                        GeneralFunctions.displayMessageBox(GeneralFunctions.WARNINGS_TITLE, GeneralFunctions.WARNINGS_MESSAGE);
+                        $('#message_box').append(GeneralFunctions.exceptionsToHtml(response.warnings));
+                    }
 
-                //Refetch appointments, and revert the cached one as it will be a duplicate of the new appointment
-                $('#reload-appointments').click();
-                eventDropInfo.revert();
+                    // Define the undo function, if the user needs to reset the last change.
+                    // var undoFunction = function () {
+                    //     var url = GlobalVariables.baseUrl + '/index.php/backend_api/ajax_delete_appointment';
+                    //     var data = {
+                    //         csrfToken: GlobalVariables.csrfToken,
+                    //         appointment_id: response.appointment.id,
+                    //         delete_reason: '',
+                    //     };
 
-                $('#footer').css('position', 'static'); // Footer position fix.
-            };
+                    //     $.post(url, data, function (response) {
+                    //         $('#notification').hide('blind');
+                    //         eventDropInfo.revert();
+                    //     }, 'json').fail(GeneralFunctions.ajaxFailureHandler);
+                    // };
 
-            // Update appointment data.
-            BackendCalendarApi.saveAppointment(appointment, undefined, undefined, successCallback);
+                    Backend.displayNotification(EALang.appointment_updated, [
+                        // {
+                        //     'label': 'Undo',
+                        //     'function': undoFunction
+                        // }
+                    ]);
+
+                    //Refetch appointments, and revert the cached one as it will be a duplicate of the new appointment
+                    $('#reload-appointments').click();
+                    eventDropInfo.revert();
+
+                    $('#footer').css('position', 'static'); // Footer position fix.
+                };
+
+                // Update appointment data.
+                BackendCalendarApi.saveAppointment(appointment, undefined, undefined, successCallback);
+            }
         } else {
             eventDropInfo.revert();
         }
