@@ -630,7 +630,11 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
      * @see _getCalendarHeight()
      */
     function _calendarWindowResize(arg) {
-        this.setOption('height', _getCalendarHeight());
+        arg.view.calendar.setOption('height', _getCalendarHeight());
+        if( arg.view.calendar.el != $('#calendar').get(0) ){
+            $(arg.view.calendar.el).find('.fc-header-toolbar .fc-toolbar-title').text($('#select-filter-item-additional option[value="' + $(arg.view.calendar.el).data('calendar-id') + '"]').text());
+            $(arg.view.calendar.el).find('.fc-header-toolbar').height( $('#calendar .fc-header-toolbar').height() );
+        }
     }
 
     /**
@@ -937,15 +941,15 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
      * not the $.html() method. So in order for the title to display the html properly we convert all the
      * .fc-event-titles where needed into html.
      */
-    function _convertTitlesToHtml() {
-        // Convert the titles to html code.
-        $('.fc-custom').each(function () {
-            var title = $(this).find('.fc-event-title').text();
-            $(this).find('.fc-event-title').html(title);
-            var time = $(this).find('.fc-event-time').text();
-            $(this).find('.fc-event-time').html(time);
-        });
-    }
+    // function _convertTitlesToHtml() {
+    //     // Convert the titles to html code.
+    //     $('.fc-custom').each(function () {
+    //         var title = $(this).find('.fc-event-title').text();
+    //         $(this).find('.fc-event-title').html(title);
+    //         var time = $(this).find('.fc-event-time').text();
+    //         $(this).find('.fc-event-time').html(time);
+    //     });
+    // }
 
     /**
      * Refresh Calendar Appointments
@@ -1347,10 +1351,6 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                             center: 'title',
                             right: ''
                         },
-
-                        datesSet: function(arg) {
-                            $(arg.view.calendar.el).find('.fc-header-toolbar .fc-toolbar-title').text($('#select-filter-item-additional option[value="' + pid + '"]').text());
-                        },
                     }
                 });
 
@@ -1360,7 +1360,8 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                     });
                 calendar.setOption('height', $('#calendar').fullCalendar().getOption('height'));
                 calendar.render();
-                $calendar.find('.fc-header-toolbar').height( $('#calendar .fc-header-toolbar').height() );
+                //$calendar.find('.fc-header-toolbar').height( $('#calendar .fc-header-toolbar').height() );
+                _calendarWindowResize({view: calendar.view});
             }
         });
     }

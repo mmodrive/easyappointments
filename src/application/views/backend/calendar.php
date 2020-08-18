@@ -42,7 +42,7 @@
 
 <div id="calendar-page" class="container-fluid">
     <div id="calendar-toolbar">
-        <div id="calendar-filter" class="form-inline col-xs-12 col-sm-5">
+        <div id="calendar-filter" class="form-inline col-xs-12 col-sm-7">
             <div class="form-group">
                 <label for="select-filter-item"><?= lang('display_calendar') ?></label>
                 <select id="select-filter-item" class="form-control" title="<?= lang('select_filter_item_hint') ?>">
@@ -55,7 +55,7 @@
             </div>
         </div>
 
-        <div id="calendar-actions" class="col-xs-12 col-sm-7">
+        <div id="calendar-actions" class="col-xs-12 col-sm-5">
             <?php if (($role_slug == DB_SLUG_ADMIN || $role_slug == DB_SLUG_PROVIDER)
                     && Config::GOOGLE_SYNC_FEATURE == TRUE): ?>
                 <button id="google-sync" class="btn btn-primary"
