@@ -1534,6 +1534,7 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
             titleFormat: 'MMMM YYYY',
             eventTimeFormat: timeFormat,
             slotLabelFormat: slotTimeFormat,
+            displayEventEnd: false,
             allDayText: EALang.all_day,
             views: {
                 timeGridDay: {
