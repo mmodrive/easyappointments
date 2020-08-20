@@ -350,6 +350,13 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
             _saveUserSelections();
             _setupAdditionalCalendars();
         });
+
+        $('#calendar_view').change(function() {
+            var calendar = $('#calendar').fullCalendar();
+            calendar.changeView($(this).val());
+            _mainCalendarViewChanged({view: calendar.view});
+        });
+
     }
 
     /**
@@ -643,9 +650,13 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
     function _calendarWindowResize(arg) {
         arg.view.calendar.setOption('height', _getCalendarHeight());
         if( arg.view.calendar.el != $('#calendar').get(0) ){
-            $(arg.view.calendar.el).find('.fc-header-toolbar .fc-toolbar-title').text($('#select-filter-item-additional option[value="' + $(arg.view.calendar.el).data('calendar-id') + '"]').text());
-            $(arg.view.calendar.el).find('.fc-header-toolbar').height( $('#calendar .fc-header-toolbar').height() );
+            _setCalendarTitle($(arg.view.calendar.el));
         }
+    }
+
+    function _setCalendarTitle($calendar) {
+        $calendar.find('.fc-header-toolbar .fc-toolbar-title').text($('#select-filter-item-additional option[value="' + $calendar.data('calendar-id') + '"]').text());
+        $calendar.find('.fc-header-toolbar').height( $('#calendar .fc-header-toolbar').height() );
     }
 
     /**
@@ -768,6 +779,8 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                 delete appointment.customer;
                 delete appointment.provider;
                 delete appointment.service;
+                appointment.start_datetime = event.start.toString('yyyy-MM-dd HH:mm:ss');
+                appointment.end_datetime = event.end.toString('yyyy-MM-dd HH:mm:ss');
 
                 // Define success callback function.
                 var successCallback = function (response) {
@@ -1598,6 +1611,8 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
         if( !['timeGridDay','timeGridWeek','dayGridMonth'].includes(initialView) )
             initialView = 'timeGridWeek';
 
+        $('#calendar_view').val(initialView);
+
         $.fn.extend({
             fullCalendar: function(createInitParams){
                 if( this.length <= 0 )
@@ -1629,18 +1644,18 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                 headerToolbar: {
                     left: 'prev,next today',
                     center: 'title',
-                    right: 'timeGridDay,timeGridWeek,dayGridMonth'
+                    right: ''
                 },
 
                 // Calendar events need to be declared on initialization.
                 //dayClick: _calendarDayClick,
-                //viewClassNames: _mainCalendarViewChanged,
                 datesSet: function( dateInfo ){
                     $('[id^="calendar-"].calendar').each(function() {
                         var add_calendar = $(this).fullCalendar();
                         if( add_calendar ){
                             if( add_calendar.view.activeStart - dateInfo.start ){
                                 add_calendar.gotoDate(dateInfo.start);
+                                _setCalendarTitle($(this));
                             }
                         }
                     });
@@ -1743,8 +1758,6 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
             });
 
         calendar.render();
-
-        $('#calendar .fc-header-toolbar button').click(function() { _mainCalendarViewChanged({view: $('#calendar').fullCalendar().view}); });
 
         // Once rendered the main calendar, make all additional calendar headers the same height
         $('#calendars .calendar-additional[data-calendar-id] .fc-header-toolbar').height( $('#calendar .fc-header-toolbar').height() );

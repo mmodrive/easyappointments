@@ -56,6 +56,12 @@
         </div>
 
         <div id="calendar-actions" class="col-xs-12 col-sm-5">
+            <select id="calendar_view" class="btn btn-default">
+                <option value="timeGridDay"><?= lang('day') ?></option>
+                <option value="timeGridWeek"><?= lang('week') ?></option>
+                <option value="dayGridMonth"><?= lang('month') ?></option>
+            </select>
+
             <?php if (($role_slug == DB_SLUG_ADMIN || $role_slug == DB_SLUG_PROVIDER)
                     && Config::GOOGLE_SYNC_FEATURE == TRUE): ?>
                 <button id="google-sync" class="btn btn-primary"

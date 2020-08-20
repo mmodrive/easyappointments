@@ -427,6 +427,14 @@ iframe.preview {
     margin-bottom: 10px;
 }
 
+#calendar-page #calendar_view {
+    background-image: none;
+}
+
+#calendar-page #calendar_view:focus {
+    outline: none;
+}
+
 .calendar .fc-time-grid-event.fc-short .fc-title {
     font-size: .7em;
 }
@@ -871,21 +879,25 @@ body .form-horizontal .controls {
     margin-left: 12px;
 }
 
-@media (max-width: 1200px) {
-    #header #header-menu .menu-item {
-        min-width: 100px;
+@media (max-width: 1800px) {
+    #calendar-page .calendar .fc-toolbar.fc-header-toolbar h2 {
+        font-size: 18px;
     }
+}
 
+@media (max-width: 1300px) {
+    #header #header-menu .menu-item {
+        min-width: 80px;
+    }
+}
+
+@media (max-width: 1200px) {
     #calendar-page #calendar-actions {
         text-align: left;
     }
 }
 
 @media (max-width: 860px) {
-    #header #header-menu .menu-item {
-        min-width: 85px;
-    }
-
     #footer #footer-user-display-name {
         text-align: left;
     }
