@@ -30,6 +30,7 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
 
     // Variables
     var lastFocusedEventData; // Contains event data for later use.
+    var leavingCalendarEvent;
     var ctrlPressed = false;
 
     /**
@@ -369,7 +370,7 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
      */
     function _getCalendarHeight() {
         var result = window.innerHeight - $('#footer').outerHeight() - $('#header').outerHeight()
-            - $('#calendar-toolbar').outerHeight() - 60; // 60 for fine tuning
+            - $('#calendar-toolbar').outerHeight() - 50; // 50 for fine tuning
         return (result > 500) ? result : 500; // Minimum height is 500px
     }
 
@@ -673,6 +674,7 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
     }
 
     function _calendarEventRemove(eventDropInfo) {
+        leavingCalendarEvent = eventDropInfo;
         if( !ctrlPressed )
             eventDropInfo.revert();
     }
@@ -772,6 +774,7 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                 appointment.id_users_provider = provider_service.provider;
                 if( !(appointment.id_services = provider_service.default_service) ){
                     eventDropInfo.revert();
+                    leavingCalendarEvent.revert(); // Additionally Call the leaving calendar revert
                     Backend.displayNotification("Unable to create: Provider offers no services!");
                     return;
                 }
@@ -1006,6 +1009,8 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
         } else {
             $('#select-filter-item-additional').closest('.form-group').hide();
         }
+
+        calendar.setOption('height', _getCalendarHeight());
 
         _setupAdditionalCalendars();
 
@@ -1420,6 +1425,7 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
         if( layoutChanged )
             $('#calendars .calendar, #calendars .calendar-additional').each(function() {
                 $(this).fullCalendar().updateSize();
+                //_calendarWindowResize({view: $(this).fullCalendar().view});
             });
 
         var container = $('#calendars');
@@ -1450,9 +1456,7 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                     function(fetchInfo, successCallback, failureCallback) {
                             return _loadCalendarEvents($calendar, fetchInfo, successCallback, failureCallback);
                     });
-                calendar.setOption('height', $('#calendar').fullCalendar().getOption('height'));
                 calendar.render();
-                //$calendar.find('.fc-header-toolbar').height( $('#calendar .fc-header-toolbar').height() );
                 _calendarWindowResize({view: calendar.view});
             }
         });
