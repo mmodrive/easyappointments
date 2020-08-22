@@ -99,4 +99,25 @@ window.BackendCalendarApi = window.BackendCalendarApi || {};
         });
     };
 
+    exports.getProviderService = function (provider_id) {
+        var provider = GlobalVariables.availableProviders.find(function (provider) {
+            return provider.id == provider_id;
+        });
+
+        var default_service = GlobalVariables.availableServices.find(function (service) {
+            return provider.id == service.id_users_default_provider;
+        });
+        var first_service = GlobalVariables.availableServices.find(function (service) {
+            return provider.services.indexOf(service.id) !== -1;
+        });
+
+        return {
+            provider: provider ? provider.id : null, 
+            default_service: default_service ? default_service.id : null,
+            first_service: first_service ? first_service.id : null,
+            any_service: default_service ? default_service.id : (first_service ? first_service.id : null),
+        };
+    }
+
+
 })(window.BackendCalendarApi); 

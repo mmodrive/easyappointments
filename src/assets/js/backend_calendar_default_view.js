@@ -357,7 +357,6 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
             calendar.changeView($(this).val());
             _mainCalendarViewChanged({view: calendar.view});
         });
-
     }
 
     /**
@@ -708,7 +707,7 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                     is_unavailable: false,
                 }
 
-                var provider_service = _getProviderService($(eventDropInfo.view.calendar.el).data('calendar-id'));
+                var provider_service = BackendCalendarApi.getProviderService($(eventDropInfo.view.calendar.el).data('calendar-id'));
 
                 appointment.id_users_provider = provider_service.provider;
                 if( !(appointment.id_services = provider_service.default_service) ){
@@ -769,7 +768,7 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                 // Prepare appointment data.
                 var appointment = GeneralFunctions.clone(event.extendedProps.data);
 
-                var provider_service = _getProviderService($(eventDropInfo.view.calendar.el).data('calendar-id'));
+                var provider_service = BackendCalendarApi.getProviderService($(eventDropInfo.view.calendar.el).data('calendar-id'));
 
                 appointment.id_users_provider = provider_service.provider;
                 if( !(appointment.id_services = provider_service.default_service) ){
@@ -1475,7 +1474,7 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
             $('#select-service').val(service.id).trigger('change');
 
         } else {
-            var provider_service = _getProviderService(calendar_id);
+            var provider_service = BackendCalendarApi.getProviderService(calendar_id);
 
             $('#select-service').val(provider_service.any_service).trigger('change');
             $('#select-provider').val(provider_service.provider).trigger('change');
@@ -1486,26 +1485,6 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
         $('#end-datetime').datepicker('setDate', selectionInfo.end);
 
         return false;
-    }
-
-    function _getProviderService(provider_id) {
-        var provider = GlobalVariables.availableProviders.find(function (provider) {
-            return provider.id == provider_id;
-        });
-
-        var default_service = GlobalVariables.availableServices.find(function (service) {
-            return provider.id == service.id_users_default_provider;
-        });
-        var first_service = GlobalVariables.availableServices.find(function (service) {
-            return provider.services.indexOf(service.id) !== -1;
-        });
-
-        return {
-            provider: provider ? provider.id : null, 
-            default_service: default_service ? default_service.id : null,
-            first_service: first_service ? first_service.id : null,
-            any_service: default_service ? default_service.id : (first_service ? first_service.id : null),
-        };
     }
 
     function _calendarInitValues() {
