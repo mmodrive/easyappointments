@@ -1170,11 +1170,9 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                                     calendarEvents.push(unavailablePeriod);
                                 });
 
-                                if (availableDates){
-                                    var targetDate = calendar.view.activeStart;
-                                    if (!availableDates.isInRange(targetDate))
-                                        workingPlan[selectedDayName] = null;
-                                }
+                                // If Available-Dates are used, then we filter our workingplan to only those dates
+                                if (availableDates && !availableDates.isInRange(calendar.view.activeStart))
+                                    workingPlan[selectedDayName] = null;
 
                                 // Non-working day.
                                 if (workingPlan[selectedDayName] == null) {
@@ -1293,11 +1291,9 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                                 });
 
                                 $.each(workingPlan, function (index, workingDay) {
-                                    if (availableDates){
-                                        var targetDate = new Date(currentDateStart + weekDays.indexOf(index));
-                                        if (!availableDates.isInRange(targetDate))
-                                            workingDay = null;
-                                    }
+                                    // If Available-Dates are used, then we filter our workingplan to only those dates
+                                    if (availableDates && !availableDates.isInRange(currentDateStart))
+                                        workingDay = null;
 
                                     if (workingDay == null) {
                                         // Add a full day unavailable event.
