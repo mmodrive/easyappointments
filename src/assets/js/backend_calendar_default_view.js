@@ -498,9 +498,9 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
         $(jsEvent.target).popover('toggle');
 
         // Fix popover position.
-        // if ($('.popover').length > 0 && $('.popover').position().top < 200) {
-        //     $('.popover').css('top', '200px');
-        // }
+        if ($('.popover').length > 0 && $('.popover').position().top < -180) {
+            $('.popover').css('top', '-180px');
+        }
     }
 
     /**
