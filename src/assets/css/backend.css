@@ -435,6 +435,14 @@ iframe.preview {
     outline: none;
 }
 
+#calendar-page .popover {
+    max-width: 500px;
+}
+
+#calendar-page .popover .popover-content strong {
+    min-width: 90px;
+}
+
 .calendar .fc-time-grid-event.fc-short .fc-title {
     font-size: .7em;
 }
@@ -919,6 +927,10 @@ body .form-horizontal .controls {
     #calendar-page #calendar-actions .btn {
         width: 100%;
         margin: 5px 0;
+    }
+
+    #calendar-page .popover {
+        max-width: 276px;
     }
 
     .ui-dialog {
