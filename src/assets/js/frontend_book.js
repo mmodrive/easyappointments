@@ -634,12 +634,22 @@ window.FrontendBook = window.FrontendBook || {};
             var missingRequiredField = false;
             $('#wizard-frame-5 .required').each(function () {
                 if ($(this).val() == '') {
-                    $(this).parents('.form-group').addClass('has-error');
+                    $(this).closest('.form-group').addClass('has-error');
                     missingRequiredField = true;
                 }
             });
             if (missingRequiredField) {
                 throw EALang.fields_are_required;
+            }
+
+            // Validate email addresses.
+            if ($('#pet_vet_email').val() && !GeneralFunctions.validateEmail($('#pet_vet_email').val())) {
+                $('#pet_vet_email').closest('.form-group').addClass('has-error');
+                throw EALang.invalid_email;
+            }
+            if ($('#pet_therapist_email').val() && !GeneralFunctions.validateEmail($('#pet_therapist_email').val())) {
+                $('#pet_therapist_email').closest('.form-group').addClass('has-error');
+                throw EALang.invalid_email;
             }
 
             return true;

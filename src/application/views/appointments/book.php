@@ -357,24 +357,12 @@
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label for="pet_name" class="control-label"><?= lang('pet_name') ?> *</label>
-                                    <input type="text" id="pet_name" class="required form-control" maxlength="100" />
-                                </div>
-                                <div class="form-group">
-                                    <label for="pet_breed" class="control-label"><?= lang('pet_breed') ?> *</label>
-                                    <input type="text" id="pet_breed" class="required form-control" maxlength="120" />
-                                </div>
-                                <div class="form-group">
-                                    <label for="pet_colours" class="control-label"><?= lang('pet_colours') ?> *</label>
-                                    <input type="text" id="pet_colours" class="required form-control" maxlength="250" />
-                                </div>
-                            </div>
-
-                            <div class="col-xs-12 col-sm-6">
-                                <div class="form-group">
-                                    <label for="pet_sex" class="control-label"><?= lang('pet_sex') ?> *</label>
+                                    <label class="control-label"><?= lang('pet_details') ?></label>
+                                    <input type="text" id="pet_name" class="required form-control" maxlength="100" placeholder="<?= lang('pet_name') ?> *" />
+                                    <input type="text" id="pet_breed" class="required form-control" maxlength="120" placeholder="<?= lang('pet_breed') ?> *" />
+                                    <input type="text" id="pet_colours" class="required form-control" maxlength="250" placeholder="<?= lang('pet_colours') ?> *" />
                                     <select id="pet_sex" class="required form-control" >
-                                        <option disabled selected value> -- select an option -- </option>
+                                        <option disabled selected value><?= lang('pet_sex') ?> *</option>
                                         <?php
                                             $this->load->model('settings_model');
                                             $pet_natures = json_decode($this->settings_model->get_setting('pet_sex'));
@@ -384,15 +372,9 @@
                                             }
                                         ?>
                                     </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="pet_dob" class="control-label"><?= lang('pet_dob') ?> *</label>
-                                    <input type="text" id="pet_dob" class="required form-control" maxlength="120" autocomplete="off" />
-                                </div>
-                                <div class="form-group">
-                                    <label for="pet_nature" class="control-label"><?= lang('pet_nature') ?> *</label>
+                                    <input type="text" id="pet_dob" class="required form-control" maxlength="120" autocomplete="off" placeholder="<?= lang('pet_dob') ?> *" />
                                     <select id="pet_nature" class="required form-control" >
-                                        <option disabled selected value> -- select an option -- </option>
+                                        <option disabled selected value><?= lang('pet_nature') ?> *</option>
                                         <?php
                                             $this->load->model('settings_model');
                                             $pet_natures = json_decode($this->settings_model->get_setting('pet_nature'));
@@ -402,16 +384,30 @@
                                             }
                                         ?>
                                     </select>
-                                </div>
-                                <div class="form-group">
-                                    <form enctype="multipart/form-data">
-                                        <label for="pet_attachment" class="control-label"><?= lang('attachment') ?></label>
-                                        <input type="file" id="pet_attachment" class="form-control" maxlength="120" multiple />
-                                    </form>
+                                    <div class="form-group">
+                                        <form enctype="multipart/form-data">
+                                            <label for="pet_attachment" class="control-label"><?= lang('attachment') ?></label>
+                                            <input type="file" id="pet_attachment" class="form-control" maxlength="120" multiple />
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
 
-                            <span id="form-5-message" class="text-danger"><?= lang('fields_are_required') ?></span>
+                            <div class="col-xs-12 col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label"><?= lang('vet_details') ?></label>
+                                    <input type="text" id="pet_vet_name" class="required form-control" maxlength="512" placeholder="<?= lang('name') ?> *" />
+                                    <input type="text" id="pet_vet_phone" class="form-control" maxlength="128" placeholder="<?= lang('phone_number') ?>" />
+                                    <input type="text" id="pet_vet_email" class="form-control" maxlength="512" placeholder="<?= lang('email') ?>" />
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label"><?= lang('therapist_details') ?></label>
+                                    <input type="text" id="pet_therapist_name" class="form-control" maxlength="512" placeholder="<?= lang('name') ?>" />
+                                    <input type="text" id="pet_therapist_phone" class="form-control" maxlength="128" placeholder="<?= lang('phone_number') ?>" />
+                                    <input type="text" id="pet_therapist_email" class="form-control" maxlength="512" placeholder="<?= lang('email') ?>" />
+                                </div>
+                                <span id="form-5-message" class="text-danger"><?= lang('fields_are_required') ?></span>
+                            </div>
                         </div>
                     </div>
 

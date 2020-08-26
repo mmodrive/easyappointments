@@ -460,6 +460,14 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                 '<strong>' + EALang.pet + '</strong> '
                 + data.pet.title
                 + '<br>' : '' ) +
+                ( data.pet && data.pet.vet_name ? 
+                '<strong>' + EALang.vet + '</strong> '
+                + ( data.pet.vet_phone ? '<a target="_blank" href="mailto:' + data.pet.vet_email + '">' + data.pet.vet_name + '</a>' : data.pet.vet_name ) + ( data.pet.vet_phone ? ' (<a target="_blank" href="tel:' + data.pet.vet_phone + '">' + data.pet.vet_phone + '</a>)' : '' )
+                + '<br>' : '' ) +
+                ( data.pet && data.pet.therapist_name ? 
+                '<strong>' + EALang.therapist + '</strong> '
+                + ( data.pet.therapist_phone ? '<a target="_blank" href="mailto:' + data.pet.therapist_email + '">' + data.pet.therapist_name + '</a>' : data.pet.therapist_name ) + ( data.pet.therapist_phone ? ' (<a target="_blank" href="tel:' + data.pet.therapist_phone + '">' + data.pet.therapist_phone + '</a>)' : '' )
+                + '<br>' : '' ) +
                 '<strong>' + EALang.email + '</strong> '
                 + data.customer.email
                 + '<br>' +

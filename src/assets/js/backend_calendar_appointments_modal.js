@@ -357,9 +357,9 @@ window.BackendCalendarAppointmentsModal = window.BackendCalendarAppointmentsModa
         else{
             $('#pet_id').closest('fieldset').slideDown();
             if( pets_option == 'O' )
-                $('#pet_id').closest('fieldset').find('input.required').data('input_required', 1).removeClass('required');
+                $('#pet_id').closest('fieldset').find('.required').data('input_required', 1).removeClass('required');
             else
-                $('#pet_id').closest('fieldset').find('input[data-input_required]').addClass('required');
+                $('#pet_id').closest('fieldset').find('[data-input_required]').addClass('required');
         } 
 
         });
@@ -562,9 +562,17 @@ window.BackendCalendarAppointmentsModal = window.BackendCalendarAppointmentsModa
                 throw EALang.fields_are_required;
             }
 
-            // Check email address.
+            // Check email addresses.
             if (!GeneralFunctions.validateEmail($dialog.find('#email').val())) {
                 $dialog.find('#email').closest('.form-group').addClass('has-error');
+                throw EALang.invalid_email;
+            }
+            if ($dialog.find('#pet_vet_email').val() && !GeneralFunctions.validateEmail($dialog.find('#pet_vet_email').val())) {
+                $dialog.find('#pet_vet_email').closest('.form-group').addClass('has-error');
+                throw EALang.invalid_email;
+            }
+            if ($dialog.find('#pet_therapist_email').val() && !GeneralFunctions.validateEmail($dialog.find('#pet_therapist_email').val())) {
+                $dialog.find('#pet_therapist_email').closest('.form-group').addClass('has-error');
                 throw EALang.invalid_email;
             }
 
