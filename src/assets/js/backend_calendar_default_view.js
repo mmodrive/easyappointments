@@ -665,11 +665,9 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
      * When the user clicks on a day square on the calendar, then he will automatically be transferred to that
      * day view calendar.
      */
-    function _calendarDayClick(date, jsEvent, view) {
-        if (!date.hasTime()) {
-            $('#calendar').fullCalendar('changeView', 'timeGridDay');
-            $('#calendar').fullCalendar('gotoDate', date);
-        }
+    function _calendarDayClick(date, jsEvent) {
+        $('#calendar_view').val('timeGridDay').change();
+        $('#calendar').fullCalendar().gotoDate(date);
     }
 
     function _calendarEventRemove(eventDropInfo) {
@@ -1627,7 +1625,8 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                 },
 
                 // Calendar events need to be declared on initialization.
-                //dayClick: _calendarDayClick,
+                navLinks: true,
+                navLinkDayClick: _calendarDayClick,
                 datesSet: function( dateInfo ){
                     $('[id^="calendar-"].calendar').each(function() {
                         var add_calendar = $(this).fullCalendar();

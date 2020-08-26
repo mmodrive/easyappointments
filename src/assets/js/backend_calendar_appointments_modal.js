@@ -187,7 +187,7 @@ window.BackendCalendarAppointmentsModal = window.BackendCalendarAppointmentsModa
 
             var pet_select = $dialog.find('#pet_id');
             pet_select.find('option:nth-child(n+2)').remove();
-            pet_select.val('').change();
+            pet_select.val('new').change();
 
             // Display modal form.
             $dialog.find('.modal-header h3').text(EALang.new_appointment_title);
@@ -371,7 +371,7 @@ window.BackendCalendarAppointmentsModal = window.BackendCalendarAppointmentsModa
             $('#manage-appointment').find('#customer-id, #first-name, #last-name, #email, '
                 + '#phone-number, #address, #city, #zip-code, #customer-notes, #pet_id').val('');
             $('#pet_id').find('option:nth-child(n+2)').remove();
-            $('#pet_id').change();
+            $('#pet_id').val('new').change();
         });
     }
 
