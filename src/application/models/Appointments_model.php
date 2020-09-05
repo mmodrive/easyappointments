@@ -53,6 +53,26 @@ class Appointments_Model extends CI_Model {
         return $appointment['id'];
     }
 
+    public function get_changing_fields($appointment)
+    {
+        // Validate the appointment data before doing anything.
+        $this->validate($appointment);
+
+        $changing_keys = [];
+
+        if ( isset($appointment['id']) )
+        {
+            $oldvalues = $this->get_row($appointment['id']);
+            $keys = array_intersect_key($oldvalues, $appointment);
+            foreach ($keys as $key => $value) {
+                if( $oldvalues[$key] != $appointment[$key] )
+                    array_push($changing_keys, $key);
+            }
+        }
+
+        return $changing_keys;
+    }
+
     /**
      * Check if a particular appointment record already exists.
      *

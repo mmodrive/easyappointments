@@ -267,6 +267,7 @@ class Backend_api extends CI_Controller {
             $this->load->model('pets_model');
             $this->load->model('settings_model');
             $is_existing_customer = TRUE;
+            $notify_fields_changed = FALSE;
 
             // :: SAVE CUSTOMER CHANGES TO DATABASE
             if ($this->input->post('customer_data'))
@@ -282,6 +283,8 @@ class Backend_api extends CI_Controller {
                 }
 
                 $is_existing_customer = $this->customers_model->exists($customer);
+                if ( !$is_existing_customer || count(array_intersect( ["email"], $this->customers_model->get_changing_fields($customer))) > 0 )
+                    $notify_fields_changed = TRUE;
                 $customer['id'] = $this->customers_model->add($customer);
             }
 
@@ -329,6 +332,10 @@ class Backend_api extends CI_Controller {
                 {
                     $appointment['id_pets'] = $pet['id'];
                 }
+
+                $is_existing_appointment = $this->appointments_model->exists($appointment);
+                if ( !$is_existing_appointment || count(array_intersect( ["start_datetime", "end_datetime", "id_services", "id_users_provider"], $this->appointments_model->get_changing_fields($appointment))) > 0 )
+                    $notify_fields_changed = TRUE;
 
                 $appointment['id'] = $this->appointments_model->add($appointment);
             }
@@ -402,7 +409,7 @@ class Backend_api extends CI_Controller {
                 $this->load->library('ics_file');
                 $ics_stream = $this->ics_file->get_stream($appointment, $service, $provider, $customer);
 
-                if ((bool)$send_customer === TRUE)
+                if ((bool)$send_customer === TRUE && $notify_fields_changed)
                 {
                     if(!$is_existing_customer){
                         $notification = $this->settings_model->getNotification(
@@ -417,7 +424,7 @@ class Backend_api extends CI_Controller {
                     $email->sendEmail($notification, new Email($customer['email']), new Text($ics_stream));
                 }
 
-                if ($send_provider == TRUE)
+                if ($send_provider == TRUE && $notify_fields_changed)
                 {
                     $notification = $this->settings_model->getNotification(
                         $notification_type,$appointment, $provider, $service, $customer, $pet, FALSE
