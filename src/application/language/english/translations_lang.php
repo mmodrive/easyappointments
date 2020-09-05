@@ -363,3 +363,5 @@ $lang['cron_active_title'] = 'Scheduler Activity:';
 $lang['cron_active'] = 'Working Normally';
 $lang['cron_inactive'] = 'NOT Working!';
 $lang['default_provider'] = 'Default Provider';
+$lang['payment_amount'] = 'Payment Amount';
+$lang['payment_type'] = 'Payment Type';

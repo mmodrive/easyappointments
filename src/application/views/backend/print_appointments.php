@@ -67,17 +67,20 @@
   font-size: 14px;
   font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
   border-collapse: collapse;
-  width: 80%;
+  width: 90%;
   margin: 0 auto;
 }
 .print td, .print th {
   border: 1px solid #ddd;
   padding: 8px;
-  white-space: nowrap;
   text-align: center;
 }
+.print td {
+  white-space: nowrap;
+} 
 .print tr td:nth-child(6) {
   text-align: left;
+  white-space: normal;
 }
 .print th {
   padding-top: 12px;
@@ -87,14 +90,20 @@
 }
 .print tr:nth-child(even){background-color: #f2f2f2;}
 .print tr:hover {background-color: #ddd;}
+.print tr td:nth-child(n+7), .print tr th:nth-child(n+7) {
+    display: none;
+}
 @media print
 {   
+    .print {
+        width: 100%;
+    }
     .no-print, .no-print *
     {
-        display: none !important;
+        display: none;
     }
-    .print th {
-      text-align: left;
+    .print tr td:nth-child(n+7), .print tr th:nth-child(n+7) {
+        display: table-cell;
     }
     h2 { 
         page-break-before: always;
@@ -149,12 +158,14 @@ if($new_service)
 <table class="center print">
   <thead>
     <tr>                     
-      <th width="15%"><span><?= lang('date') ?></span></th>
-      <th width="15%"><span><?= lang('time_start') ?></span></th>
-      <th width="15%"><span><?= lang('time_end') ?></span></th>
-      <th width="30%"><span><?= lang('customer') ?></span></th>
-      <th width="15%"><span><?= lang('phone_number') ?></span></th>         
-      <th width="20%"><span><?= lang('pet') ?></span></th>  
+      <th width="10%"><span><?= lang('date') ?></span></th>
+      <th width="10%"><span><?= lang('time_start') ?></span></th>
+      <th width="10%"><span><?= lang('time_end') ?></span></th>
+      <th width="20%"><span><?= lang('customer') ?></span></th>
+      <th width="10%"><span><?= lang('phone_number') ?></span></th>         
+      <th width="20%"><span><?= lang('pet') ?></span></th>      
+      <th width="10%"><span><?= lang('payment_amount') ?></span></th>      
+      <th width="10%"><span><?= lang('payment_type') ?></span></th>  
       </tr>
   </thead>
 <tbody>
@@ -167,6 +178,8 @@ if($new_service)
               <td>'.($appointment["customer_name"] ?? '').'</td>
               <td>'.($appointment["phone_number"] ?? '').'</td>
               <td>'.($appointment["pet_title"] ?? '').'</td>
+              <td></td>
+              <td></td>
             </tr>';
 }
  
