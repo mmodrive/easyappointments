@@ -67,7 +67,7 @@
   font-size: 14px;
   font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
   border-collapse: collapse;
-  width: 90%;
+  width: 80%;
   margin: 0 auto;
 }
 .print td, .print th {
@@ -78,9 +78,16 @@
 .print td {
   white-space: nowrap;
 } 
+.print tr td:nth-child(5) {
+  text-align: left;
+  white-space: normal;
+}
 .print tr td:nth-child(6) {
   text-align: left;
   white-space: normal;
+  width: 100%;
+}
+.print tr td:nth-child(4){
 }
 .print th {
   padding-top: 12px;
@@ -104,6 +111,7 @@
     }
     .print tr td:nth-child(n+7), .print tr th:nth-child(n+7) {
         display: table-cell;
+        width: 100px;
     }
     h2 { 
         page-break-before: always;
@@ -115,33 +123,34 @@ h2 {
 }
 </style>
 <div class="returned-content">
-<div class="no-print"><h4>Please select date range of bookings</h4> 
-  <!-- <form name="frmSearch" method="post" action="" > -->
- <?php echo form_open('') ?>
-  <p class="search_input">
-   <input type="text" placeholder="From Date" name="post_at" value="<?= $post_at ?? ''; ?>" autocomplete="off" class="input-control input-date" />
-   <input type="text" placeholder="To Date" name="post_at_to_date" style="margin-left:10px" value="<?= $post_at_to_date ?? ''; ?>" class="input-control input-date" autocomplete="off" />   
-   <select name="service" class="input-control">
-    <option value="all">All Services</option>
-   <?php
-    foreach ($available_services as $iservice) {
-      echo '<option value="' . $iservice['id'] . '" ' . ($iservice['id'] == $service ? 'selected' : '') . '>' . $iservice['name'] . '</option>';
-    }
-    ?>
-   </select>
-   <select name="provider" class="input-control">
-    <option value="all">All Providers</option>
-   <?php
-    foreach ($available_providers as $iprovider) {
-      echo '<option value="' . $iprovider['id'] . '" ' . ($iprovider['id'] == $provider ? 'selected' : '') . '>' . $iprovider['first_name'] . ' ' . $iprovider['last_name'] . '</option>';
-    }
-    ?>
-   </select>
-   <input type="submit" name="search" value="Search" >
-  </p>
- </form> 
- <button class="button" onclick="window.print();">Print bookings</button>
-</div>
+  <div class="no-print">
+    <h4>Please select date range of bookings</h4> 
+    <!-- <form name="frmSearch" method="post" action="" > -->
+   <?php echo form_open('') ?>
+    <p class="search_input">
+     <input type="text" placeholder="From Date" name="post_at" value="<?= $post_at ?? ''; ?>" autocomplete="off" class="input-control input-date" />
+     <input type="text" placeholder="To Date" name="post_at_to_date" style="margin-left:10px" value="<?= $post_at_to_date ?? ''; ?>" class="input-control input-date" autocomplete="off" />   
+     <select name="service" class="input-control">
+      <option value="all">All Services</option>
+     <?php
+      foreach ($available_services as $iservice) {
+        echo '<option value="' . $iservice['id'] . '" ' . ($iservice['id'] == $service ? 'selected' : '') . '>' . $iservice['name'] . '</option>';
+      }
+      ?>
+     </select>
+     <select name="provider" class="input-control">
+      <option value="all">All Providers</option>
+     <?php
+      foreach ($available_providers as $iprovider) {
+        echo '<option value="' . $iprovider['id'] . '" ' . ($iprovider['id'] == $provider ? 'selected' : '') . '>' . $iprovider['first_name'] . ' ' . $iprovider['last_name'] . '</option>';
+      }
+      ?>
+     </select>
+     <input type="submit" name="search" value="Search" >
+    </p>
+   </form> 
+   <button class="button" onclick="window.print();">Print bookings</button>
+  </div>
 <?php
 $service_name = null;
 if(!empty($appointments)){
@@ -155,20 +164,20 @@ if($new_service)
 {
   echo '<h2 class=""> ' . $service_name . ' (' . $appointment['provider_name'] . ') bookings between ' . $post_at . ' and ' . $post_at_to_date . '</h2>';
 ?>
-<table class="center print">
-  <thead>
-    <tr>                     
-      <th width="10%"><span><?= lang('date') ?></span></th>
-      <th width="10%"><span><?= lang('time_start') ?></span></th>
-      <th width="10%"><span><?= lang('time_end') ?></span></th>
-      <th width="20%"><span><?= lang('customer') ?></span></th>
-      <th width="10%"><span><?= lang('phone_number') ?></span></th>         
-      <th width="20%"><span><?= lang('pet') ?></span></th>      
-      <th width="10%"><span><?= lang('payment_amount') ?></span></th>      
-      <th width="10%"><span><?= lang('payment_type') ?></span></th>  
+  <table class="center print">
+    <thead>
+      <tr>
+        <th><span><?= lang('date') ?></span></th>
+        <th><span><?= lang('time_start') ?></span></th>
+        <th><span><?= lang('time_end') ?></span></th>
+        <th><span><?= lang('customer') ?></span></th>
+        <th><span><?= lang('phone_number') ?></span></th>
+        <th><span><?= lang('pet') ?></span></th>
+        <th><span><?= lang('payment_amount') ?></span></th>
+        <th><span><?= lang('payment_type') ?></span></th>
       </tr>
-  </thead>
-<tbody>
+    </thead>
+    <tbody>
 <?php   
 }
        echo '<tr>
@@ -184,8 +193,8 @@ if($new_service)
 }
  
 ?>
-</tbody>
-</table>
+    </tbody>
+  </table>
 <?php } ?>
  
 </div>
