@@ -39,6 +39,20 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
     function _bindEventHandlers() {
         var $calendarPage = $('#calendar-page');
 
+        var dateFormat;
+
+        switch (GlobalVariables.dateFormat) {
+            case 'DMY':
+                dateFormat = 'dd/mm/yy';
+                break;
+            case 'MDY':
+                dateFormat = 'mm/dd/yy';
+                break;
+            case 'YMD':
+                dateFormat = 'yy/mm/dd';
+                break;
+        }
+
         $(window).keydown(function(evt) {
             if (evt.which == 17) { // ctrl
                 ctrlPressed = true;
@@ -62,6 +76,40 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
             });
         });
 
+        var $date_selector = $calendarPage.find('#date-selector');
+        $date_selector.datepicker({
+            dateFormat: dateFormat,
+
+            // Translation
+            dayNames: [EALang.sunday, EALang.monday, EALang.tuesday, EALang.wednesday,
+                EALang.thursday, EALang.friday, EALang.saturday],
+            dayNamesShort: [EALang.sunday.substr(0, 3), EALang.monday.substr(0, 3),
+                EALang.tuesday.substr(0, 3), EALang.wednesday.substr(0, 3),
+                EALang.thursday.substr(0, 3), EALang.friday.substr(0, 3),
+                EALang.saturday.substr(0, 3)],
+            dayNamesMin: [EALang.sunday.substr(0, 2), EALang.monday.substr(0, 2),
+                EALang.tuesday.substr(0, 2), EALang.wednesday.substr(0, 2),
+                EALang.thursday.substr(0, 2), EALang.friday.substr(0, 2),
+                EALang.saturday.substr(0, 2)],
+            monthNames: [EALang.january, EALang.february, EALang.march, EALang.april,
+                EALang.may, EALang.june, EALang.july, EALang.august, EALang.september,
+                EALang.october, EALang.november, EALang.december],
+            prevText: EALang.previous,
+            nextText: EALang.next,
+            currentText: EALang.now,
+            closeText: EALang.close,
+            changeMonth: true, 
+            changeYear: true, 
+        });
+        $date_selector.datepicker('setDate', $('#calendar').fullCalendar().getDate());
+        $date_selector.change( function (event) {
+            var calendar = $('#calendar').fullCalendar();
+            var calendarDate = calendar.getDate();
+            calendarDate.setHours(0,0,0,0);
+            if( calendarDate.valueOf() != $(this).datepicker("getDate").valueOf() )
+                calendar.gotoDate($(this).datepicker("getDate"));
+            $(this).blur();
+        });
         /**
          * Event: Popover Close Button "Click"
          *
@@ -1573,7 +1621,7 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                 today: EALang.today,
                 day: EALang.day,
                 week: EALang.week,
-                month: EALang.month
+                month: EALang.month,
             },
 
             // Calendar events need to be declared on initialization.
@@ -1645,6 +1693,7 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                             }
                         }
                     });
+                    $('#calendar-page #date-selector').datepicker('setDate', dateInfo.start);
                 }
             }
         });

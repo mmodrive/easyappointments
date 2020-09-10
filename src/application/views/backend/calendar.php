@@ -56,6 +56,8 @@
         </div>
 
         <div id="calendar-actions" class="col-xs-12 col-sm-5">
+            <input id="date-selector" class="btn btn-default" style="z-index: 100; position: relative;" maxlength="10" size="10">
+
             <select id="calendar_view" class="btn btn-default">
                 <option value="timeGridDay"><?= lang('day') ?></option>
                 <option value="timeGridWeek"><?= lang('week') ?></option>
