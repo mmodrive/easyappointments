@@ -561,6 +561,6 @@ class Customers_Model extends CI_Model {
             return $customer;
         }
         else
-            return NULL;
+            return $customer;
     }
 }

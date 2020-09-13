@@ -107,7 +107,7 @@ window.FrontendBookApi = window.FrontendBookApi || {};
     };
 
     exports.loginCustomer = function(email, password) {
-        var postUrl = GlobalVariables.baseUrl + '/index.php/appointments/ajax_check_login';
+        var postUrl = GlobalVariables.baseUrl + '/index.php/appointments/ajax_check_customer_login';
         var postData = {
             'csrfToken': GlobalVariables.csrfToken,
             'email': email,

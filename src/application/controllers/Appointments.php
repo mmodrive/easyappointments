@@ -446,7 +446,7 @@ class Appointments extends CI_Controller {
      *   - 'role_slug'
      *   - 'dest_url'
      */
-    public function ajax_check_login()
+    public function ajax_check_customer_login()
     {
         try
         {
@@ -460,7 +460,6 @@ class Appointments extends CI_Controller {
 
             if ($customer_data)
             {
-                $this->session->set_userdata($customer_data); // Save data on user's session.
                 $this->output
                     ->set_content_type('application/json')
                     ->set_output(json_encode($customer_data));
