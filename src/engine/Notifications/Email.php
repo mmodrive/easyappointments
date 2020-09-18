@@ -266,8 +266,12 @@ class Email {
             $mailer->isSMTP();
             $mailer->Host = $this->config['smtp_host'];
             $mailer->SMTPAuth = TRUE;
-            $mailer->Username = $this->config['smtp_user'];
-            $mailer->Password = $this->config['smtp_pass'];
+            if (!empty($this->config['smtp_user'])) {
+                $mailer->Username = $this->config['smtp_user'];
+                $mailer->Password = $this->config['smtp_pass'];
+            }
+            else
+                $mailer->SMTPAuth = FALSE;
             $mailer->SMTPSecure = $this->config['smtp_crypto'];
             $mailer->Port = $this->config['smtp_port'];
         }
