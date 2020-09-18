@@ -326,7 +326,7 @@ class Pets_Model extends CI_Model {
             ->join('ea_services AS service', 'app.id_services=service.id', 'inner')
             ->where(['id_pets' => $pet_id])
             ->order_by('start_datetime', 'DESC')
-            ->limit(10)
+            //->limit(10)
             ->get()->result_array();
 
         $pet['attachments'] = $this->db
