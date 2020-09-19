@@ -148,6 +148,10 @@
 
                         <div class="col-xs-12 col-sm-6">
                             <h3><?= lang('pets') ?></h3>
+                            <button id="view-soap_report" class="btn btn-default" disabled="disabled">
+                                <span class="glyphicon glyphicon-book"></span>
+                                <?= lang('soap_report') ?>
+                            </button>
                             <div id="customer-pets" class="well"></div>
                             <div id="pet-details" class="well hidden"></div>
                         </div>
