@@ -104,6 +104,7 @@ class Backend extends CI_Controller {
 
         $this->load->view('backend/header', $view);
         $this->load->view('backend/calendar', $view);
+        $this->load->view('backend/soap_report', $view);
         $this->load->view('backend/footer', $view);
     }
 
@@ -152,23 +153,8 @@ class Backend extends CI_Controller {
 
         $this->load->view('backend/header', $view);
         $this->load->view('backend/customers', $view);
-        $this->load->view('backend/footer', $view);
-    }
-
-    public function soap_report($pet_id)
-    {
-        if ( ! $this->_has_privileges(PRIV_CUSTOMERS))
-        {
-            return;
-        }
-
-        // $this->load->model('soap_reports_model');
-
-        // $view['soap_reports'] = $this->soap_report_model->get_reports($pet_id);
-
-        $this->set_user_data($view);
-
         $this->load->view('backend/soap_report', $view);
+        $this->load->view('backend/footer', $view);
     }
 
     /**

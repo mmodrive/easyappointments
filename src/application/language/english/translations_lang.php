@@ -374,3 +374,6 @@ $lang['assessment_desc'] = 'What the therapist feels and tries - tests';
 $lang['plan'] = 'Plan';
 $lang['plan_desc'] = 'What is the recommendations and plan going forward';
 $lang['soap_report'] = 'SOAP Report';
+$lang['add_soap_report'] = 'Add SOAP Report';
+$lang['report_saved'] = 'Report saved successfully!';
+$lang['report_deleted'] = 'Report deleted successfully.';

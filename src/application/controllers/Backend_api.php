@@ -1691,6 +1691,116 @@ class Backend_api extends CI_Controller {
         }
     }
 
+    /**
+     * [AJAX] Load a SOAP Report record.
+     *
+     * Require POST Parameters:
+     *
+     * - array $_POST['pet_id'] JSON encoded array that contains the customer's data.
+     */
+    public function ajax_load_soap_reports()
+    {
+        try
+        {
+            $this->load->model('soap_reports_model');
+            $pet_id = $this->input->post('pet_id');
+
+            $REQUIRED_PRIV = ( ! isset($customer['id']))
+                ? $this->privileges[PRIV_APPOINTMENTS]['add']
+                : $this->privileges[PRIV_APPOINTMENTS]['edit'];
+            if ($REQUIRED_PRIV == FALSE)
+            {
+                throw new Exception('You do not have the required privileges for this task.');
+            }
+
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode([
+                    'status' => AJAX_SUCCESS,
+                    'reports' => $this->soap_reports_model->get_reports($pet_id),
+                ]));
+        }
+        catch (Exception $exc)
+        {
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode(['exceptions' => [exceptionToJavaScript($exc)]]));
+        }
+    }
+
+        /**
+     * [AJAX] Save (insert or update) a SOAP Report record.
+     *
+     * Require POST Parameters:
+     *
+     * - array $_POST['report'] JSON encoded array that contains the customer's data.
+     */
+    public function ajax_save_soap_report()
+    {
+        try
+        {
+            $this->load->model('soap_reports_model');
+            $report = json_decode($this->input->post('report'), TRUE);
+
+            $REQUIRED_PRIV = ( ! isset($customer['id']))
+                ? $this->privileges[PRIV_APPOINTMENTS]['add']
+                : $this->privileges[PRIV_APPOINTMENTS]['edit'];
+            if ($REQUIRED_PRIV == FALSE)
+            {
+                throw new Exception('You do not have the required privileges for this task.');
+            }
+
+            $report_id = $this->soap_reports_model->add($report);
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode([
+                    'status' => AJAX_SUCCESS,
+                    'id' => $report_id,
+                    'reports' => $this->soap_reports_model->get_reports($report['id_pets']),
+                ]));
+        }
+        catch (Exception $exc)
+        {
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode(['exceptions' => [exceptionToJavaScript($exc)]]));
+        }
+    }
+
+    /**
+     * [AJAX] Delete SOAP Report from database.
+     *
+     * Required POST Parameters:
+     *
+     * - int $_POST['id'] Customer record id to be deleted.
+     */
+    public function ajax_delete_soap_report()
+    {
+        try
+        {
+            if ($this->privileges[PRIV_APPOINTMENTS]['delete'] == FALSE)
+            {
+                throw new Exception('You do not have the required privileges for this task.');
+            }
+
+            $this->load->model('soap_reports_model');
+            $report = $this->soap_reports_model->get_row($this->input->post('id'));
+            $this->soap_reports_model->delete($this->input->post('id'));
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode([
+                    'status' => AJAX_SUCCESS,
+                    'reports' => $this->soap_reports_model->get_reports($report['id_pets']),
+                ]));
+        }
+        catch (Exception $exc)
+        {
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode(['exceptions' => [exceptionToJavaScript($exc)]]));
+        }
+    }
+
     public function ajax_test_sms()
     {
         try

@@ -288,6 +288,10 @@
                     <fieldset>
                         <legend>
                             <?= lang('pet_details_title') ?>
+                            <button id="view-soap_report" class="btn btn-default">
+                                <span class="glyphicon glyphicon-book"></span>
+                                <?= lang('soap_report') ?>
+                            </button>
                             <div class="form-group">
                                 <select id="pet_id" class="required form-control" >
                                     <option selected value="new"> Click to Select </option>

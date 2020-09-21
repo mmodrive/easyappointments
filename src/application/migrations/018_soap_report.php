@@ -15,7 +15,7 @@ class Migration_Soap_report extends CI_Migration {
     public function up()
     {
         $this->db->query('
-            CREATE TABLE IF NOT EXISTS `ea_soap_report` (
+            CREATE TABLE IF NOT EXISTS `ea_soap_reports` (
                 `id` INT NOT NULL AUTO_INCREMENT,
                 `modified` DATETIME DEFAULT CURRENT_TIMESTAMP
                 ON UPDATE CURRENT_TIMESTAMP,
@@ -31,7 +31,7 @@ class Migration_Soap_report extends CI_Migration {
                 DEFAULT CHARSET = utf8;
         ');
 
-        $this->db->query('ALTER TABLE `ea_soap_report`
+        $this->db->query('ALTER TABLE `ea_soap_reports`
             ADD CONSTRAINT `soap_report_pets` FOREIGN KEY (`id_pets`) REFERENCES `ea_pets` (`id`)
             ON DELETE CASCADE
             ON UPDATE CASCADE');
@@ -39,6 +39,6 @@ class Migration_Soap_report extends CI_Migration {
 
     public function down()
     {
-        $this->db->query('DROP TABLE `ea_soap_report`;');
+        $this->db->query('DROP TABLE `ea_soap_reports`;');
     }
 }

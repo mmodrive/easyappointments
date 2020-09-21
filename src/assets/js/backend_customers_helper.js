@@ -130,21 +130,9 @@
         });
 
         $('#view-soap_report').click(function() {
-            var postUrl = GlobalVariables.baseUrl + '/index.php/backend/soap_report/' + $('#customer-pets .selected').attr('data-id');
-            var postData = {
-                csrfToken: GlobalVariables.csrfToken
-            };
-
-            $.post(postUrl, postData, function (response) {
-                if (!GeneralFunctions.handleAjaxExceptions(response)) {
-                    return;
-                }
-                var $response = $(response);
-                $(this).after($response);
-                var $dialog = $(this).parent().find('#soap_report');
-
-                $dialog.modal('show');
-            }.bind(this), 'html').fail(GeneralFunctions.ajaxFailureHandler);
+            var $dialog = $('#soap_report');
+            $dialog.modal('show');
+            window.BackendSOAPReport.load($('#customer-pets .selected').attr('data-id'));
         });
 
         /**

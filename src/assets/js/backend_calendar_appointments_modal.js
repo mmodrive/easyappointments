@@ -373,6 +373,13 @@ window.BackendCalendarAppointmentsModal = window.BackendCalendarAppointmentsModa
             $('#pet_id').find('option:nth-child(n+2)').remove();
             $('#pet_id').val('new').change();
         });
+
+        $('#view-soap_report').click(function(event) {
+            var $dialog = $('#soap_report');
+            $dialog.modal('show');
+            window.BackendSOAPReport.load($('#pet_id').val());
+            event.preventDefault();
+        });
     }
 
     /**
