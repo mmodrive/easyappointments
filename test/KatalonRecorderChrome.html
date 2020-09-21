@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta content="text/html; charset=UTF-8" http-equiv="content-type" />
+	<title>bookings.rosewoodfarm.com.au</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">Load SOAP Report</td></tr>
+</thead>
+<tbody>
+<tr><td>open</td><td>http://localhost/index.php/backend/customers<datalist><option>http://localhost/index.php/backend/customers</option></datalist></td><td></td>
+</tr>
+<tr><td>click</td><td>//div[@id='filter-customers']/div/div<datalist><option>//div[@id='filter-customers']/div/div</option><option>//div[3]/div/div/div/div</option><option>css=div.entry</option></datalist></td><td></td>
+</tr>
+<tr><td>click</td><td>//div[@id='customer-pets']/div<datalist><option>//div[@id='customer-pets']/div</option><option>//div[2]/div[2]/div/div[2]/div/div</option><option>css=div.pet-row</option></datalist></td><td></td>
+</tr>
+<tr><td>click</td><td>id=view-soap_report<datalist><option>id=view-soap_report</option><option>//button[@id='view-soap_report']</option><option>//div[@id='customers-page']/div/div[2]/div[2]/div[2]/div/div[2]/button</option><option>//div[2]/div[2]/div/div[2]/button</option><option>css=#view-soap_report</option></datalist></td><td></td>
+</tr>
+<tr><td>waitForVisible</td><td>css=#soap_report #date<datalist><option>css=#soap_report #date</option><option>id=date</option><option>xpath=(//button[@type='button'])[4]</option></datalist></td><td></td>
+</tr>
+</tbody></table>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">Load Calendar SOAP</td></tr>
+</thead>
+<tbody>
+<tr><td>open</td><td>http://localhost/index.php/backend<datalist><option>http://localhost/index.php/backend</option></datalist></td><td></td>
+</tr>
+<tr><td>click</td><td>id=date-selector<datalist><option>id=date-selector</option><option>//input[@id='date-selector']</option><option>//div[@id='calendar-actions']/input</option><option>//input</option><option>css=#date-selector</option></datalist></td><td></td>
+</tr>
+<tr><td>click</td><td>link=13<datalist><option>link=13</option><option>//a[contains(text(),'13')]</option><option>//div[@id='ui-datepicker-div']/table/tbody/tr[3]/td/a</option><option>xpath=(//a[contains(@href, '#')])[13]</option><option>//tr[3]/td/a</option><option>css=a.ui-state-default.ui-state-hover</option></datalist></td><td></td>
+</tr>
+<tr><td>click</td><td>//div[@id='calendar']/div[2]/div/table/tbody/tr[3]/td/div/div/div/div[2]/table/tbody/tr/td[6]/div/div[2]/div[2]/a/div/div/div[2]<datalist><option>//div[@id='calendar']/div[2]/div/table/tbody/tr[3]/td/div/div/div/div[2]/table/tbody/tr/td[6]/div/div[2]/div[2]/a/div/div/div[2]</option><option>//td[6]/div/div[2]/div[2]/a/div/div/div[2]</option><option>css=a.fc-timegrid-event.fc-v-event.fc-event.fc-event-draggable.fc-event-resizable.fc-event-start.fc-event-end.fc-event-past &gt; div.fc-event-main &gt; div.fc-event-main-frame &gt; div.fc-event-title-container</option></datalist></td><td></td>
+</tr>
+<tr><td>click</td><td>//div[@role='tooltip']/div[2]/div/button<datalist><option>//div[@id='popover386114']/div[2]/div/button</option><option>//div[2]/div/button</option><option>//div[@role='tooltip']/div[2]/div/button</option></datalist></td><td></td>
+</tr>
+<tr><td>click</td><td>id=view-soap_report<datalist><option>id=view-soap_report</option><option>//button[@id='view-soap_report']</option><option>//div[@id='manage-appointment']/div/div/div[2]/form/fieldset[3]/legend/button</option><option>//fieldset[3]/legend/button</option><option>css=#view-soap_report</option></datalist></td><td></td>
+</tr>
+</tbody></table>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">Add</td></tr>
+</thead>
+<tbody>
+<tr><td>type</td><td>css=#soap_report #date<datalist><option>id=date</option><option>//input[@id='date']</option><option>//fieldset[@id='soap_report_form']/div/input</option><option>//fieldset/div/input</option><option>css=#date</option><option>css=#soap_report #date</option></datalist></td><td>21/09/2020</td>
+</tr>
+<tr><td>type</td><td>id=subjective<datalist><option>id=subjective</option><option>//textarea[@id='subjective']</option><option>//fieldset[@id='soap_report_form']/div[2]/textarea</option><option>//div[2]/textarea</option><option>css=#subjective</option></datalist></td><td>subjective opinion</td>
+</tr>
+<tr><td>type</td><td>id=objective<datalist><option>id=objective</option><option>//textarea[@id='objective']</option><option>//fieldset[@id='soap_report_form']/div[3]/textarea</option><option>//div[3]/textarea</option><option>css=#objective</option></datalist></td><td>objective observation</td>
+</tr>
+<tr><td>type</td><td>id=assessment<datalist><option>id=assessment</option><option>//textarea[@id='assessment']</option><option>//fieldset[@id='soap_report_form']/div[4]/textarea</option><option>//div[4]/textarea</option><option>css=#assessment</option></datalist></td><td>the dog performed like so</td>
+</tr>
+<tr><td>type</td><td>id=plan<datalist><option>id=plan</option><option>//textarea[@id='plan']</option><option>//fieldset[@id='soap_report_form']/div[5]/textarea</option><option>//div[5]/textarea</option><option>css=#plan</option></datalist></td><td>continue with the program</td>
+</tr>
+<tr><td>click</td><td>css=#soap_report #soap_report_form .add-report<datalist><option>xpath=(//button[@type='button'])[4]</option><option>//div[@id='soap_report']/div/div/div[2]/form/div/button</option><option>//form/div/button</option><option>css=button.add-report.btn.btn-primary</option><option>css=#soap_report .add-report</option><option>css=#soap_report #soap_report_form .add-report</option></datalist></td><td></td>
+</tr>
+</tbody></table>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">Edit</td></tr>
+</thead>
+<tbody>
+<tr><td>click</td><td>//div[@id='soap_report']/div/div/div[2]/table/tbody/tr/td[6]/button/span<datalist><option>//div[@id='soap_report']/div/div/div[2]/table/tbody/tr/td[6]/button/span</option><option>//td[6]/button/span</option><option>css=button.btn.btn-default.btn-sm.edit-report &gt; span.glyphicon.glyphicon-pencil</option></datalist></td><td></td>
+</tr>
+<tr><td>type</td><td>id=subjective<datalist><option>id=subjective</option><option>//textarea[@id='subjective']</option><option>//form[@id='soap_report_form']/fieldset/div[2]/textarea</option><option>//div[2]/textarea</option><option>css=#subjective</option></datalist></td><td>subjective opinion33</td>
+</tr>
+<tr><td>click</td><td>css=#soap_report #soap_report_form .edit-report<datalist><option>xpath=(//button[@type='button'])[4]</option><option>//form[@id='soap_report_form']/div/button</option><option>//form/div/button</option><option>css=button.edit-report.btn.btn-primary</option><option>xpath=(//div[@id='soap_report']//button[@type='button'])[4]</option><option>css=#soap_report #soap_report_form .edit-report</option></datalist></td><td></td>
+</tr>
+</tbody></table>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">Delete</td></tr>
+</thead>
+<tbody>
+<tr><td>chooseOkOnNextConfirmation</td><td><datalist><option></option></datalist></td><td></td>
+</tr>
+<tr><td>click</td><td>//div[@id='soap_report']/div/div/div[2]/table/tbody/tr/td[6]/button[2]/span<datalist><option>//div[@id='soap_report']/div/div/div[2]/table/tbody/tr/td[6]/button[2]/span</option><option>//td[6]/button[2]/span</option><option>css=button.btn.btn-default.btn-sm.delete-report &gt; span.glyphicon.glyphicon-remove</option></datalist></td><td></td>
+</tr>
+<tr><td>assertConfirmation</td><td>Are you sure you want to delete this report? This action is not reversible!<datalist><option>Are you sure you want to delete this report? This action is not reversible!</option></datalist></td><td></td>
+</tr>
+</tbody></table>
+</body>
+</html>

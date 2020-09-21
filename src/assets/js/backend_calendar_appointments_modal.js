@@ -376,8 +376,15 @@ window.BackendCalendarAppointmentsModal = window.BackendCalendarAppointmentsModa
 
         $('#view-soap_report').click(function(event) {
             var $dialog = $('#soap_report');
-            $dialog.modal('show');
-            window.BackendSOAPReport.load($('#pet_id').val());
+            // Workaround for bootstrap non-supported multiple modal 
+            $('#manage-appointment').one('hidden.bs.modal', function( event, ui ) {
+                $dialog.modal('show');
+                $dialog.on('hidden.bs.modal', function( event, ui ) {
+                        $('#manage-appointment').modal('show');
+                    });
+                window.BackendSOAPReport.load($('#pet_id').val());
+            });
+            $('#manage-appointment').modal('hide');
             event.preventDefault();
         });
     }
