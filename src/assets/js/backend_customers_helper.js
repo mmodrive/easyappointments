@@ -283,7 +283,7 @@
             // Validate required fields.
             var missingRequired = false;
 
-            $('.required').each(function () {
+            $('#customers-page .required').each(function () {
                 if ($(this).val() == '') {
                     $(this).closest('.form-group').addClass('has-error');
                     missingRequired = true;
