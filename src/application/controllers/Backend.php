@@ -264,7 +264,7 @@ class Backend extends CI_Controller {
         $view['company_name'] = $this->settings_model->get_setting('company_name');
         $view['base_url'] = $this->config->item('base_url');
         $view['user_display_name'] = $this->user_model->get_user_display_name($this->session->userdata('user_id'));
-        $view['active_menu'] = PRIV_PRINT_APPOINTMENTS;
+        $view['active_menu'] = MENU_PRINT_APPOINTMENTS;
         $view['date_format'] = $this->settings_model->get_setting('date_format');
         $view['time_format'] = $this->settings_model->get_setting('time_format');
 
@@ -306,10 +306,11 @@ class Backend extends CI_Controller {
             $view['provider'] = $provider = $this->input->post('provider');
 
             $this->db
-                ->select('CONCAT(customer.first_name, " ", customer.last_name) customer_name, CONCAT(provider.first_name, " ", provider.last_name) provider_name, service.name service_name, app.start_datetime, app.end_datetime, customer.phone_number, pet.id pet_id ')
+                ->select('CONCAT(customer.first_name, " ", customer.last_name) customer_name, CONCAT(provider.first_name, " ", provider.last_name) provider_name, provider_settings.working_plan provider_working_plan, service.name service_name, app.start_datetime, app.end_datetime, customer.phone_number, pet.id pet_id ')
                 ->from('ea_appointments AS app')
                 ->join('ea_users AS customer', 'app.id_users_customer=customer.id', 'inner')
                 ->join('ea_users AS provider', 'app.id_users_provider=provider.id', 'inner')
+                ->join('ea_user_settings AS provider_settings', 'provider.id=provider_settings.id_users', 'inner')
                 ->join('ea_services AS service', 'app.id_services=service.id', 'inner')
                 ->join('ea_pets AS pet', 'app.id_pets=pet.id', 'left')
                 ->where("start_datetime BETWEEN '" . date_format($post_at, "Y-m-d") . " 00:00:00' AND '" . date_format($post_at_to_date, "Y-m-d") . " 23:59:59'");
@@ -318,6 +319,7 @@ class Backend extends CI_Controller {
             if ($provider && $provider !== "all")
                 $this->db->where('app.id_users_provider', $provider);
             $appointments = $this->db->order_by('service.name')
+                ->order_by('provider.id')
                 ->order_by('app.start_datetime')
                 ->get()->result_array();
 

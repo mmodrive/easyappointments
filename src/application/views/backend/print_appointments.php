@@ -10,7 +10,8 @@
             email      : <?= json_encode($user_email) ?>,
             role_slug  : <?= json_encode($role_slug) ?>,
             privileges : <?= json_encode($privileges) ?>
-        }
+        },
+        availableProviders : <?= json_encode($available_providers) ?>,
     };
 
     $(document).ready(function() {
@@ -152,17 +153,20 @@ h2 {
    <button class="button" onclick="window.print();">Print bookings</button>
   </div>
 <?php
-$service_name = null;
+$service_provider_name = null;
+$prev_sp_appointment = null;
 if(!empty($appointments)){
     foreach ($appointments as $appointment) {
 
-$new_service = $service_name !== $appointment['service_name'];
-if($new_service && !is_null($service_name))
+$new_service_provider = $service_provider_name !== ($appointment['service_name'] . '|' . $appointment['provider_name']);
+if($new_service_provider && !is_null($service_provider_name)) {
   echo '</tbody></table>';
-$service_name = $appointment['service_name'];
-if($new_service)
+  $prev_sp_appointment = null;
+}
+$service_provider_name = $appointment['service_name'] . '|' . $appointment['provider_name'];
+if($new_service_provider)
 {
-  echo '<h2 class=""> ' . $service_name . ' (' . $appointment['provider_name'] . ') bookings between ' . $post_at . ' and ' . $post_at_to_date . '</h2>';
+  echo '<h2 class=""> ' . $appointment['service_name'] . ' (' . $appointment['provider_name'] . ') bookings between ' . $post_at . ' and ' . $post_at_to_date . '</h2>';
 ?>
   <table class="center print">
     <thead>
@@ -180,16 +184,42 @@ if($new_service)
     <tbody>
 <?php   
 }
-       echo '<tr>
-              <td>'.date($php_date_format,strtotime($appointment["start_datetime"])).'</td>
-              <td>'.date($php_time_format,strtotime($appointment["start_datetime"])).'</td>
-              <td>'.date($php_time_format,strtotime($appointment["end_datetime"])).'</td>
-              <td>'.($appointment["customer_name"] ?? '').'</td>
-              <td>'.($appointment["phone_number"] ?? '').'</td>
-              <td>'.($appointment["pet_title"] ?? '').'</td>
-              <td></td>
-              <td></td>
-            </tr>';
+  if ($prev_sp_appointment && date($php_date_format,strtotime($prev_sp_appointment["start_datetime"])) === date($php_date_format, strtotime($appointment["start_datetime"])) ) {
+      $wp = json_decode($appointment["provider_working_plan"]);
+      $dow = strtolower(date("l", strtotime($appointment["start_datetime"])));
+      if ( property_exists($wp, $dow) && !empty($wp->$dow->breaks) ) {
+        $previous_end = strtotime($prev_sp_appointment["end_datetime"]);
+        $current_start = strtotime($appointment["start_datetime"]);
+        $breaks = array_filter($wp->$dow->breaks, function($break) use($previous_end,$current_start,$php_date_format) {
+          $puredate = date_time_set(date_timestamp_set(date_create(), $previous_end),0,0);
+          return $previous_end <= date_timestamp_get(date_modify($puredate,$break->start)) && date_timestamp_get(date_modify($puredate,$break->end)) <= $current_start;
+        });
+        if ($breaks) {
+          $break = reset($breaks);
+          echo '<tr>
+                <td>'.date($php_date_format,strtotime($appointment["start_datetime"])).'</td>
+                <td>'.date($php_time_format,strtotime($break->start)).'</td>
+                <td>'.date($php_time_format,strtotime($break->end)).'</td>
+                <td>Break</td>
+                <td>--</td>
+                <td>--</td>
+                <td></td>
+                <td></td>
+              </tr>';
+        }
+      }
+  }
+  echo '<tr>
+        <td>'.date($php_date_format,strtotime($appointment["start_datetime"])).'</td>
+        <td>'.date($php_time_format,strtotime($appointment["start_datetime"])).'</td>
+        <td>'.date($php_time_format,strtotime($appointment["end_datetime"])).'</td>
+        <td>'.($appointment["customer_name"] ?? '').'</td>
+        <td>'.($appointment["phone_number"] ?? '').'</td>
+        <td>'.($appointment["pet_title"] ?? '').'</td>
+        <td></td>
+        <td></td>
+      </tr>';
+  $prev_sp_appointment = $appointment;
 }
  
 ?>

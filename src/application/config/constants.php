@@ -72,6 +72,8 @@ define('PRIV_PRINT_APPOINTMENTS', 'appointments');
 define('PRIV_SYSTEM_SETTINGS', 'system_settings');
 define('PRIV_USER_SETTINGS', 'user_settings');
 
+define('MENU_PRINT_APPOINTMENTS', 'print');
+
 define('DATE_FORMAT_DMY', 'DMY');
 define('DATE_FORMAT_MDY', 'MDY');
 define('DATE_FORMAT_YMD', 'YMD');
