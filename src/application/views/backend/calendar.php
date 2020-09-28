@@ -284,11 +284,10 @@
                     </fieldset>
 
                     <br>
-
                     <fieldset>
                         <legend>
                             <?= lang('pet_details_title') ?>
-                            <button id="view-soap_report" class="btn btn-default">
+                            <button id="view-soap_report" type="button" class="btn btn-default">
                                 <span class="glyphicon glyphicon-book"></span>
                                 <?= lang('soap_report') ?>
                             </button>

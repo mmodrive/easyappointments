@@ -375,17 +375,21 @@ window.BackendCalendarAppointmentsModal = window.BackendCalendarAppointmentsModa
         });
 
         $('#view-soap_report').click(function(event) {
-            var $dialog = $('#soap_report');
-            // Workaround for bootstrap non-supported multiple modals
-            $('#manage-appointment').one('hidden.bs.modal', function( event, ui ) {
-                $dialog.modal('show');
-                $dialog.on('hidden.bs.modal', function( event, ui ) {
+            if ( isNaN($('#pet_id').val()) ) 
+                alert('Please select a saved dog first.');
+            else {
+                var $dialog = $('#soap_report');
+                // Workaround for bootstrap non-supported multiple modals
+                $('#manage-appointment').one('hidden.bs.modal', function( event, ui ) {
+                    $dialog.modal('show');
+                    $dialog.on('hidden.bs.modal', function( event, ui ) {
                         $('#manage-appointment').modal('show');
                     });
-                window.BackendSOAPReport.load($('#pet_id').val());
-            });
-            $('#manage-appointment').modal('hide');
-            event.preventDefault();
+                    window.BackendSOAPReport.load($('#pet_id').val());
+                });
+                $('#manage-appointment').modal('hide');
+                event.preventDefault();
+            }
         });
     }
 
