@@ -80,7 +80,7 @@
                 </table>
             </div>
             <div class="modal-footer">
-                <button id="cancel-soap" class="btn btn-default" data-dismiss="modal"><?= lang('close') ?></button>
+                <button id="cancel-soap" class="cancel-soap btn btn-default"><?= lang('close') ?></button>
             </div>
         </div>
     </div>

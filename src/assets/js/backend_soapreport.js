@@ -37,10 +37,26 @@ window.BackendSOAPReport = window.BackendSOAPReport || {};
         $report.find('.cancel-report').click(function() {
             _resetForm();
         });
+
+        $report.find('.cancel-soap').click(function() {
+            var originalState = $report.find('#soap_report_form #id').data('state');
+            var unchanged = true;
+            $report.find('#soap_report_form .form-control:visible').each(
+                function(i, el){
+                    return unchanged =
+                        originalState ?
+                            originalState[el.id] == $(el).val() :
+                            $(el).val() == "";
+                }
+            );
+            if( unchanged || confirm("Changes NOT saved. Are you sure you want close?") )
+                $('#soap_report').modal('hide');
+        });
     }
 
     function _resetForm(){
         $report.find('#soap_report_form .form-control:visible, #soap_report_form #id').val('');
+        $report.find('#soap_report_form #id').removeData('state');
         $report.find('#soap_report_form .edit-report').hide();
         $report.find('#soap_report_form .add-report').show();
         $report.find('.modal-message').addClass('hidden').removeClass('alert-danger alert-success');
@@ -51,13 +67,14 @@ window.BackendSOAPReport = window.BackendSOAPReport || {};
         $report.find('.reports tbody').empty();
 
         $.each(reports, function(i, value) {
+            value.date = GeneralFunctions.formatDate(Date.parseExact(value.date, 'yyyy-MM-dd HH:mm:ss'), GlobalVariables.dateFormat, false);
             var tr =
                 '<tr data-id="' + value.id + '">' +
-                '<td data-field="date" class="">' + GeneralFunctions.formatDate(Date.parseExact(value.date, 'yyyy-MM-dd HH:mm:ss'), GlobalVariables.dateFormat, false) + '</td>' +
-                '<td data-field="subjective" class="">' + value.subjective + '</td>' +
-                '<td data-field="objective" class="">' + value.objective + '</td>' +
-                '<td data-field="assessment" class="">' + value.assessment + '</td>' +
-                '<td data-field="plan" class="">' + value.plan + '</td>' +
+                '<td class="">' + value.date + '</td>' +
+                '<td class="">' + value.subjective + '</td>' +
+                '<td class="">' + value.objective + '</td>' +
+                '<td class="">' + value.assessment + '</td>' +
+                '<td class="">' + value.plan + '</td>' +
                 '<td>' +
                 '<button type="button" class="btn btn-default btn-sm edit-report" title="' + EALang.edit + '">' +
                 '<span class="glyphicon glyphicon-pencil"></span>' +
@@ -67,14 +84,19 @@ window.BackendSOAPReport = window.BackendSOAPReport || {};
                 '</button>' +
                 '</td>' +
                 '</tr>';
-            $report.find('.reports tbody').append(tr);
+            $report.find('.reports tbody').append(tr)
+                .find('tr[data-id=' + value.id + ']')
+                .data('state', value);
         });
         
         $report.find('.reports tbody .edit-report').click(function() {
-            $(this).closest('tr').find('>td').each(function() {
-                $report.find('#soap_report_form #' + $(this).data('field') + '.form-control').val($(this).text())
+            var state = $(this).closest('tr').data('state');
+            $.each(state, function(key, value) {
+                $report.find('#soap_report_form #' + key + '.form-control').val(value);
             });
-            $report.find('#soap_report_form #id').val($(this).closest('tr').data('id'));
+            $report.find('#soap_report_form #id')
+                .val($(this).closest('tr').data('id'))
+                .data('state', state);
             $report.find('#soap_report_form .edit-report').show();
             $report.find('#soap_report_form .add-report').hide();
         });

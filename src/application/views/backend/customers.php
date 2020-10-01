@@ -156,28 +156,28 @@
                             <div id="pet-details" class="well hidden"></div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-xs-12 col-sm-12">
-                            <h3><?= lang('pet_history_title') ?></h3>
-                            <table id="pet_history" class="">
-                                <thead>
-                                    <tr>
-                                        <th><?= lang('date') ?></th>
-                                        <th><?= lang('service') ?></th>
-                                        <th><?= lang('provider') ?></th>
-                                        <th><?= lang('depth') ?></th>
-                                        <th><?= lang('speed') ?></th>
-                                        <th><?= lang('time') ?></th>
-                                        <th><?= lang('comments') ?></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
+                    
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12 col-sm-12">
+                    <h3><?= lang('pet_history_title') ?></h3>
+                    <table id="pet_history" class="">
+                        <thead>
+                            <tr>
+                                <th><?= lang('date') ?></th>
+                                <th><?= lang('service') ?></th>
+                                <th><?= lang('provider') ?></th>
+                                <th><?= lang('depth') ?></th>
+                                <th><?= lang('speed') ?></th>
+                                <th><?= lang('time') ?></th>
+                                <th><?= lang('comments') ?></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                        </tbody>
+                    </table>
                 </div>
             </div>
     	</div>
