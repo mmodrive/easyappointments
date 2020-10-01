@@ -49,7 +49,7 @@ window.BackendSOAPReport = window.BackendSOAPReport || {};
                             $(el).val() == "";
                 }
             );
-            if( unchanged || confirm("Changes NOT saved. Are you sure you want close?") )
+            if( unchanged || !confirm("Changes NOT saved. Click OK to continue editing or cancel to discard.") )
                 $('#soap_report').modal('hide');
         });
     }
