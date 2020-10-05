@@ -72,7 +72,10 @@
             instance.display(customer);
             $('#filter-customers .selected').removeClass('selected');
             $(this).addClass('selected');
-            $('#edit-customer, #delete-customer').prop('disabled', false);
+            $("#edit-customer, #delete-customer, #merge-customer").prop(
+                "disabled",
+                false
+            );
         });
 
         /**
@@ -200,26 +203,70 @@
         /**
          * Event: Delete Customer Button "Click"
          */
-        $('#delete-customer').click(function () {
-            var customerId = $('#customer-id').val();
+        $("#delete-customer").click(function () {
+            var customerId = $("#customer-id").val();
             var buttons = [
                 {
                     text: EALang.delete,
                     click: function () {
                         instance.delete(customerId);
-                        $('#message_box').dialog('close');
-                    }
+                        $("#message_box").dialog("close");
+                    },
                 },
                 {
                     text: EALang.cancel,
                     click: function () {
-                        $('#message_box').dialog('close');
-                    }
-                }
+                        $("#message_box").dialog("close");
+                    },
+                },
             ];
 
-            GeneralFunctions.displayMessageBox(EALang.delete_customer,
-                EALang.delete_record_prompt, buttons);
+            GeneralFunctions.displayMessageBox(
+                EALang.delete_customer,
+                EALang.delete_record_prompt,
+                buttons
+            );
+        });
+
+        $("#merge-customer").click(function () {
+            var customerId = $("#customer-id").val();
+
+            function GetFullName(){
+                return $("#first-name").val() + ' ' + $("#last-name").val();
+            }
+
+            if( $("#merge-customer").data('customer-id-from') ){
+                if(customerId == $("#merge-customer").data('customer-id-from')){
+                    alert('Please select another customer to merge with.');
+                    return;
+                }
+                var buttons = [
+                    {
+                        text: EALang.merge,
+                        click: function () {
+                            instance.merge($("#merge-customer").data('customer-id-from'), customerId);
+                            $("#message_box").dialog("close");
+                        },
+                    },
+                    {
+                        text: EALang.cancel,
+                        click: function () {
+                            $("#merge-customer").removeData('customer-id-from')
+                            $("#message_box").dialog("close");
+                        },
+                    },
+                ];
+                
+                GeneralFunctions.displayMessageBox(
+                    EALang.merge_customer,
+                    `Are you sure you want to merge ${$("#merge-customer").data('customer-id-from-name')} and ${GetFullName()}? This action cannot be undone.`,
+                    buttons
+                    );
+            }
+            else{
+                $("#merge-customer").data('customer-id-from', customerId);
+                $("#merge-customer").data('customer-id-from-name', GetFullName());
+            }
         });
     };
 
@@ -265,6 +312,31 @@
             }
 
             Backend.displayNotification(EALang.customer_deleted);
+            this.resetForm();
+            this.filter($('#filter-customers .key').val());
+        }.bind(this), 'json').fail(GeneralFunctions.ajaxFailureHandler);
+    };
+
+    /**
+     * Merge two customers from database.
+     *
+     * @param {Number} from_id Record id to be merged from.
+     * @param {Number} to_id Record id to be merge to.
+     */
+    CustomersHelper.prototype.merge = function (from_id, to_id) {
+        var postUrl = GlobalVariables.baseUrl + '/index.php/backend_api/ajax_merge_customer';
+        var postData = {
+            csrfToken: GlobalVariables.csrfToken,
+            from_id: from_id,
+            to_id: to_id
+        };
+
+        $.post(postUrl, postData, function (response) {
+            if (!GeneralFunctions.handleAjaxExceptions(response)) {
+                return;
+            }
+
+            Backend.displayNotification(EALang.customer_merged);
             this.resetForm();
             this.filter($('#filter-customers .key').val());
         }.bind(this), 'json').fail(GeneralFunctions.ajaxFailureHandler);
@@ -319,7 +391,10 @@
 
         $('#customer-appointments').empty();
         $('#appointment-details').toggleClass('hidden', true).empty();
-        $('#edit-customer, #delete-customer').prop('disabled', true);
+        $("#edit-customer, #delete-customer, #merge-customer").prop(
+            "disabled",
+            true
+        );
         $('#add-edit-delete-group').show();
         $('#save-cancel-group').hide();
 
@@ -478,7 +553,10 @@
             $.each(this.filterResults, function (index, customer) {
                 if (customer.id == id) {
                     this.display(customer);
-                    $('#edit-customer, #delete-customer').prop('disabled', false);
+                    $("#edit-customer, #delete-customer, #merge-customer").prop(
+                        "disabled",
+                        false
+                    );
                     return false;
                 }
             }.bind(this));

@@ -71,6 +71,13 @@
                         <?= lang('delete') ?>
                     </button>
                     <?php endif ?>
+
+                    <?php if ($privileges[PRIV_CUSTOMERS]['edit'] === TRUE): ?>
+                    <button id="merge-customer" class="btn btn-default" disabled="disabled" title="Find the first customer, select and click Merge. Then find the second customer, select and click Merge again.">
+                        <span class="glyphicon glyphicon-link"></span>
+                        <?= lang('merge') ?>
+                    </button>
+                    <?php endif ?>
                 </div>
 
                 <div id="save-cancel-group" class="btn-group" style="display:none;">

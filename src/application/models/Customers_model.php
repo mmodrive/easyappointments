@@ -231,6 +231,55 @@ class Customers_Model extends CI_Model {
         return (int)$customer['id'];
     }
 
+    function Merge($from_id, $to_id)
+    {
+        $this->db->trans_begin();
+
+        // 1. Transfer all pets
+        $this->db->where('id_users', $from_id);
+        if ( ! $this->db->update('ea_pets',  ['id_users' => $to_id])){
+            $this->db->trans_rollback();
+            throw new Exception('Could not transfer pets.');
+        }
+        
+        // 2. Transfer all appointments
+        $this->db->where('id_users_customer', $from_id);
+        if ( ! $this->db->update('ea_appointments', ['id_users_customer' => $to_id])){
+            $this->db->trans_rollback();
+            throw new Exception('Could not transfer appointments.');
+        }
+
+        // 3. Update 'to' customer with old details
+        $current_notes = $this->get_row($to_id)['notes'] ?? '';
+        $current_notes .= $current_notes ? "\n" : '';
+        $to_data = $this->get_row($to_id);
+        $from_data = $this->get_row($from_id);
+        $from_data = array_filter($from_data,
+            function($value, $key) use($to_data){ return 
+                !empty($value) && 
+                strpos($key, 'id') !== 0 && 
+                !is_array($value) &&
+                $to_data[$key] != $value; },
+            ARRAY_FILTER_USE_BOTH );
+        $current_notes .= 'Merged: '.implode(' ', $from_data);
+        $this->db->where('id', $to_id);
+        if ( ! $this->db->update('ea_users', ['notes' => $current_notes]))
+        {
+            $this->db->trans_rollback();
+            throw new Exception('Could not transfer to notes.');
+        }
+        
+        // 4. Delete 'from' customer
+        if( ! $this->delete($from_id) ){
+            $this->db->trans_rollback();
+            throw new Exception('Could not transfer appointments.');
+        }
+
+        $this->db->trans_complete();
+
+        return $to_id;
+    }
+
     /**
      * Find the database id of a customer record.
      *

@@ -904,6 +904,32 @@ class Backend_api extends CI_Controller {
         }
     }
 
+    public function ajax_merge_customer()
+    {
+        try
+        {
+            if ($this->privileges[PRIV_CUSTOMERS]['edit'] == FALSE)
+            {
+                throw new Exception('You do not have the required privileges for this task.');
+            }
+
+            $this->load->model('customers_model');
+            $this->customers_model->merge(
+                $this->input->post('from_id'),
+                $this->input->post('to_id')
+            );
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode(AJAX_SUCCESS));
+        }
+        catch (Exception $exc)
+        {
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode(['exceptions' => [exceptionToJavaScript($exc)]]));
+        }
+    }
+
     /**
      * [AJAX] Save (insert or update) service record.
      *

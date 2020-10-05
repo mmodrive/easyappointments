@@ -21,3 +21,4 @@
 /vendor/
 /src/php.ini
 /xdebug.ini
+.vscode

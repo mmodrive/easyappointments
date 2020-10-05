@@ -305,12 +305,14 @@ window.GeneralFunctions = window.GeneralFunctions || {};
             response.exceptions = GeneralFunctions.parseExceptions(response.exceptions);
             GeneralFunctions.displayMessageBox(GeneralFunctions.EXCEPTIONS_TITLE, GeneralFunctions.EXCEPTIONS_MESSAGE);
             $('#message_box').append(GeneralFunctions.exceptionsToHtml(response.exceptions));
+            console.log(GeneralFunctions.exceptionsToHtml(response.exceptions));
             return false;
         }
-
+        
         if (response.warnings) {
             response.warnings = GeneralFunctions.parseExceptions(response.warnings);
             GeneralFunctions.displayMessageBox(GeneralFunctions.WARNINGS_TITLE, GeneralFunctions.WARNINGS_MESSAGE);
+            console.log(GeneralFunctions.exceptionsToHtml(response.warnings));
             $('#message_box').append(GeneralFunctions.exceptionsToHtml(response.warnings));
         }
 
@@ -385,7 +387,8 @@ window.GeneralFunctions = window.GeneralFunctions || {};
             }
         ];
         GeneralFunctions.displayMessageBox(GeneralFunctions.EXCEPTIONS_TITLE, GeneralFunctions.EXCEPTIONS_MESSAGE);
-        $('#message_box').append(GeneralFunctions.exceptionsToHtml(exceptions));
+        console.log(GeneralFunctions.exceptionsToHtml(exceptions));
+        $("#message_box").append(exceptions);
     };
 
     /**
