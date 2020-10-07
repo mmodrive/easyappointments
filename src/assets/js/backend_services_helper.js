@@ -356,11 +356,19 @@
      */
     ServicesHelper.prototype.getFilterHtml = function (service) {
         var html =
-            '<div class="service-row entry" data-id="' + service.id + '">' +
-            '<strong>' + service.name + '</strong><br>' +
-            service.duration + ' min - ' +
-            service.price + ' ' + service.currency + '<br>' +
-            '</div><hr>';
+            '<div class="service-row entry" data-id="' +
+            service.id +
+            '">' +
+            "<strong>" +
+            service.name +
+            "</strong><br>" +
+            service.duration +
+            " min - " +
+            (service.currency.includes("{price}")
+                ? service.currency.replace("{price}", service.price)
+                : service.price + " " + service.currency) +
+            "<br>" +
+            "</div><hr>";
 
         return html;
     };

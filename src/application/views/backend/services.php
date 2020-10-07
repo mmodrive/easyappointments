@@ -108,6 +108,8 @@
 
                     <div class="form-group">
                         <label for="service-currency"><?= lang('currency') ?></label>
+                        <br>
+                        <small>Note: Use {price} for substition.</small>
                         <input id="service-currency" class="form-control" maxlength="32">
                     </div>
 

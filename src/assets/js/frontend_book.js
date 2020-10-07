@@ -681,21 +681,29 @@ window.FrontendBook = window.FrontendBook || {};
 
         $.each(GlobalVariables.availableServices, function (index, service) {
             if (service.id == selServiceId) {
-                servicePrice = '<br>' + service.price;
+                servicePrice = service.price;
                 serviceCurrency = service.currency;
                 return false; // break loop
             }
         });
 
         var html =
-            '<h4>' + $('#select-service option:selected').text() + '</h4>' +
-            '<p>'
-            + '<strong class="text-primary">'
-            + $('#select-provider option:selected').text() + '<br>'
-            + selectedDate + ' ' + $('.selected-hour').text()
-            + servicePrice + ' ' + serviceCurrency
-            + '</strong>' +
-            '</p>';
+            "<h4>" +
+            $("#select-service option:selected").text() +
+            "</h4>" +
+            "<p>" +
+            '<strong class="text-primary">' +
+            $("#select-provider option:selected").text() +
+            "<br>" +
+            selectedDate +
+            " " +
+            $(".selected-hour").text() +
+            "<br>" +
+            (serviceCurrency.includes("{price}")
+                ? serviceCurrency.replace("{price}", servicePrice)
+                : servicePrice + " " + serviceCurrency) +
+            "</strong>" +
+            "</p>";
 
         $('#appointment-details').html(html);
 
@@ -944,7 +952,14 @@ window.FrontendBook = window.FrontendBook || {};
                 }
 
                 if (service.price != '' && service.price != null) {
-                    html += '[' + EALang.price + ' ' + service.price + ' ' + service.currency + ']';
+                    html +=
+                        "[" +
+                        EALang.price +
+                        " " +
+                        (service.currency.includes("{price}")
+                            ? service.currency.replace("{price}", service.price)
+                            : service.price + " " + service.currency) +
+                        "]";
                 }
 
                 html += '<br>';
