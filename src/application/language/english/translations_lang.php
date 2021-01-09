@@ -380,3 +380,4 @@ $lang['report_saved'] = 'Report saved successfully!';
 $lang['report_deleted'] = 'Report deleted successfully.';
 $lang['merge'] = 'Merge';
 $lang['merge_customer'] = 'Merge Customers';
+$lang['hours_restriction'] = 'Hours Restriction';

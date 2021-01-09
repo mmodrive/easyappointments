@@ -106,33 +106,56 @@
 			} else if (index == 'availabilities') {
 				$.each(workingPlan[index], function (i, avl) {
 					var tr =
-						'<tr class="datarow">' +
-						'<td class="availability-date-start editable">' + moment(avl.start, GlobalVariables.dbDateFormat).format(GlobalVariables.momDateFormat) + '</td>' +
-						'<td class="availability-date-end editable">' + moment(avl.end, GlobalVariables.dbDateFormat).format(GlobalVariables.momDateFormat) + '</td>' +
-						// '<td class="availability-time-start editable">' + (avl.ts && Date.parse(avl.ts).toString(GlobalVariables.timeFormat === 'regular' ? 'h:mm tt' : 'HH:mm').toUpperCase()) + '</td>' +
-						// '<td class="availability-time-end editable">' + (avl.te && Date.parse(avl.te).toString(GlobalVariables.timeFormat === 'regular' ? 'h:mm tt' : 'HH:mm').toUpperCase()) + '</td>' +
-						'<td>' +
-						'<button type="button" class="btn btn-default btn-sm edit-availability" title="' + EALang.edit + '">' +
-						'<span class="glyphicon glyphicon-pencil"></span>' +
-						'</button>' +
-						'<button type="button" class="btn btn-default btn-sm delete-availability" title="' + EALang.delete + '">' +
-						'<span class="glyphicon glyphicon-remove"></span>' +
-						'</button>' +
-						'<button type="button" class="btn btn-default btn-sm save-availability hidden" title="' + EALang.save + '">' +
-						'<span class="glyphicon glyphicon-ok"></span>' +
-						'</button>' +
-						'<button type="button" class="btn btn-default btn-sm cancel-availability hidden" title="' + EALang.cancel + '">' +
-						'<span class="glyphicon glyphicon-ban-circle"></span>' +
-						'</button>' +
-						'</td>' +
-						'</tr>';
+                        '<tr class="datarow">' +
+                        '<td class="availability-date-start editable">' +
+                        moment(avl.start, GlobalVariables.dbDateFormat).format(
+                            GlobalVariables.momDateFormat
+                        ) +
+                        "</td>" +
+                        '<td class="availability-date-end editable">' +
+                        moment(avl.end, GlobalVariables.dbDateFormat).format(
+                            GlobalVariables.momDateFormat
+                        ) +
+                        "</td>" +
+                        '<td class="availability-hours-restriction editable">' +
+                        (avl.hours_restriction ?? '') +
+                        "</td>" +
+                        // '<td class="availability-time-start editable">' + (avl.ts && Date.parse(avl.ts).toString(GlobalVariables.timeFormat === 'regular' ? 'h:mm tt' : 'HH:mm').toUpperCase()) + '</td>' +
+                        // '<td class="availability-time-end editable">' + (avl.te && Date.parse(avl.te).toString(GlobalVariables.timeFormat === 'regular' ? 'h:mm tt' : 'HH:mm').toUpperCase()) + '</td>' +
+                        "<td>" +
+                        '<button type="button" class="btn btn-default btn-sm edit-availability" title="' +
+                        EALang.edit +
+                        '">' +
+                        '<span class="glyphicon glyphicon-pencil"></span>' +
+                        "</button>" +
+                        '<button type="button" class="btn btn-default btn-sm delete-availability" title="' +
+                        EALang.delete +
+                        '">' +
+                        '<span class="glyphicon glyphicon-remove"></span>' +
+                        "</button>" +
+                        '<button type="button" class="btn btn-default btn-sm save-availability hidden" title="' +
+                        EALang.save +
+                        '">' +
+                        '<span class="glyphicon glyphicon-ok"></span>' +
+                        "</button>" +
+                        '<button type="button" class="btn btn-default btn-sm cancel-availability hidden" title="' +
+                        EALang.cancel +
+                        '">' +
+                        '<span class="glyphicon glyphicon-ban-circle"></span>' +
+                        "</button>" +
+                        "</td>" +
+                        "</tr>";
 					$('.availabilities tbody').append(tr);
 				}.bind(this));
 			}
         }.bind(this));
 
 		// Make availability cells editable.
-		this.editableAvailabilityDate($('.availability-date-start, .availability-date-end'));
+		this.editableAvailabilityDate(
+            $(
+                ".availability-date-start, .availability-date-end, .availability-hours-restriction"
+            )
+        );
 		// this.editableBreakTime($('.availability-time-start, .availability-time-end'));
         // Make break cells editable.
         this.editableBreakDay($('.breaks .break-day'));
@@ -399,25 +422,40 @@
         $('.add-availability').click(function () {
             var tr =
                 '<tr class="datarow">' +
-                '<td class="availability-date-start editable">' + '' + '</td>' +
-                '<td class="availability-date-end editable">' + '' + '</td>' +
+                '<td class="availability-date-start editable">' +
+                "" +
+                "</td>" +
+                '<td class="availability-date-end editable">' +
+                "" +
+                "</td>" +
+                '<td class="availability-hours-restriction editable">' +
+                "" +
+                "</td>" +
                 // '<td class="availability-time-start editable">' + (GlobalVariables.timeFormat === 'regular' ? '9:00 AM' : '09:00') + '</td>' +
                 // '<td class="availability-time-end editable">' + (GlobalVariables.timeFormat === 'regular' ? '5:00 PM' : '17:00') + '</td>' +
-                '<td>' +
-                '<button type="button" class="btn btn-default btn-sm edit-availability" title="' + EALang.edit + '">' +
+                "<td>" +
+                '<button type="button" class="btn btn-default btn-sm edit-availability" title="' +
+                EALang.edit +
+                '">' +
                 '<span class="glyphicon glyphicon-pencil"></span>' +
-                '</button>' +
-                '<button type="button" class="btn btn-default btn-sm delete-availability" title="' + EALang.delete + '">' +
+                "</button>" +
+                '<button type="button" class="btn btn-default btn-sm delete-availability" title="' +
+                EALang.delete +
+                '">' +
                 '<span class="glyphicon glyphicon-remove"></span>' +
-                '</button>' +
-                '<button type="button" class="btn btn-default btn-sm save-availability hidden" title="' + EALang.save + '">' +
+                "</button>" +
+                '<button type="button" class="btn btn-default btn-sm save-availability hidden" title="' +
+                EALang.save +
+                '">' +
                 '<span class="glyphicon glyphicon-ok"></span>' +
-                '</button>' +
-                '<button type="button" class="btn btn-default btn-sm cancel-availability hidden" title="' + EALang.cancel + '">' +
+                "</button>" +
+                '<button type="button" class="btn btn-default btn-sm cancel-availability hidden" title="' +
+                EALang.cancel +
+                '">' +
                 '<span class="glyphicon glyphicon-ban-circle"></span>' +
-                '</button>' +
-                '</td>' +
-                '</tr>';
+                "</button>" +
+                "</td>" +
+                "</tr>";
             $('.availabilities').prepend(tr);
 
             // Bind editable and event handlers.
@@ -595,13 +633,22 @@
         $('.availabilities tr.datarow').each(function (index, tr) {
             var date_start = $(tr).find('.availability-date-start').text();
             var date_end = $(tr).find('.availability-date-end').text();
+            var hours_restriction = $(tr)
+                .find(".availability-hours-restriction")
+                .text();
             // var time_start = $(tr).find('.availability-time-start').text();
             // var time_end = $(tr).find('.availability-time-end').text();
             
             if( moment(date_start, GlobalVariables.momDateFormat).isValid() ) {
                 availabilities.push({
-                    start: moment(date_start, GlobalVariables.momDateFormat).format(GlobalVariables.dbDateFormat),
-                    end: moment(date_end, GlobalVariables.momDateFormat).format(GlobalVariables.dbDateFormat)
+                    start: moment(
+                        date_start,
+                        GlobalVariables.momDateFormat
+                    ).format(GlobalVariables.dbDateFormat),
+                    end: moment(date_end, GlobalVariables.momDateFormat).format(
+                        GlobalVariables.dbDateFormat
+                    ),
+                    hours_restriction: parseInt(hours_restriction),
                     // ts: Date.parse(time_start) && Date.parse(time_start).toString('HH:mm') || '',
                     // te: Date.parse(time_end) && Date.parse(time_end).toString('HH:mm') || ''
                 });

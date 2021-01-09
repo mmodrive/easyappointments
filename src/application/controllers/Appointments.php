@@ -878,23 +878,29 @@ class Appointments extends CI_Controller {
 
         // Find the empty spaces on the plan. The first split between the plan is due to a break (if any). After that
         // every reserved appointment is considered to be a taken space in the plan.
+        $selected_date_dt = new DateTime($selected_date);
         $selected_date_working_plan = $working_plan[strtolower(date('l', strtotime($selected_date)))];
 
         $periods = [];
 
         $availabilities = [];
 
+        $hoursRestriction = 0;
+        $allowedWindowStart;
+        $allowedWindowEnd;
+
         if (isset($working_plan['availabilities']) && !empty($working_plan['availabilities']))
         {
             $dateInRange = FALSE;
             $format = 'YmdGisu';
-            $sd = new DateTime($selected_date);
             foreach ($working_plan['availabilities'] as $index => $availability) {
                 $start = DateTime::createFromFormat($format, $availability["start"].'000000000000');
                 $end = DateTime::createFromFormat($format, $availability["end"].'235959999999');
-                if(($sd >= $start) && ($sd <= $end))
+                if(($selected_date_dt >= $start) && ($selected_date_dt <= $end))
                 {
                     $dateInRange = TRUE;
+                    if (!empty($availability['hours_restriction']) && is_numeric($availability['hours_restriction']))
+                        $hoursRestriction = intval($availability['hours_restriction']);
                     break;
                 }
             }
@@ -902,15 +908,46 @@ class Appointments extends CI_Controller {
                 return array_values($periods);
         }
 
+        if( $hoursRestriction > 0 )
+        {
+            $windowStarts = [];
+            $windowEnds = [];
+            // Limit available periods to within x hours of existing appointments.
+            foreach ($provider_appointments as $provider_appointment)
+            {
+                $appointment_start = new DateTime($provider_appointment['start_datetime']);
+                $appointment_end = new DateTime($provider_appointment['end_datetime']);
+                if( $appointment_start->format('Ymd') == $selected_date_dt->format('Ymd') )
+                {
+                    $allowed_window_start = $appointment_start->sub(new DateInterval('PT'.$hoursRestriction.'H'));
+                    $allowed_window_end = $appointment_end->add(new DateInterval('PT'.$hoursRestriction.'H'));
+                    array_push($windowStarts, $allowed_window_start);
+                    array_push($windowEnds, $allowed_window_end);
+                }
+            }
+
+            if( !empty($windowStarts)){
+                $allowed_window_start = min($windowStarts);
+                $allowed_window_end = max($windowEnds);
+            }
+        }
+        
         if (isset($selected_date_working_plan['breaks']))
         {
-            $periods[] = [
-                'start' => $selected_date_working_plan['start'],
-                'end' => $selected_date_working_plan['end']
-            ];
-
             $day_start = new DateTime($selected_date_working_plan['start']);
             $day_end = new DateTime($selected_date_working_plan['end']);
+
+            if( isset($allowed_window_start)){
+                $today_allowed_window_start = new DateTime($allowed_window_start->format('H:i'));
+                $today_allowed_window_end = new DateTime($allowed_window_end->format('H:i'));
+                $day_start = max($day_start, $today_allowed_window_start);
+                $day_end = min($day_end, $today_allowed_window_end);
+            }
+            
+            $periods[] = [
+                'start' => $day_start->format('H:i'),
+                'end' => $day_end->format('H:i')
+            ];
 
             // Split the working plan to available time periods that do not contain the breaks in them.
             foreach ($selected_date_working_plan['breaks'] as $index => $break)
