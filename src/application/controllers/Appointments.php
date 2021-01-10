@@ -886,8 +886,12 @@ class Appointments extends CI_Controller {
         $availabilities = [];
 
         $hoursRestriction = 0;
-        $allowedWindowStart;
-        $allowedWindowEnd;
+        $appointments_start;
+        $appointments_end;
+
+        
+        if(!empty($selected_date_working_plan['hours_restriction']))
+            $hoursRestriction = intval($selected_date_working_plan['hours_restriction']);
 
         if (isset($working_plan['availabilities']) && !empty($working_plan['availabilities']))
         {
@@ -908,36 +912,35 @@ class Appointments extends CI_Controller {
                 return array_values($periods);
         }
 
-        if( $hoursRestriction > 0 )
+        if( $hoursRestriction > 0 || !empty($selected_date_working_plan['hours_restriction']) )
         {
-            $windowStarts = [];
-            $windowEnds = [];
-            // Limit available periods to within x hours of existing appointments.
+            $appointmentStarts = [];
+            $appointmentEnds = [];
             foreach ($provider_appointments as $provider_appointment)
             {
                 $appointment_start = new DateTime($provider_appointment['start_datetime']);
                 $appointment_end = new DateTime($provider_appointment['end_datetime']);
                 if( $appointment_start->format('Ymd') == $selected_date_dt->format('Ymd') )
                 {
-                    $allowed_window_start = $appointment_start->sub(new DateInterval('PT'.$hoursRestriction.'H'));
-                    $allowed_window_end = $appointment_end->add(new DateInterval('PT'.$hoursRestriction.'H'));
-                    array_push($windowStarts, $allowed_window_start);
-                    array_push($windowEnds, $allowed_window_end);
+                    array_push($appointmentStarts, $appointment_start);
+                    array_push($appointmentEnds, $appointment_end);
                 }
             }
-
-            if( !empty($windowStarts)){
-                $allowed_window_start = min($windowStarts);
-                $allowed_window_end = max($windowEnds);
+            
+            if( !empty($appointmentStarts)){
+                $appointments_start = min($appointmentStarts);
+                $appointments_end = max($appointmentEnds);
             }
         }
         
-        if (isset($selected_date_working_plan['breaks']))
+        if (isset($selected_date_working_plan['start']))
         {
             $day_start = new DateTime($selected_date_working_plan['start']);
             $day_end = new DateTime($selected_date_working_plan['end']);
-
-            if( isset($allowed_window_start)){
+            
+            if( isset($appointments_start)){
+                $allowed_window_start = $appointments_start->sub(new DateInterval('PT'.$hoursRestriction.'H'));
+                $allowed_window_end = $appointments_end->add(new DateInterval('PT'.$hoursRestriction.'H'));
                 $today_allowed_window_start = new DateTime($allowed_window_start->format('H:i'));
                 $today_allowed_window_end = new DateTime($allowed_window_end->format('H:i'));
                 $day_start = max($day_start, $today_allowed_window_start);
@@ -948,63 +951,66 @@ class Appointments extends CI_Controller {
                 'start' => $day_start->format('H:i'),
                 'end' => $day_end->format('H:i')
             ];
-
-            // Split the working plan to available time periods that do not contain the breaks in them.
-            foreach ($selected_date_working_plan['breaks'] as $index => $break)
+            
+            if (isset($selected_date_working_plan['breaks']))
             {
-                $break_start = new DateTime($break['start']);
-                $break_end = new DateTime($break['end']);
-
-                if ($break_start < $day_start)
+                // Split the working plan to available time periods that do not contain the breaks in them.
+                foreach ($selected_date_working_plan['breaks'] as $index => $break)
                 {
-                    $break_start = $day_start;
-                }
+                    $break_start = new DateTime($break['start']);
+                    $break_end = new DateTime($break['end']);
 
-                if ($break_end > $day_end)
-                {
-                    $break_end = $day_end;
-                }
-
-                if ($break_start >= $break_end)
-                {
-                    continue;
-                }
-
-                foreach ($periods as $key => $period)
-                {
-                    $period_start = new DateTime($period['start']);
-                    $period_end = new DateTime($period['end']);
-
-                    $remove_current_period = FALSE;
-
-                    if ($break_start > $period_start && $break_start < $period_end && $break_end > $period_start)
+                    if ($break_start < $day_start)
                     {
-                        $periods[] = [
-                            'start' => $period_start->format('H:i'),
-                            'end' => $break_start->format('H:i')
-                        ];
-
-                        $remove_current_period = TRUE;
+                        $break_start = $day_start;
                     }
 
-                    if ($break_start < $period_end && $break_end > $period_start && $break_end < $period_end)
+                    if ($break_end > $day_end)
                     {
-                        $periods[] = [
-                            'start' => $break_end->format('H:i'),
-                            'end' => $period_end->format('H:i')
-                        ];
-
-                        $remove_current_period = TRUE;
+                        $break_end = $day_end;
                     }
 
-                    if ($break_start == $period_start && $break_end == $period_end)
+                    if ($break_start >= $break_end)
                     {
-                        $remove_current_period = TRUE;
+                        continue;
                     }
 
-                    if ($remove_current_period)
+                    foreach ($periods as $key => $period)
                     {
-                        unset($periods[$key]);
+                        $period_start = new DateTime($period['start']);
+                        $period_end = new DateTime($period['end']);
+
+                        $remove_current_period = FALSE;
+
+                        if ($break_start > $period_start && $break_start < $period_end && $break_end > $period_start)
+                        {
+                            $periods[] = [
+                                'start' => $period_start->format('H:i'),
+                                'end' => $break_start->format('H:i')
+                            ];
+
+                            $remove_current_period = TRUE;
+                        }
+
+                        if ($break_start < $period_end && $break_end > $period_start && $break_end < $period_end)
+                        {
+                            $periods[] = [
+                                'start' => $break_end->format('H:i'),
+                                'end' => $period_end->format('H:i')
+                            ];
+
+                            $remove_current_period = TRUE;
+                        }
+
+                        if ($break_start == $period_start && $break_end == $period_end)
+                        {
+                            $remove_current_period = TRUE;
+                        }
+
+                        if ($remove_current_period)
+                        {
+                            unset($periods[$key]);
+                        }
                     }
                 }
             }

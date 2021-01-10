@@ -71,6 +71,9 @@
 					$('#' + index).prop('checked', true);
 					$('#' + index + '-start').prop('disabled', false).val(Date.parse(workingDay.start).toString(GlobalVariables.timeFormat  === 'regular' ? 'h:mm tt' : 'HH:mm').toUpperCase());
 					$('#' + index + '-end').prop('disabled', false).val(Date.parse(workingDay.end).toString(GlobalVariables.timeFormat === 'regular' ? 'h:mm tt' : 'HH:mm').toUpperCase());
+					$("#" + index + "-hours-restriction")
+                        .prop("disabled", false)
+                        .val(workingDay.hours_restriction);
 
 					// Add the day's breaks on the breaks table.
 					$.each(workingDay.breaks, function (i, brk) {
@@ -101,7 +104,10 @@
 				} else {
 					$('#' + index).prop('checked', false);
 					$('#' + index + '-start').prop('disabled', true).val('');
-					$('#' + index + '-end').prop('disabled', true).val('');
+                    $('#' + index + '-end').prop('disabled', true).val('');
+                    $("#" + index + "-hours-restriction")
+                        .prop("disabled", true)
+                        .val("");
 				}
 			} else if (index == 'availabilities') {
 				$.each(workingPlan[index], function (i, avl) {
@@ -280,9 +286,15 @@
             if ($(this).prop('checked') == true) {
                 $('#' + id + '-start').prop('disabled', false).val(GlobalVariables.timeFormat === 'regular' ? '9:00 AM' : '09:00');
                 $('#' + id + '-end').prop('disabled', false).val(GlobalVariables.timeFormat === 'regular' ? '6:00 PM' : '18:00');
+                $("#" + id + "-hours-restriction")
+                    .prop("disabled", false)
+                    .val("");
             } else {
                 $('#' + id + '-start').prop('disabled', true).val('');
                 $('#' + id + '-end').prop('disabled', true).val('');
+                $("#" + id + "-hours-restriction")
+                    .prop("disabled", true)
+                    .val("");
             }
         });
 
@@ -589,9 +601,16 @@
             var id = $(checkbox).attr('id');
             if ($(checkbox).prop('checked') == true) {
                 workingPlan[id] = {
-                    start: Date.parse($('#' + id + '-start').val()).toString('HH:mm'),
-                    end: Date.parse($('#' + id + '-end').val()).toString('HH:mm'),
-                    breaks: []
+                    start: Date.parse($("#" + id + "-start").val()).toString(
+                        "HH:mm"
+                    ),
+                    end: Date.parse($("#" + id + "-end").val()).toString(
+                        "HH:mm"
+                    ),
+                    hours_restriction: parseInt(
+                        $("#" + id + "-hours-restriction").val()
+                    ),
+                    breaks: [],
                 };
 
                 $('.breaks tr').each(function (index, tr) {
@@ -673,8 +692,13 @@
 
         if (disabled == false) {
             // Set timepickers where needed.
-            $('.working-plan input:text').timepicker({
-                timeFormat: GlobalVariables.timeFormat === 'regular' ? 'h:mm TT' : 'HH:mm',
+            $(
+                ".working-plan input:text:not(.work-hours-restriction)"
+            ).timepicker({
+                timeFormat:
+                    GlobalVariables.timeFormat === "regular"
+                        ? "h:mm TT"
+                        : "HH:mm",
                 currentText: EALang.now,
                 closeText: EALang.close,
                 timeOnlyTitle: EALang.select_time,
@@ -684,13 +708,29 @@
 
                 onSelect: function (datetime, inst) {
                     // Start time must be earlier than end time.
-                    var start = Date.parse($(this).parent().parent().find('.work-start').val()),
-                        end = Date.parse($(this).parent().parent().find('.work-end').val());
+                    var start = Date.parse(
+                            $(this).parent().parent().find(".work-start").val()
+                        ),
+                        end = Date.parse(
+                            $(this).parent().parent().find(".work-end").val()
+                        );
 
                     if (start > end) {
-                        $(this).parent().parent().find('.work-end').val(start.addHours(1).toString(GlobalVariables.timeFormat === 'regular' ? 'h:mm tt' : 'HH:mm'));
+                        $(this)
+                            .parent()
+                            .parent()
+                            .find(".work-end")
+                            .val(
+                                start
+                                    .addHours(1)
+                                    .toString(
+                                        GlobalVariables.timeFormat === "regular"
+                                            ? "h:mm tt"
+                                            : "HH:mm"
+                                    )
+                            );
                     }
-                }
+                },
             });
         } else {
             $('.working-plan input').timepicker('destroy');

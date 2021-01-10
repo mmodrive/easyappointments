@@ -273,6 +273,7 @@
                                     <th><?= lang('day') ?></th>
                                     <th><?= lang('start') ?></th>
                                     <th><?= lang('end') ?></th>
+									<th><?= lang('hours_restriction') ?></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -287,6 +288,7 @@
                                     </td>
                                     <td><input id="sunday-start" class="work-start form-control input-sm"></td>
                                     <td><input id="sunday-end" class="work-end form-control input-sm"></td>
+                                    <td><input id="sunday-hours-restriction" class="work-hours-restriction form-control input-sm"></td>
                                 </tr>
                                 <tr>
                                     <td>
@@ -299,6 +301,7 @@
                                     </td>
                                     <td><input id="monday-start" class="work-start form-control input-sm"></td>
                                     <td><input id="monday-end" class="work-end form-control input-sm"></td>
+                                    <td><input id="monday-hours-restriction" class="work-hours-restriction form-control input-sm"></td>
                                 </tr>
                                 <tr>
                                     <td>
@@ -311,6 +314,7 @@
                                     </td>
                                     <td><input id="tuesday-start" class="work-start form-control input-sm"></td>
                                     <td><input id="tuesday-end" class="work-end form-control input-sm"></td>
+                                    <td><input id="tuesday-hours-restriction" class="work-hours-restriction form-control input-sm"></td>
                                 </tr>
                                 <tr>
                                     <td>
@@ -323,6 +327,7 @@
                                     </td>
                                     <td><input id="wednesday-start" class="work-start form-control input-sm"></td>
                                     <td><input id="wednesday-end" class="work-end form-control input-sm"></td>
+                                    <td><input id="wednesday-hours-restriction" class="work-hours-restriction form-control input-sm"></td>
                                 </tr>
                                 <tr>
                                     <td>
@@ -335,6 +340,7 @@
                                     </td>
                                     <td><input id="thursday-start" class="work-start form-control input-sm"></td>
                                     <td><input id="thursday-end" class="work-end form-control input-sm"></td>
+                                    <td><input id="thursday-hours-restriction" class="work-hours-restriction form-control input-sm"></td>
                                 </tr>
                                 <tr>
                                     <td>
@@ -347,6 +353,7 @@
                                     </td>
                                     <td><input id="friday-start" class="work-start form-control input-sm"></td>
                                     <td><input id="friday-end" class="work-end form-control input-sm"></td>
+                                    <td><input id="friday-hours-restriction" class="work-hours-restriction form-control input-sm"></td>
                                 </tr>
                                 <tr>
                                     <td>
@@ -359,6 +366,7 @@
                                     </td>
                                     <td><input id="saturday-start" class="work-start form-control input-sm"></td>
                                     <td><input id="saturday-end" class="work-end form-control input-sm"></td>
+                                    <td><input id="saturday-hours-restriction" class="work-hours-restriction form-control input-sm"></td>
                                 </tr>
                             </tbody>
                         </table>
