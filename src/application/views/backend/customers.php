@@ -178,7 +178,8 @@
                                 <th><?= lang('depth') ?></th>
                                 <th><?= lang('speed') ?></th>
                                 <th><?= lang('time') ?></th>
-                                <th><?= lang('comments') ?></th>
+                                <th><?= lang('observ_current') ?></th>
+                                <th><?= lang('observ_previous') ?></th>
                             </tr>
                         </thead>
                         <tbody>

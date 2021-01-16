@@ -613,7 +613,8 @@
                 tr.append("<td>" + (app.depth ?? '') + "</td>");
                 tr.append("<td>" + (app.speed ?? '') + "</td>");
                 tr.append("<td>" + (app.time ?? '') + "</td>");
-                tr.append("<td>" + (app.comments ?? '') + "</td>");
+                tr.append("<td>" + (app.observ_current ?? "") + "</td>");
+                tr.append("<td>" + (app.observ_previous ?? "") + "</td>");
             });
 
         $('#pet_history').removeClass('hidden');

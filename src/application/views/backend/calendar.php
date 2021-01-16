@@ -406,8 +406,12 @@
                             </div>
                             <div class="col-xs-12 col-sm-6">
                                 <div class="form-group">
-                                    <label for="comments" class="control-label"><?= lang('comments') ?></label>
-                                    <textarea id="comments" rows="7" class="form-control"></textarea>
+                                    <label for="observ_current" class="control-label"><?= lang('current').' '.lang('appointment').' '.lang('observations') ?></label>
+                                    <textarea id="observ_current" rows="3" class="form-control"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="observ_previous" class="control-label"><?= lang('previous').' '.lang('appointment').' '.lang('observations') ?></label>
+                                    <textarea id="observ_previous" rows="3" class="form-control"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -427,7 +431,8 @@
                                             <th><?= lang('depth') ?></th>
                                             <th><?= lang('speed') ?></th>
                                             <th><?= lang('time') ?></th>
-                                            <th><?= lang('comments') ?></th>
+                                            <th><?= lang('current').' '.lang('observations') ?></th>
+                                            <th><?= lang('previous').' '.lang('observations') ?></th>
                                         </tr>
                                     </thead>
                                     <tbody>

@@ -162,7 +162,10 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                 $dialog.find('#depth').val(appointment.depth);
                 $dialog.find('#speed').val(appointment.speed);
                 $dialog.find('#time').val(appointment.time);
-                $dialog.find('#comments').val(appointment.comments);
+                $dialog.find("#observ_current").val(appointment.observ_current);
+                $dialog
+                    .find("#observ_previous")
+                    .val(appointment.observ_previous);
 
                 var pet_select = $dialog.find('#pet_id');
                 pet_select.find('option:nth-child(n+2)').remove();
@@ -226,7 +229,8 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                     tr.append("<td>" + (app.depth ?? '') + "</td>");
                     tr.append("<td>" + (app.speed ?? '') + "</td>");
                     tr.append("<td>" + (app.time ?? '') + "</td>");
-                    tr.append("<td>" + (app.comments ?? '') + "</td>");
+                    tr.append("<td>" + (app.observ_current ?? "") + "</td>");
+                    tr.append("<td>" + (app.observ_previous ?? "") + "</td>");
                 });
 
             var pet_attachments = $('#pet_attachments');
@@ -1829,7 +1833,8 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
             $dialog.find('#depth').val(appointment.depth);
             $dialog.find('#speed').val(appointment.speed);
             $dialog.find('#time').val(appointment.time);
-            $dialog.find('#comments').val(appointment.comments);
+            $dialog.find("#observ_current").val(appointment.observ_current);
+            $dialog.find("#observ_previous").val(appointment.observ_previous);
 
             $dialog.modal('show');
         }

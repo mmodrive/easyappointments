@@ -53,16 +53,17 @@ window.BackendCalendarAppointmentsModal = window.BackendCalendarAppointmentsModa
             var endDatetime = $dialog.find('#end-datetime').datetimepicker('getDate').toString('yyyy-MM-dd HH:mm:ss');
 
             var appointment = {
-                id_services: $dialog.find('#select-service').val(),
-                id_users_provider: $dialog.find('#select-provider').val(),
+                id_services: $dialog.find("#select-service").val(),
+                id_users_provider: $dialog.find("#select-provider").val(),
                 start_datetime: startDatetime,
                 end_datetime: endDatetime,
-                notes: $dialog.find('#appointment-notes').val(),
+                notes: $dialog.find("#appointment-notes").val(),
                 is_unavailable: false,
-                depth: $dialog.find('#depth:visible').val(),
-                speed: $dialog.find('#speed:visible').val(),
-                time: $dialog.find('#time:visible').val(),
-                comments: $dialog.find('#comments:visible').val(),
+                depth: $dialog.find("#depth:visible").val(),
+                speed: $dialog.find("#speed:visible").val(),
+                time: $dialog.find("#time:visible").val(),
+                observ_current: $dialog.find("#observ_current:visible").val(),
+                observ_previous: $dialog.find("#observ_previous:visible").val(),
             };
 
             if ($dialog.find('#appointment-id').val() !== '') {
