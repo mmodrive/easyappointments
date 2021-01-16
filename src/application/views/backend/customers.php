@@ -178,8 +178,8 @@
                                 <th><?= lang('depth') ?></th>
                                 <th><?= lang('speed') ?></th>
                                 <th><?= lang('time') ?></th>
-                                <th><?= lang('current').' '.lang('observations') ?></th>
                                 <th><?= lang('previous').' '.lang('observations') ?></th>
+                                <th><?= lang('current').' '.lang('observations') ?></th>
                             </tr>
                         </thead>
                         <tbody>
