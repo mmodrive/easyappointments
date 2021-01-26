@@ -886,8 +886,8 @@ class Appointments extends CI_Controller {
         $availabilities = [];
 
         $hoursRestriction = 0;
-        $appointments_start;
-        $appointments_end;
+        $allowed_window_start;
+        $allowed_window_end;
 
         
         if(!empty($selected_date_working_plan['hours_restriction']))
@@ -916,20 +916,60 @@ class Appointments extends CI_Controller {
         {
             $appointmentStarts = [];
             $appointmentEnds = [];
+            $app_windows = [];
+
+            // Filter out appointments for the selected date only and record allowed hour windows
             foreach ($provider_appointments as $provider_appointment)
             {
                 $appointment_start = new DateTime($provider_appointment['start_datetime']);
                 $appointment_end = new DateTime($provider_appointment['end_datetime']);
                 if( $appointment_start->format('Ymd') == $selected_date_dt->format('Ymd') )
                 {
-                    array_push($appointmentStarts, $appointment_start);
-                    array_push($appointmentEnds, $appointment_end);
+                    $allowed_window_start = $appointment_start->sub(new DateInterval('PT'.$hoursRestriction.'H'));
+                    $allowed_window_end = $appointment_end->add(new DateInterval('PT'.$hoursRestriction.'H'));
+                    array_push($app_windows, ['start' => $allowed_window_start, 'end' => $allowed_window_end]);
+                    array_push($appointmentStarts, $allowed_window_start);
+                    array_push($appointmentEnds, $allowed_window_end);
                 }
             }
             
+            // Intersection Join days appointment windows
+            do {
+                $changes = 0;
+                foreach ($app_windows as $o_key => $o_value) 
+                {
+                    for ($j=$o_key+1; $j < count($app_windows); $j++) { 
+                        if (isset($app_windows[$j]) && $o_value['end'] >= $app_windows[$j]['start'] &&
+                        $o_value['end'] <= $app_windows[$j]['end']) {
+                            $app_windows[$o_key]['end'] = $app_windows[$j]['end'];
+                            unset($app_windows[$j]);
+                            $changes = 1;
+                        }
+                    }
+                }
+            } while ($changes);
+
+            // Sort appointment windows chronologically
+            usort( $app_windows, function ($a, $b) { return ($a['start'] <=> $b['start']); } );
+
+            // Invert / Create breaks for the non-appointment windows
+            if( count($app_windows) > 1 ){
+                if (!isset($selected_date_working_plan['breaks']))
+                $selected_date_working_plan['breaks'] = [];
+                for ($i=1; $i < count($app_windows); $i++) { 
+                    // Insert the non-appointment window breaks at the start as they are assumed to be largest
+                    // for the following breaking algorithm to work properly
+                    array_unshift($selected_date_working_plan['breaks'],[
+                        'start' => $app_windows[$i-1]['end']->format('H:i'),
+                        'end' =>$app_windows[$i]['start']->format('H:i')
+                    ]);
+                }
+            }
+
+            // Record day start and end times as per appointment windows
             if( !empty($appointmentStarts)){
-                $appointments_start = min($appointmentStarts);
-                $appointments_end = max($appointmentEnds);
+                $allowed_window_start = min($appointmentStarts);
+                $allowed_window_end = max($appointmentEnds);
             }
         }
         
@@ -938,9 +978,8 @@ class Appointments extends CI_Controller {
             $day_start = new DateTime($selected_date_working_plan['start']);
             $day_end = new DateTime($selected_date_working_plan['end']);
             
-            if( isset($appointments_start)){
-                $allowed_window_start = $appointments_start->sub(new DateInterval('PT'.$hoursRestriction.'H'));
-                $allowed_window_end = $appointments_end->add(new DateInterval('PT'.$hoursRestriction.'H'));
+            // Curb the day start and end times by appointment windows if any
+            if( isset($allowed_window_start)){
                 $today_allowed_window_start = new DateTime($allowed_window_start->format('H:i'));
                 $today_allowed_window_end = new DateTime($allowed_window_end->format('H:i'));
                 $day_start = max($day_start, $today_allowed_window_start);
