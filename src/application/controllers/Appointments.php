@@ -1287,6 +1287,11 @@ class Appointments extends CI_Controller {
         $working_plan = json_decode($provider['settings']['working_plan'], TRUE);
         $working_day = strtolower(date('l', strtotime($selected_date)));
         $working_hours = $working_plan[$working_day];
+        
+        $hours = [];
+
+        if( !isset($working_plan[$working_day]) )
+            return $hours;
 
         $periods = [
             [
@@ -1297,8 +1302,6 @@ class Appointments extends CI_Controller {
 
         $periods = $this->remove_breaks($selected_date, $periods, $working_hours['breaks']);
         $periods = $this->remove_unavailabilities($periods, $unavailabilities);
-
-        $hours = [];
 
         $interval_value = $service['availabilities_type'] == AVAILABILITIES_TYPE_FIXED ? $service['duration'] : '15';
         $interval = new DateInterval('PT' . (int)$interval_value . 'M');
