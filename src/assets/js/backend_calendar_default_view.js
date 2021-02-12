@@ -232,14 +232,14 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                     tr.append(
                         "<td>" +
                             GeneralFunctions.HtmlAbbreviate(
-                                app.observ_current
+                                app.observ_previous
                             ) +
                             "</td>"
                     );
                     tr.append(
                         "<td>" +
                             GeneralFunctions.HtmlAbbreviate(
-                                app.observ_previous
+                                app.observ_current
                             ) +
                             "</td>"
                     );

@@ -615,12 +615,12 @@
                 tr.append("<td>" + (app.time ?? '') + "</td>");
                 tr.append(
                     "<td>" +
-                        GeneralFunctions.HtmlAbbreviate(app.observ_current) +
+                        GeneralFunctions.HtmlAbbreviate(app.observ_previous) +
                         "</td>"
                 );
                 tr.append(
                     "<td>" +
-                        GeneralFunctions.HtmlAbbreviate(app.observ_previous) +
+                        GeneralFunctions.HtmlAbbreviate(app.observ_current) +
                         "</td>"
                 );
             });
