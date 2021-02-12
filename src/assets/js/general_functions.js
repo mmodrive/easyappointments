@@ -434,4 +434,17 @@ window.GeneralFunctions = window.GeneralFunctions || {};
         return result;
     };
 
+    exports.HtmlAbbreviate = function (text) {
+        return !text
+            ? ""
+            : text.len <= 20
+            ? text
+            : '<abbr title="' +
+              (text ?? "") +
+              '">' +
+              (text ?? "").substr(0, 20) +
+              (text ? "..." : "") +
+              "<abbr></td>";
+    };
+
 })(window.GeneralFunctions);
