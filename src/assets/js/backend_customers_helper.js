@@ -512,7 +512,7 @@
      * @return {String} Returns the record HTML code.
      */
     CustomersHelper.prototype.getFilterHtml = function (customer) {
-        var name = customer.first_name + ' ' + customer.last_name;
+        var name = customer.last_name.toUpperCase() + " " + customer.first_name;
         var info = customer.email;
         info = (customer.phone_number != '' && customer.phone_number != null)
             ? info + ', ' + customer.phone_number : info;

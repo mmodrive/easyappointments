@@ -523,6 +523,8 @@ class Customers_Model extends CI_Model {
 
         $this->db->where('id_roles', $customers_role_id);
 
+        $this->db->order_by('last_name, first_name');
+
         $batch = $this->db->get('ea_users')->result_array();
 
         // Get every customer settings.
