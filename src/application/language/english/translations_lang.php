@@ -89,6 +89,7 @@ $lang['phone'] = 'Phone';
 $lang['address'] = 'Address';
 $lang['appointment_link_title'] = 'Appointment Link';
 $lang['success'] = 'Success!';
+$lang['direct_book_link'] = 'Direct Booking Link';
 $lang['appointment_added_to_google_calendar'] = 'Your appointment has been added to your Google Calendar account.';
 $lang['view_appointment_in_google_calendar'] = 'Click here to view your appointment on Google Calendar.';
 $lang['appointment_added_to_your_plan'] = 'A new appointment has been added to your plan.';

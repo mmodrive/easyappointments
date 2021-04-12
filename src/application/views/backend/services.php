@@ -167,6 +167,11 @@
                         <textarea id="service-description" rows="4" class="form-control"></textarea>
                     </div>
 
+                    <div class="form-group">
+                        <label for="service-link"><?= lang('direct_book_link') ?></label>
+                        <a id="service-link" class="form-control"></a>
+                    </div>
+
                     <p id="form-message" class="text-danger">
                         <em><?= lang('fields_are_required') ?></em>
                     </p>

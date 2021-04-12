@@ -265,12 +265,11 @@ window.FrontendBook = window.FrontendBook || {};
                 $('#select-provider').prepend(new Option('- ' + EALang.any_provider + ' -', 'any-provider'));
                 $('#select-provider').val('any-provider');
             }
-
+            
             FrontendBookApi.getUnavailableDates($('#select-provider').val(), $(this).val(),
-                $('#select-date').datepicker('getDate').toString('yyyy-MM-dd'));
+            $('#select-date').datepicker('getDate').toString('yyyy-MM-dd'));
             FrontendBook.updateConfirmFrame();
             _updateServiceDescription($('#select-service').val(), $('#service-description'));
-
 
             $.each(GlobalVariables.availableServices, function (index, service) {
                 if (service.id == currServiceId && service.id_users_default_provider) {

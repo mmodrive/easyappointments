@@ -299,6 +299,7 @@
         $('#service-default-provider').val(service.id_users_default_provider);
         $('#pets_option').val(service.pets_option);
         $('#service-description').val(service.description);
+        $('#service-link').text(service.book_link).attr("href", service.book_link);
         $('#service-availabilities-type').val(service.availabilities_type);
         $('#service-attendants-number').val(service.attendants_number);
 

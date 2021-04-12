@@ -320,8 +320,16 @@ class Services_Model extends CI_Model {
         {
             $this->db->where($where_clause);
         }
+        
+        $batch = $this->db->get('ea_services')->result_array();
+        
+        $this->load->helper('url');
+        foreach ($batch as &$service)
+        {
+            $service['book_link'] = base_url('/?sid='.$service['id']);
+        }
 
-        return $this->db->get('ea_services')->result_array();
+        return $batch;
     }
 
     /**
@@ -332,7 +340,7 @@ class Services_Model extends CI_Model {
     public function get_available_services()
     {
         $this->db->distinct();
-        return $this->db
+        $batch = $this->db
             ->select('ea_services.*, ea_service_categories.name AS category_name, '
                 . 'ea_service_categories.id AS category_id')
             ->from('ea_services')
@@ -342,6 +350,7 @@ class Services_Model extends CI_Model {
                 'ea_service_categories.id = ea_services.id_service_categories', 'left')
             ->order_by('ea_services.name')
             ->get()->result_array();
+        return $batch;
     }
 
     /**
