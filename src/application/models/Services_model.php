@@ -326,7 +326,7 @@ class Services_Model extends CI_Model {
         $this->load->helper('url');
         foreach ($batch as &$service)
         {
-            $service['book_link'] = base_url('/?sid='.$service['id']);
+            $service['book_link'] = base_url('/?service='.$service['id']);
         }
 
         return $batch;

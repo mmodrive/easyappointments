@@ -182,7 +182,8 @@ window.FrontendBook = window.FrontendBook || {};
             var $selectService = $('#select-service');
 
             // Check if a specific service was selected (via URL parameter).
-            var selectedServiceId = GeneralFunctions.getUrlParameter(location.href, 'service');
+            var selectedServiceId = GeneralFunctions.getUrlParameter(location.href, 'service') ||
+                                    GeneralFunctions.getUrlParameter(location.href, 'sid');
 
             if (selectedServiceId && $selectService.find('option[value="' + selectedServiceId + '"]').length > 0) {
                 $selectService.val(selectedServiceId);
@@ -191,7 +192,8 @@ window.FrontendBook = window.FrontendBook || {};
             $selectService.trigger('change'); // Load the available hours.
 
             // Check if a specific provider was selected. 
-            var selectedProviderId = GeneralFunctions.getUrlParameter(location.href, 'provider');
+            var selectedProviderId = GeneralFunctions.getUrlParameter(location.href, 'provider') ||
+                                    GeneralFunctions.getUrlParameter(location.href, 'pid');
 
             if (selectedProviderId && $selectProvider.find('option[value="' + selectedProviderId + '"]').length === 0) {
                 // Select a service of this provider in order to make the provider available in the select box. 
