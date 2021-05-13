@@ -1071,7 +1071,7 @@ class Appointments extends CI_Controller {
                 }
                 else
                 {
-                    if ($appointment_start <= $period_start && $appointment_end <= $period_end && $appointment_end >= $period_start)
+                    if ($appointment_start < $period_start && $appointment_end <= $period_end && $appointment_end >= $period_start)
                     {
                         // The appointment starts before the period and finishes somewhere inside. We will need to break
                         // this period and leave the available part.
