@@ -440,9 +440,9 @@ window.GeneralFunctions = window.GeneralFunctions || {};
             : text.len <= 20
             ? text
             : '<abbr title="' +
-              (text ?? "") +
+              (text ? text : "") +
               '">' +
-              (text ?? "").substr(0, 20) +
+              (text ? text : "").substr(0, 20) +
               (text ? "..." : "") +
               "<abbr></td>";
     };
