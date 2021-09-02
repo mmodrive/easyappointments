@@ -254,6 +254,7 @@
 									<th><?= lang('hours_restriction') ?></th>
                                     <!-- <th><?= lang('time_start') ?></th>
                                     <th><?= lang('time_end') ?></th> -->
+									<th><?= lang('services') ?></th>
                                     <th><?= lang('actions') ?></th>
                                 </tr>
                             </thead>
@@ -274,6 +275,7 @@
                                     <th><?= lang('start') ?></th>
                                     <th><?= lang('end') ?></th>
 									<th><?= lang('hours_restriction') ?></th>
+									<th><?= lang('services') ?></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -289,6 +291,7 @@
                                     <td><input id="sunday-start" class="work-start form-control input-sm"></td>
                                     <td><input id="sunday-end" class="work-end form-control input-sm"></td>
                                     <td><input id="sunday-hours-restriction" class="work-hours-restriction form-control input-sm"></td>
+                                    <td><select multiple id="sunday-services" class="work-services form-control input-sm"></td>
                                 </tr>
                                 <tr>
                                     <td>
@@ -302,6 +305,7 @@
                                     <td><input id="monday-start" class="work-start form-control input-sm"></td>
                                     <td><input id="monday-end" class="work-end form-control input-sm"></td>
                                     <td><input id="monday-hours-restriction" class="work-hours-restriction form-control input-sm"></td>
+                                    <td><select multiple id="monday-services" class="work-services form-control input-sm"></td>
                                 </tr>
                                 <tr>
                                     <td>
@@ -315,6 +319,7 @@
                                     <td><input id="tuesday-start" class="work-start form-control input-sm"></td>
                                     <td><input id="tuesday-end" class="work-end form-control input-sm"></td>
                                     <td><input id="tuesday-hours-restriction" class="work-hours-restriction form-control input-sm"></td>
+                                    <td><select multiple id="tuesday-services" class="work-services form-control input-sm"></td>
                                 </tr>
                                 <tr>
                                     <td>
@@ -328,6 +333,7 @@
                                     <td><input id="wednesday-start" class="work-start form-control input-sm"></td>
                                     <td><input id="wednesday-end" class="work-end form-control input-sm"></td>
                                     <td><input id="wednesday-hours-restriction" class="work-hours-restriction form-control input-sm"></td>
+                                    <td><select multiple id="wednesday-services" class="work-services form-control input-sm"></td>
                                 </tr>
                                 <tr>
                                     <td>
@@ -341,6 +347,7 @@
                                     <td><input id="thursday-start" class="work-start form-control input-sm"></td>
                                     <td><input id="thursday-end" class="work-end form-control input-sm"></td>
                                     <td><input id="thursday-hours-restriction" class="work-hours-restriction form-control input-sm"></td>
+                                    <td><select multiple id="thursday-services" class="work-services form-control input-sm"></td>
                                 </tr>
                                 <tr>
                                     <td>
@@ -354,6 +361,7 @@
                                     <td><input id="friday-start" class="work-start form-control input-sm"></td>
                                     <td><input id="friday-end" class="work-end form-control input-sm"></td>
                                     <td><input id="friday-hours-restriction" class="work-hours-restriction form-control input-sm"></td>
+                                    <td><select multiple id="friday-services" class="work-services form-control input-sm"></td>
                                 </tr>
                                 <tr>
                                     <td>
@@ -367,6 +375,7 @@
                                     <td><input id="saturday-start" class="work-start form-control input-sm"></td>
                                     <td><input id="saturday-end" class="work-end form-control input-sm"></td>
                                     <td><input id="saturday-hours-restriction" class="work-hours-restriction form-control input-sm"></td>
+                                    <td><select multiple id="saturday-services" class="work-services form-control input-sm"></td>
                                 </tr>
                             </tbody>
                         </table>

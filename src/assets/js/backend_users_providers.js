@@ -229,6 +229,22 @@
                 $('.working-plan-view').show('fade');
             });
         });
+        
+        /**
+         * Event: Services Checked/Unchecked
+         */
+        $('#providers').on('change', '#provider-services input:checkbox', function () {
+            var serviceId = $(this).attr('data-id');
+            var isSelected = $(this).prop('checked');
+            $('.working-plan .work-services option, .availabilities .work-services option').each(function () {
+                if ($(this).val() == serviceId){
+                    if (isSelected)
+                        {$(this).show();}
+                    else
+                        {$(this).hide();}
+                }
+            });
+        });
 
         /**
          * Event: Reset Working Plan Button "Click".
@@ -435,6 +451,7 @@
         BackendUsers.wp.setup(workingPlan);
         $('.breaks').find('.edit-break, .delete-break').prop('disabled', true);
 		$('.availabilities').find('.edit-availability, .delete-availability').prop('disabled', true);
+        $('#providers #provider-services input:checkbox').change();
     };
 
     /**

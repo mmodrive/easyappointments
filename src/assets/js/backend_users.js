@@ -63,6 +63,7 @@ window.BackendUsers = window.BackendUsers || {};
 
         // Fill the services and providers list boxes.
         var html = '<div>';
+        var html_opt = '';
         $.each(GlobalVariables.services, function (index, service) {
             html +=
                 '<div class="checkbox">' +
@@ -71,10 +72,15 @@ window.BackendUsers = window.BackendUsers || {};
                 service.name +
                 '</label>' +
                 '</div>';
+            html_opt +=
+                '<option value="' + service.id + '">' +
+                service.name +
+                '</option>';
 
         });
         html += '</div>';
         $('#provider-services').html(html);
+        $('.working-plan .work-services').html(html_opt);
 
         html = '<div>';
         $.each(GlobalVariables.providers, function (index, provider) {

@@ -72,8 +72,9 @@
 					$('#' + index + '-start').prop('disabled', false).val(Date.parse(workingDay.start).toString(GlobalVariables.timeFormat  === 'regular' ? 'h:mm tt' : 'HH:mm').toUpperCase());
 					$('#' + index + '-end').prop('disabled', false).val(Date.parse(workingDay.end).toString(GlobalVariables.timeFormat === 'regular' ? 'h:mm tt' : 'HH:mm').toUpperCase());
 					$("#" + index + "-hours-restriction")
-                        .prop("disabled", false)
-                        .val(workingDay.hours_restriction);
+                    .prop("disabled", false)
+                    .val(workingDay.hours_restriction);
+					$('#' + index + '-services').prop('disabled', true).val(workingDay.services);
 
 					// Add the day's breaks on the breaks table.
 					$.each(workingDay.breaks, function (i, brk) {
@@ -106,8 +107,9 @@
 					$('#' + index + '-start').prop('disabled', true).val('');
                     $('#' + index + '-end').prop('disabled', true).val('');
                     $("#" + index + "-hours-restriction")
-                        .prop("disabled", true)
-                        .val("");
+                    .prop("disabled", true)
+                    .val("");
+                    $('#' + index + '-services').prop('disabled', true).val('');
 				}
 			} else if (index == 'availabilities') {
 				$.each(workingPlan[index], function (i, avl) {
@@ -128,6 +130,11 @@
                         "</td>" +
                         // '<td class="availability-time-start editable">' + (avl.ts && Date.parse(avl.ts).toString(GlobalVariables.timeFormat === 'regular' ? 'h:mm tt' : 'HH:mm').toUpperCase()) + '</td>' +
                         // '<td class="availability-time-end editable">' + (avl.te && Date.parse(avl.te).toString(GlobalVariables.timeFormat === 'regular' ? 'h:mm tt' : 'HH:mm').toUpperCase()) + '</td>' +
+                        '<td class="availability-services editable">' +
+                        '<select multiple class="work-services form-control input-sm" disabled>' +
+                        $(".working-plan select.work-services:eq(0)").html() +
+                        '</select>' +
+                        "</td>" +
                         "<td>" +
                         '<button type="button" class="btn btn-default btn-sm edit-availability" title="' +
                         EALang.edit +
@@ -151,7 +158,9 @@
                         "</button>" +
                         "</td>" +
                         "</tr>";
-					$('.availabilities tbody').append(tr);
+                    tr = $(tr);
+                    tr.find("select.work-services").val(avl.services ?? '');
+					var newRow = $('.availabilities tbody').append(tr);
 				}.bind(this));
 			}
         }.bind(this));
@@ -287,14 +296,16 @@
                 $('#' + id + '-start').prop('disabled', false).val(GlobalVariables.timeFormat === 'regular' ? '9:00 AM' : '09:00');
                 $('#' + id + '-end').prop('disabled', false).val(GlobalVariables.timeFormat === 'regular' ? '6:00 PM' : '18:00');
                 $("#" + id + "-hours-restriction")
-                    .prop("disabled", false)
-                    .val("");
+                .prop("disabled", false)
+                .val("");
+                $('#' + id + '-services').prop('disabled', false).val("");
             } else {
                 $('#' + id + '-start').prop('disabled', true).val('');
                 $('#' + id + '-end').prop('disabled', true).val('');
                 $("#" + id + "-hours-restriction")
-                    .prop("disabled", true)
-                    .val("");
+                .prop("disabled", true)
+                .val("");
+                $('#' + id + '-services').prop('disabled', true).val("");
             }
         });
 
@@ -445,6 +456,9 @@
                 "</td>" +
                 // '<td class="availability-time-start editable">' + (GlobalVariables.timeFormat === 'regular' ? '9:00 AM' : '09:00') + '</td>' +
                 // '<td class="availability-time-end editable">' + (GlobalVariables.timeFormat === 'regular' ? '5:00 PM' : '17:00') + '</td>' +
+                '<td class="availability-services editable">' +
+                "" +
+                "</td>" +
                 "<td>" +
                 '<button type="button" class="btn btn-default btn-sm edit-availability" title="' +
                 EALang.edit +
@@ -610,6 +624,7 @@
                     hours_restriction: parseInt(
                         $("#" + id + "-hours-restriction").val()
                     ),
+                    services: $("#" + id + "-services option:not([style*='display: none']):selected").map(function(){ return $(this).val(); }).get(),
                     breaks: [],
                 };
 
@@ -668,6 +683,7 @@
                         GlobalVariables.dbDateFormat
                     ),
                     hours_restriction: parseInt(hours_restriction),
+                    services: $(tr).find(".work-services option:not([style*='display: none']):selected").map(function(){ return $(this).val(); }).get(),
                     // ts: Date.parse(time_start) && Date.parse(time_start).toString('HH:mm') || '',
                     // te: Date.parse(time_end) && Date.parse(time_end).toString('HH:mm') || ''
                 });
@@ -693,7 +709,7 @@
         if (disabled == false) {
             // Set timepickers where needed.
             $(
-                ".working-plan input:text:not(.work-hours-restriction)"
+                ".working-plan input:text.work-start, .working-plan input:text.work-end"
             ).timepicker({
                 timeFormat:
                     GlobalVariables.timeFormat === "regular"
