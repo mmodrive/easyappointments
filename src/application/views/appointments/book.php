@@ -154,11 +154,11 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="select-provider">
-                                    <strong><?= lang('select_provider') ?></strong>
+                                <label for="select-preffered-provider">
+                                    <strong><?= lang('select_preffered_provider') ?></strong>
                                 </label>
 
-                                <select id="select-provider" class="col-xs-12 col-sm-4 form-control"></select>
+                                <select id="select-preffered-provider" class="col-xs-12 col-sm-4 form-control"></select>
                             </div>
 
                             <div id="service-description" style="display:none;"></div>
@@ -187,7 +187,18 @@
                             </div>
 
                             <div class="col-xs-12 col-sm-6">
-                                <div id="available-hours"></div>
+                                <div class="col-xs-12 col-sm-12">
+                                    <div id="available-hours"></div>
+                                </div>
+                                <div class="col-xs-12 col-sm-12">
+                                    <div class="form-group">
+                                        <label for="select-provider">
+                                            <strong><?= lang('select_provider') ?></strong>
+                                        </label>
+
+                                        <select id="select-provider" class="col-xs-12 col-sm-12 form-control"></select>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

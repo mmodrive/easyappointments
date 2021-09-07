@@ -370,7 +370,7 @@ class Appointments extends CI_Controller {
             // for an available provider that will provide the requested service.
             if ($this->input->post('provider_id') === ANY_PROVIDER)
             {
-                $_POST['provider_id'] = $this->_search_any_provider($this->input->post('service_id'),
+                $provider_ids = $this->_search_providers_by_service($this->input->post('service_id'),
                     $this->input->post('selected_date'));
                 if ($this->input->post('provider_id') === NULL)
                 {
@@ -380,48 +380,53 @@ class Appointments extends CI_Controller {
                     return;
                 }
             }
+            else
+                $provider_ids = [$this->input->post('provider_id')];
 
-            $service = $this->services_model->get_row($this->input->post('service_id'));
-            $provider = $this->providers_model->get_row($_POST['provider_id']);
+            $data = [];
 
-            $empty_periods = $this->_get_provider_available_time_periods($this->input->post('provider_id'),
-                $this->input->post('service_id'),
-                $this->input->post('selected_date'), $exclude_appointments);
+            foreach ($provider_ids as $provider_id) {
+                $service = $this->services_model->get_row($this->input->post('service_id'));
+                $provider = $this->providers_model->get_row($provider_id);
 
-            $available_hours = $this->_calculate_available_hours($empty_periods, $this->input->post('selected_date'),
-                $this->input->post('service_duration'),
-                filter_var($this->input->post('manage_mode'), FILTER_VALIDATE_BOOLEAN),
-                $service['availabilities_type']);
+                $empty_periods = $this->_get_provider_available_time_periods($provider_id,
+                    $this->input->post('service_id'),
+                    $this->input->post('selected_date'), $exclude_appointments);
 
-            if ($service['attendants_number'] > 1)
-            {
-                $available_hours = $this->_get_multiple_attendants_hours($this->input->post('selected_date'), $service,
-                    $provider);
-            }
+                $available_hours = $this->_calculate_available_hours($empty_periods, $this->input->post('selected_date'),
+                    $this->input->post('service_duration'),
+                    filter_var($this->input->post('manage_mode'), FILTER_VALIDATE_BOOLEAN),
+                    $service['availabilities_type']);
 
-            // If the selected date is today, remove past hours. It is important  include the timeout before
-            // booking that is set in the back-office the system. Normally we might want the customer to book
-            // an appointment that is at least half or one hour from now. The setting is stored in minutes.
-            if (date('Y-m-d', strtotime($this->input->post('selected_date'))) === date('Y-m-d'))
-            {
-                $book_advance_timeout = $this->settings_model->get_setting('book_advance_timeout');
-
-                foreach ($available_hours as $index => $value)
+                if ($service['attendants_number'] > 1)
                 {
-                    $available_hour = strtotime($value);
-                    $current_hour = strtotime('+' . $book_advance_timeout . ' minutes', strtotime('now'));
-                    if ($available_hour <= $current_hour)
+                    $available_hours = $this->_get_multiple_attendants_hours($this->input->post('selected_date'), $service,
+                        $provider);
+                }
+
+                // If the selected date is today, remove past hours. It is important  include the timeout before
+                // booking that is set in the back-office the system. Normally we might want the customer to book
+                // an appointment that is at least half or one hour from now. The setting is stored in minutes.
+                if (date('Y-m-d', strtotime($this->input->post('selected_date'))) === date('Y-m-d'))
+                {
+                    $book_advance_timeout = $this->settings_model->get_setting('book_advance_timeout');
+
+                    foreach ($available_hours as $index => $value)
                     {
-                        unset($available_hours[$index]);
+                        $available_hour = strtotime($value);
+                        $current_hour = strtotime('+' . $book_advance_timeout . ' minutes', strtotime('now'));
+                        if ($available_hour <= $current_hour)
+                        {
+                            unset($available_hours[$index]);
+                        }
                     }
                 }
-            }
 
-            $available_hours = array_values($available_hours);
-            sort($available_hours, SORT_STRING);
-            $available_hours = array_values($available_hours);
-            $data = (object)[ 'provider_id' => $provider['id'],
-                    'hours' => $available_hours ];
+                $available_hours = array_values($available_hours);
+                sort($available_hours, SORT_STRING);
+                $available_hours = array_values($available_hours);
+                $data[$provider['id']] = $available_hours;
+            }
 
             $this->output
                 ->set_content_type('application/json')
@@ -883,8 +888,6 @@ class Appointments extends CI_Controller {
 
         $periods = [];
 
-        $availabilities = [];
-
         $hoursRestriction = 0;
         $allowed_window_start;
         $allowed_window_end;
@@ -893,23 +896,12 @@ class Appointments extends CI_Controller {
         if(!empty($selected_date_working_plan['hours_restriction']))
             $hoursRestriction = intval($selected_date_working_plan['hours_restriction']);
 
-        if (isset($working_plan['availabilities']) && !empty($working_plan['availabilities']))
-        {
-            $dateInRange = FALSE;
-            $format = 'YmdGisu';
-            foreach ($working_plan['availabilities'] as $index => $availability) {
-                $start = DateTime::createFromFormat($format, $availability["start"].'000000000000');
-                $end = DateTime::createFromFormat($format, $availability["end"].'235959999999');
-                if(($selected_date_dt >= $start) && ($selected_date_dt <= $end))
-                {
-                    $dateInRange = TRUE;
-                    if (!empty($availability['hours_restriction']) && is_numeric($availability['hours_restriction']))
-                        $hoursRestriction = intval($availability['hours_restriction']);
-                    break;
-                }
-            }
-            if(!$dateInRange)
-                return array_values($periods);
+        $availability = $this->_check_workingplan_available($working_plan, $selected_date_dt);
+        if( $availability === FALSE )
+            return array_values($periods);
+        elseif( $availability !== TRUE ){
+            if (!empty($availability['hours_restriction']) && is_numeric($availability['hours_restriction']))
+                $hoursRestriction = intval($availability['hours_restriction']);
         }
 
         if( $hoursRestriction > 0 || !empty($selected_date_working_plan['hours_restriction']) )
@@ -1131,6 +1123,26 @@ class Appointments extends CI_Controller {
         return array_values($periods);
     }
 
+
+    protected function _check_workingplan_available($working_plan, $date)
+    {
+        if (isset($working_plan['availabilities']) && !empty($working_plan['availabilities']))
+        {
+            $format = 'YmdGisu';
+            foreach ($working_plan['availabilities'] as $index => $availability) {
+                $start = DateTime::createFromFormat($format, $availability["start"].'000000000000');
+                $end = DateTime::createFromFormat($format, $availability["end"].'235959999999');
+                if(($date >= $start) && ($date <= $end))
+                {
+                    return $availability;
+                }
+            }
+            return FALSE;
+        }
+
+        return TRUE;
+    }
+
     /**
      * Search for any provider that can handle the requested service.
      *
@@ -1190,11 +1202,14 @@ class Appointments extends CI_Controller {
      *
      * @return array Returns the ID of the provider that can provide the requested service.
      */
-    protected function _search_providers_by_service($service_id)
+    protected function _search_providers_by_service($service_id, $selected_date = NULL)
     {
         $this->load->model('providers_model');
         $available_providers = $this->providers_model->get_available_providers();
         $provider_list = array();
+
+        if (!is_null($selected_date))
+            $selected_date = new DateTime($selected_date);
 
         foreach ($available_providers as $provider)
         {
@@ -1202,8 +1217,26 @@ class Appointments extends CI_Controller {
             {
                 if ($provider_service_id === $service_id)
                 {
-                    // Check if the provider is affected to the selected service.
-                    $provider_list[] = $provider['id'];
+                    if (is_null($selected_date)){
+                        // Check if the provider is affected to the selected service.
+                        $provider_list[] = $provider['id'];
+                    }
+                    else{
+                        $working_plan = json_decode($provider['settings']['working_plan'], TRUE);
+                        $availability = $this->_check_workingplan_available($working_plan, $selected_date);
+                        if ($availability){ // If the date is available
+                            if( $availability !== TRUE ){
+                                if (array_key_exists('services',$availability) && in_array($service_id, $availability['services'])) // If availability includes the service
+                                    $provider_list[] = $provider['id'];
+                            }
+                            else { // Check the Working Plan
+                                $selected_date_working_plan = $working_plan[strtolower(date_format($selected_date, 'l'))];
+                                // check wp
+                                if ($selected_date_working_plan && array_key_exists('services',$selected_date_working_plan) && in_array($service_id, $selected_date_working_plan['services'])) // If working plan includes the service
+                                    $provider_list[] = $provider['id'];
+                            }
+                        }
+                    }
                 }
             }
         }

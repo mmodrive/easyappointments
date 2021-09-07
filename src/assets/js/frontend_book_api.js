@@ -53,7 +53,7 @@ window.FrontendBookApi = window.FrontendBookApi || {};
         var postData = {
             csrfToken: GlobalVariables.csrfToken,
             service_id: $('#select-service').val(),
-            provider_id: $('#select-provider').val(),
+            provider_id: $('#select-preffered-provider').val(),
             selected_date: selDate,
             service_duration: selServiceDuration,
             manage_mode: FrontendBook.manageMode,
@@ -65,41 +65,55 @@ window.FrontendBookApi = window.FrontendBookApi || {};
                 return;
             }
 
-            // The response contains the available hours for the selected provider and
-            // service. Fill the available hours div with response data.
-            if (response.hours.length > 0) {
-                var currColumn = 1;
-                $('#available-hours').html('<div style="width:80px; float:left;"></div>');
-
-                var timeFormat = GlobalVariables.timeFormat === 'regular' ? 'h:mm tt' : 'HH:mm';
-
-                $('#select-provider').val(response.provider_id);
-
-                $.each(response.hours, function (index, availableHour) {
-                    if ((currColumn * 10) < (index + 1)) {
-                        currColumn++;
-                        $('#available-hours').append('<div style="width:80px; float:left;"></div>');
-                    }
-
-                    $('#available-hours div:eq(' + (currColumn - 1) + ')').append(
-                        '<span class="available-hour">' + Date.parse(availableHour).toString(timeFormat) + '</span><br/>');
+            // if( Object.keys(response).length == 1 )
+            //     $('#select-provider').val(Object.keys(response)[0]);
+            
+            var allAvailableHours = new Object();
+            $.each(response, function (provider_id, availableHours) {
+                $.each(availableHours, function (index, availableHour) {
+                    if( availableHour in allAvailableHours )
+                        allAvailableHours[availableHour].push(provider_id);
+                    else
+                        allAvailableHours[availableHour] = [provider_id];
                 });
+            });
 
+            allAvailableHours = Object.keys(allAvailableHours).sort().reduce((r, k) => (r[k] = allAvailableHours[k], r), {});
+
+            var currColumn = 1;
+            var hour_count = 0;
+            var timeFormat = GlobalVariables.timeFormat === 'regular' ? 'h:mm tt' : 'HH:mm';
+
+            $.each(allAvailableHours, function (availableHour, provider_ids) {
+                hour_count++;
+
+                if (hour_count == 1) 
+                    $('#available-hours').html('<div style="width:80px; float:left;"></div>');
+
+                if ( hour_count % 10 == 0) {
+                    currColumn++;
+                    $('#available-hours').append('<div style="width:80px; float:left;"></div>');
+                }
+
+                var hourspan = $('<span class="available-hour">' + Date.parse(availableHour).toString(timeFormat) + '</span>');
+                hourspan.attr('data-provider_ids', JSON.stringify(provider_ids));
+                $('#available-hours div:eq(' + (currColumn - 1) + ')').append(hourspan).append('<br/>');
+            });
+            
+            if(hour_count > 0){
                 if (FrontendBook.manageMode) {
                     // Set the appointment's start time as the default selection.
-                    $('.available-hour').removeClass('selected-hour');
                     $('.available-hour').filter(function () {
                         return $(this).text() === Date.parseExact(
                             GlobalVariables.appointmentData.start_datetime,
                             'yyyy-MM-dd HH:mm:ss').toString(timeFormat);
-                    }).addClass('selected-hour');
+                    }).click();
                 } else {
                     // Set the first available hour as the default selection.
-                    $('.available-hour:eq(0)').addClass('selected-hour');
+                    $('.available-hour:eq(0)').click();
                 }
-
+    
                 FrontendBook.updateConfirmFrame();
-
             } else {
                 $('#available-hours').text(EALang.no_available_hours);
             }

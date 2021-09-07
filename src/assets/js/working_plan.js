@@ -457,7 +457,9 @@
                 // '<td class="availability-time-start editable">' + (GlobalVariables.timeFormat === 'regular' ? '9:00 AM' : '09:00') + '</td>' +
                 // '<td class="availability-time-end editable">' + (GlobalVariables.timeFormat === 'regular' ? '5:00 PM' : '17:00') + '</td>' +
                 '<td class="availability-services editable">' +
-                "" +
+                '<select multiple class="work-services form-control input-sm">' +
+                $(".working-plan select.work-services:eq(0)").html() +
+                '</select>' +
                 "</td>" +
                 "<td>" +
                 '<button type="button" class="btn btn-default btn-sm edit-availability" title="' +
@@ -482,6 +484,8 @@
                 "</button>" +
                 "</td>" +
                 "</tr>";
+            tr = $(tr);
+            tr.find("select.work-services").val('');
             $('.availabilities').prepend(tr);
 
             // Bind editable and event handlers.

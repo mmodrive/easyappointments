@@ -43,7 +43,7 @@ function get_sample_service()
         'currency' => 'Euro',
         'description' => 'This is a test service automatically inserted by the installer.',
         'availabilities_type' => 'flexible',
-        'attendants_number' => 1,
+        // 'attendants_number' => 1,
         'id_service_categories' => NULL
     ];
 }
