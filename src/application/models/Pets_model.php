@@ -320,7 +320,7 @@ class Pets_Model extends CI_Model {
         $pet = $this->db->get_where('ea_pets', ['id' => $pet_id])->row_array();
 
         $pet['appointments'] = $this->db
-            ->select('app.*, CONCAT(provider.first_name, " ", provider.last_name) provider_name, service.name service_name')
+            ->select('app.*, CONCAT(SUBSTRING(provider.first_name, 1, 1), SUBSTRING(provider.last_name, 1, 1)) provider_name, service.name service_name')
             ->from('ea_appointments AS app')
             ->join('ea_users AS provider', 'app.id_users_provider=provider.id', 'inner')
             ->join('ea_services AS service', 'app.id_services=service.id', 'inner')

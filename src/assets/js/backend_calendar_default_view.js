@@ -382,26 +382,27 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
             _saveUserSelections();
 
             var calendar = $('#calendar').fullCalendar();
-            if ($('#select-filter-item option:selected').attr('type') === FILTER_TYPE_SERVICE) {
-                $('#google-sync, #enable-sync, #insert-appointment, #insert-unavailable').prop('disabled', true);
-                calendar.setOption('selectable', false);
-                calendar.setOption('editable', false);
+            // if ($('#select-filter-item option:selected').attr('type') === FILTER_TYPE_SERVICE) {
+            //     $('#google-sync, #enable-sync, #insert-appointment, #insert-unavailable').prop('disabled', true);
+            //     calendar.setOption('selectable', false);
+            //     calendar.setOption('editable', false);
+            // } else {
+            $('#google-sync, #enable-sync, #insert-appointment, #insert-unavailable').prop('disabled', false);
+            calendar.setOption('selectable', true);
+            calendar.setOption('editable', true);
+            
+            // If the user has already the sync enabled then apply the proper style changes.
+            if ($('#select-filter-item option:selected').attr('google-sync') === 'true') {
+                $('#enable-sync').addClass('btn-danger enabled');
+                $('#enable-sync span:eq(1)').text(EALang.disable_sync);
+                $('#google-sync').prop('disabled', false);
             } else {
-                $('#google-sync, #enable-sync, #insert-appointment, #insert-unavailable').prop('disabled', false);
-                calendar.setOption('selectable', true);
-                calendar.setOption('editable', true);
-
-                // If the user has already the sync enabled then apply the proper style changes.
-                if ($('#select-filter-item option:selected').attr('google-sync') === 'true') {
-                    $('#enable-sync').addClass('btn-danger enabled');
-                    $('#enable-sync span:eq(1)').text(EALang.disable_sync);
-                    $('#google-sync').prop('disabled', false);
-                } else {
-                    $('#enable-sync').removeClass('btn-danger enabled');
-                    $('#enable-sync span:eq(1)').text(EALang.enable_sync);
-                    $('#google-sync').prop('disabled', true);
-                }
-
+                $('#enable-sync').removeClass('btn-danger enabled');
+                $('#enable-sync span:eq(1)').text(EALang.enable_sync);
+                $('#google-sync').prop('disabled', true);
+            }
+                
+            if ($('#select-filter-item option:selected').attr('type') === FILTER_TYPE_PROVIDER) {
                 $('#select-filter-item-additional option').show().filter('option[value="' + $('#select-filter-item option:selected').attr('value') + '"]').hide();
             }
 
@@ -1181,9 +1182,9 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
             // :: ADD PROVIDER'S UNAVAILABLE TIME PERIODS
             var calendarView = calendar.view.type;
 
-            if (filterType === FILTER_TYPE_PROVIDER && calendarView !== 'dayGridMonth') {
+            if (calendarView !== 'dayGridMonth') {
                 $.each(GlobalVariables.availableProviders, function (index, provider) {
-                    if (provider.id == recordId) {
+                    if (filterType === FILTER_TYPE_PROVIDER && provider.id == recordId ) {
                         var workingPlan = jQuery.parseJSON(provider.settings.working_plan);
                         var unavailablePeriod;
 
@@ -1528,19 +1529,19 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
     }
 
     function _calendarSelect(selectionInfo) {
-        var calendar_id = $(this.el).closest('.calendar').data('calendar-id');
+        var calendar = $(this.el).closest('.calendar');
 
         $('#insert-appointment').trigger('click');
 
         // Preselect service & provider.
-        if ($(this).closest('.calendar').data('calendar-id-type') === FILTER_TYPE_SERVICE) {
+        if (calendar.data('calendar-id-type') === FILTER_TYPE_SERVICE) {
             var service = GlobalVariables.availableServices.find(function (service) {
-                return service.id == calendar_id
+                return service.id == calendar.data('calendar-id');
             });
             $('#select-service').val(service.id).trigger('change');
 
         } else {
-            var provider_service = BackendCalendarApi.getProviderService(calendar_id);
+            var provider_service = BackendCalendarApi.getProviderService(calendar.data('calendar-id'));
 
             $('#select-service').val(provider_service.any_service).trigger('change');
             $('#select-provider').val(provider_service.provider).trigger('change');

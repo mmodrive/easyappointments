@@ -486,6 +486,7 @@
                 "</tr>";
             tr = $(tr);
             tr.find("select.work-services").val('');
+            tr.find("select.work-services option:not([style*='display: none'])").prop('selected', true);
             $('.availabilities').prepend(tr);
 
             // Bind editable and event handlers.
