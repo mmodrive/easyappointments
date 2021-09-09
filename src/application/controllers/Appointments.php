@@ -384,9 +384,9 @@ class Appointments extends CI_Controller {
                 $provider_ids = [$this->input->post('provider_id')];
 
             $data = [];
+            $service = $this->services_model->get_row($this->input->post('service_id'));
 
             foreach ($provider_ids as $provider_id) {
-                $service = $this->services_model->get_row($this->input->post('service_id'));
                 $provider = $this->providers_model->get_row($provider_id);
 
                 $empty_periods = $this->_get_provider_available_time_periods($provider_id,
@@ -892,17 +892,20 @@ class Appointments extends CI_Controller {
         $allowed_window_start;
         $allowed_window_end;
 
+        // Check if service is provided on the day
+        if( !$selected_date_working_plan || !$selected_date_working_plan['services'] || !in_array($service_id, $selected_date_working_plan['services']) )
+            return $periods;
         
         if(!empty($selected_date_working_plan['hours_restriction']))
             $hoursRestriction = intval($selected_date_working_plan['hours_restriction']);
 
-        $availability = $this->_check_workingplan_available($working_plan, $selected_date_dt);
+        $availability = $this->_check_workingplan_available($working_plan, $selected_date_dt);    
         if( $availability === FALSE )
             return array_values($periods);
         elseif( $availability !== TRUE ){
             if (!empty($availability['hours_restriction']) && is_numeric($availability['hours_restriction']))
                 $hoursRestriction = intval($availability['hours_restriction']);
-        }
+        }        
 
         if( $hoursRestriction > 0 || !empty($selected_date_working_plan['hours_restriction']) )
         {
