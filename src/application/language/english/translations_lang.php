@@ -156,6 +156,7 @@ $lang['customers'] = 'Customers';
 $lang['details'] = 'Details';
 $lang['no_records_found'] = 'No records found...';
 $lang['services'] = 'Services';
+$lang['calendar_color'] = 'Calendar Colour';
 $lang['duration_minutes'] = 'Duration (Minutes)';
 $lang['currency'] = 'Currency';
 $lang['category'] = 'Category';

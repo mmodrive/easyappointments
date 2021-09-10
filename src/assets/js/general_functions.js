@@ -401,6 +401,22 @@ window.GeneralFunctions = window.GeneralFunctions || {};
     exports.escapeHtml = function (str) {
         return $('<div/>').text(str).html();
     };
+    
+    /**
+     * Calculate the foreground color given the background color.
+     *
+     * @param {String} hexcolor Background Color.
+     *
+     * @return {String} Returns hex foreground color.
+     */
+    exports.getContrastYIQ = function (hexcolor) {
+        hexcolor = hexcolor.replace("#", "");
+        var r = parseInt(hexcolor.substr(0,2),16);
+        var g = parseInt(hexcolor.substr(2,2),16);
+        var b = parseInt(hexcolor.substr(4,2),16);
+        var yiq = ((r*299)+(g*587)+(b*114))/1000;
+        return (yiq >= 128) ? '#000' : '#fff';
+    };
 
     /**
      * Format a given date according to the date format setting.

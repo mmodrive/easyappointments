@@ -97,6 +97,11 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="service-color"><?= lang('calendar_color') ?> *</label>
+                        <input id="service-color" type="color" class="form-control required">
+                    </div>
+                    
+                    <div class="form-group">
                         <label for="service-duration"><?= lang('duration_minutes') ?> *</label>
                         <input id="service-duration" class="form-control required" type="number" min="15">
                     </div>
