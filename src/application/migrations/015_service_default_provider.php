@@ -24,7 +24,7 @@ class Migration_Service_default_provider extends CI_Migration {
 
         $this->db->query('ALTER TABLE `ea_services`
             ADD CONSTRAINT `services_default_provider` FOREIGN KEY (`id_users_default_provider`) REFERENCES `ea_users` (`id`)
-            ON DELETE CASCADE
+            ON DELETE SET NULL
             ON UPDATE CASCADE');
     }
 

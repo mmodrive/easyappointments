@@ -148,11 +148,6 @@
                         </select>
                     </div>
 
-                    <!-- <div class="form-group">
-                        <label for="service-attendants-number"><?= lang('attendants_number') ?> *</label>
-                        <input id="service-attendants-number" class="form-control required" type="number" min="1">
-                    </div> -->
-
                     <div class="form-group">
                         <label for="pets_option"><?= lang('pets_option') ?> *</label>
                         <select id="pets_option" class="form-control" >

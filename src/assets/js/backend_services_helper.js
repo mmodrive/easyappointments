@@ -132,7 +132,6 @@
                 pets_option: $('#pets_option').val(),
                 description: $('#service-description').val(),
                 availabilities_type: $('#service-availabilities-type').val(),
-                // attendants_number: $('#service-attendants-number').val()
             };
 
             if ($('#service-category').val() !== 'null') {
@@ -303,7 +302,6 @@
         $('#service-description').val(service.description);
         $('#service-link').text(service.book_link).attr("href", service.book_link);
         $('#service-availabilities-type').val(service.availabilities_type);
-        // $('#service-attendants-number').val(service.attendants_number);
 
         var categoryId = (service.id_service_categories !== null) ? service.id_service_categories : 'null';
         $('#service-category').val(categoryId);

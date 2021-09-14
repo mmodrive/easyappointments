@@ -193,7 +193,7 @@
                                 <div class="col-xs-12 col-sm-12">
                                     <div class="form-group">
                                         <label for="select-provider">
-                                            <strong><?= lang('select_provider') ?></strong>
+                                            <strong><?= lang('provider') ?></strong>
                                         </label>
 
                                         <select id="select-provider" class="col-xs-12 col-sm-12 form-control"></select>

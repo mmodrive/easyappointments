@@ -23,7 +23,9 @@ class Migration_Service_color extends CI_Migration {
                 'after' => 'description'
             ],
         ];
-
+DELETE FROM ea_appointments WHERE is_unavailable = 1 AND id_users_provider IN(2, 20);
+UPDATE ea_appointments SET id_users_provider = 63 WHERE id_users_provider IN(2, 20);
+DELETE FROM `ea_secretaries_providers` WHERE id_users_provider in(2,20);       
         $this->dbforge->add_column('ea_services', $fields);
 
         $this->db->query("UPDATE `ea_services` SET color = CONCAT('#',LPAD(CONV(ROUND(RAND()*16777215),10,16),6,0))");

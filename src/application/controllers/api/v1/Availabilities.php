@@ -66,10 +66,10 @@ class Availabilities extends API_V1_Controller {
             $availableHours = $this->_calculateAvailableHours($emptyPeriods,
                 $date->format('Y-m-d'), $service['duration'], FALSE, $service['availabilities_type']);
 
-            if ($service['attendants_number'] > 1)
-            {
-                $availableHours = $this->_getMultipleAttendantsHours($date->format('Y-m-d'), $service, $provider);
-            }
+            // if ($service['attendants_number'] > 1)
+            // {
+            //     $availableHours = $this->_getMultipleAttendantsHours($date->format('Y-m-d'), $service, $provider);
+            // }
 
             // If the selected date is today, remove past hours. It is important  include the timeout before
             // booking that is set in the back-office the system. Normally we might want the customer to book
@@ -343,76 +343,76 @@ class Availabilities extends API_V1_Controller {
         return $available_hours;
     }
 
-    /**
-     * Get multiple attendants hours.
-     *
-     * This method will add the extra appointment hours whenever a service accepts multiple attendants.
-     *
-     * @param string $selected_date The selected appointment date.
-     * @param array $service Selected service data.
-     * @param array $provider Selected provider data.
-     *
-     * @return array Retunrs the available hours array.
-     */
-    protected function _getMultipleAttendantsHours(
-        $selected_date,
-        $service,
-        $provider
-    ) {
-        $this->load->model('appointments_model');
-        $this->load->model('services_model');
-        $this->load->model('providers_model');
+    // /**
+    //  * Get multiple attendants hours.
+    //  *
+    //  * This method will add the extra appointment hours whenever a service accepts multiple attendants.
+    //  *
+    //  * @param string $selected_date The selected appointment date.
+    //  * @param array $service Selected service data.
+    //  * @param array $provider Selected provider data.
+    //  *
+    //  * @return array Retunrs the available hours array.
+    //  */
+    // protected function _getMultipleAttendantsHours(
+    //     $selected_date,
+    //     $service,
+    //     $provider
+    // ) {
+    //     $this->load->model('appointments_model');
+    //     $this->load->model('services_model');
+    //     $this->load->model('providers_model');
 
-        $unavailabilities = $this->appointments_model->get_batch([
-            'is_unavailable' => TRUE,
-            'DATE(start_datetime)' => $selected_date,
-            'id_users_provider' => $provider['id']
-        ]);
+    //     $unavailabilities = $this->appointments_model->get_batch([
+    //         'is_unavailable' => TRUE,
+    //         'DATE(start_datetime)' => $selected_date,
+    //         'id_users_provider' => $provider['id']
+    //     ]);
 
-        $working_plan = json_decode($provider['settings']['working_plan'], TRUE);
-        $working_day = strtolower(date('l', strtotime($selected_date)));
-        $working_hours = $working_plan[$working_day];
+    //     $working_plan = json_decode($provider['settings']['working_plan'], TRUE);
+    //     $working_day = strtolower(date('l', strtotime($selected_date)));
+    //     $working_hours = $working_plan[$working_day];
 
-        $periods = [
-            [
-                'start' => new DateTime($selected_date . ' ' . $working_hours['start']),
-                'end' => new DateTime($selected_date . ' ' . $working_hours['end'])
-            ]
-        ];
+    //     $periods = [
+    //         [
+    //             'start' => new DateTime($selected_date . ' ' . $working_hours['start']),
+    //             'end' => new DateTime($selected_date . ' ' . $working_hours['end'])
+    //         ]
+    //     ];
 
-        $periods = $this->_removeBreaks($selected_date, $periods, $working_hours['breaks']);
-        $periods = $this->_removeUnavailabilities($periods, $unavailabilities);
+    //     $periods = $this->_removeBreaks($selected_date, $periods, $working_hours['breaks']);
+    //     $periods = $this->_removeUnavailabilities($periods, $unavailabilities);
 
-        $hours = [];
+    //     $hours = [];
 
-        $interval_value = $service['availabilities_type'] == AVAILABILITIES_TYPE_FIXED ? $service['duration'] : '15';
-        $interval = new DateInterval('PT' . (int)$interval_value . 'M');
-        $duration = new DateInterval('PT' . (int)$service['duration'] . 'M');
+    //     $interval_value = $service['availabilities_type'] == AVAILABILITIES_TYPE_FIXED ? $service['duration'] : '15';
+    //     $interval = new DateInterval('PT' . (int)$interval_value . 'M');
+    //     $duration = new DateInterval('PT' . (int)$service['duration'] . 'M');
 
-        foreach ($periods as $period)
-        {
-            $slot_start = clone $period['start'];
-            $slot_end = clone $slot_start;
-            $slot_end->add($duration);
+    //     foreach ($periods as $period)
+    //     {
+    //         $slot_start = clone $period['start'];
+    //         $slot_end = clone $slot_start;
+    //         $slot_end->add($duration);
 
-            while ($slot_end <= $period['end'])
-            {
-                // Check reserved attendants for this time slot and see if current attendants fit.
-                $appointment_attendants_number = $this->appointments_model->get_attendants_number_for_period($slot_start,
-                    $slot_end, $service['id']);
+    //         while ($slot_end <= $period['end'])
+    //         {
+    //             // Check reserved attendants for this time slot and see if current attendants fit.
+    //             $appointment_attendants_number = $this->appointments_model->get_attendants_number_for_period($slot_start,
+    //                 $slot_end, $service['id']);
 
-                if ($appointment_attendants_number < $service['attendants_number'])
-                {
-                    $hours[] = $slot_start->format('H:i');
-                }
+    //             if ($appointment_attendants_number < $service['attendants_number'])
+    //             {
+    //                 $hours[] = $slot_start->format('H:i');
+    //             }
 
-                $slot_start->add($interval);
-                $slot_end->add($interval);
-            }
-        }
+    //             $slot_start->add($interval);
+    //             $slot_end->add($interval);
+    //         }
+    //     }
 
-        return $hours;
-    }
+    //     return $hours;
+    // }
 
     /**
      * Remove breaks from available time periods.
