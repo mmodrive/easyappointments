@@ -1154,6 +1154,7 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
             var calendarEvents = [];
 
             $.each(response.appointments, function (index, appointment) {
+                var backgroundColor = appointment.discount_qualify == '1' ? '#FF0000' : appointment.service.color;
                 var event = {
                     id: appointment.id,
                     title: /*appointment.service.name + ' - ' +*/
@@ -1162,8 +1163,8 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                     (appointment.pet ? ' - ' + appointment.pet.name : ''),
                     start: +moment(appointment.start_datetime),
                     end: +moment(appointment.end_datetime),
-                    backgroundColor: appointment.service.color,
-                    textColor: GeneralFunctions.getContrastYIQ(appointment.service.color),
+                    backgroundColor: backgroundColor,
+                    textColor: GeneralFunctions.getContrastYIQ(backgroundColor),
                     allDay: false,
                     data: appointment // Store appointment data for later use.
                 };

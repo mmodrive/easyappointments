@@ -136,6 +136,16 @@
                     </div>
 
                     <div class="form-group">
+                        <label class="control-label" for="disc_qualify"><?= lang('disc_qualify') ?></label>
+                        <input id="disc_qualify" type="checkbox" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label" for="disc_opening_appointment"><?= lang('disc_opening_appointment') ?></label>
+                        <select id="disc_opening_appointment" class="form-control">
+                    </div>
+
+                    <div class="form-group">
                         <label class="control-label" for="notes"><?= lang('user_notes') ?></label>
                         <textarea id="notes" rows="4" class="form-control"></textarea>
                     </div>

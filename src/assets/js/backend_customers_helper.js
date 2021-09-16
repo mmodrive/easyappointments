@@ -186,6 +186,8 @@
                 address: $('#address').val(),
                 city: $('#city').val(),
                 zip_code: $('#zip-code').val(),
+                disc_qualify: $('#disc_qualify').is(":checked"),
+                id_disc_opening_appointment: $('#disc_opening_appointment').val() == '' ? null : $('#disc_opening_appointment').val(),
                 notes: $('#notes').val()
             };
 
@@ -423,9 +425,12 @@
         $('#address').val(customer.address);
         $('#city').val(customer.city);
         $('#zip-code').val(customer.zip_code);
+        $('#disc_qualify').prop('checked', customer.disc_qualify == 1 ? true : false);
         $('#notes').val(customer.notes);
 
         $('#customer-appointments').empty();
+        $('#disc_opening_appointment').empty();
+        $('#disc_opening_appointment').append('<option value="">Not Set</option>');
         $.each(customer.appointments, function (index, appointment) {
             if (GlobalVariables.user.role_slug === Backend.DB_SLUG_PROVIDER && parseInt(appointment.id_users_provider) !== GlobalVariables.user.id) {
                 return true; // continue
@@ -445,7 +450,14 @@
                 (appointment.pet ? '<br>' + appointment.pet.title : '') +
                 '</div>';
             $('#customer-appointments').append(html);
+            var html_select =
+                '<option value="' + appointment.id + '">' +
+                start + ' - ' + appointment.service.name
+                '</option>';
+            $('#disc_opening_appointment').append(html_select);
         });
+
+        $('#disc_opening_appointment').val(customer.id_disc_opening_appointment);
 
         $('#appointment-details').empty();
 

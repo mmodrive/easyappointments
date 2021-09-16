@@ -34,6 +34,8 @@ class Services implements ParsersInterface {
             'currency' => $response['currency'],
             'description' => $response['description'],
             'availabilitiesType' => $response['availabilities_type'],
+            'disc_num_of_apps_before' => $response['disc_num_of_apps_before'],
+            'disc_timeframe_days' => $response['disc_timeframe_days'],
             'categoryId' => $response['id_service_categories'] !== NULL ? (int)$response['id_service_categories'] : NULL
         ];
 

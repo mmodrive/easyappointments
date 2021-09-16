@@ -168,6 +168,16 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="service-disc_num_of_apps_before"><?= lang('disc_num_of_apps_before') ?> *</label>
+                        <input id="service-disc_num_of_apps_before" class="form-control required" type="number">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="service-disc_timeframe_days"><?= lang('disc_timeframe_days') ?> *</label>
+                        <input id="service-disc_timeframe_days" class="form-control required" type="number">
+                    </div>
+
+                    <div class="form-group">
                         <label for="service-link"><?= lang('direct_book_link') ?></label>
                         <a id="service-link" class="form-control"></a>
                     </div>

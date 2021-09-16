@@ -147,6 +147,12 @@ class Appointments_Model extends CI_Model {
     protected function _update($appointment)
     {
         $this->db->where('id', $appointment['id']);
+
+        if (isset($appointment['discount_count']))
+            unset($appointment['discount_count']);
+        if (isset($appointment['discount_qualify']))
+            unset($appointment['discount_qualify']);
+
         if ( ! $this->db->update('ea_appointments', $appointment))
         {
             throw new Exception('Could not update appointment record.');
@@ -373,7 +379,12 @@ class Appointments_Model extends CI_Model {
             $this->db->where($where_clause);
         }
 
-        $appointments = $this->db->get('ea_appointments')->result_array();
+        $appointments = $this->db
+        ->select('ea_appointments.*, ea_appointments_discount.app_counter AS discount_count, ea_appointments_discount.app_discount AS discount_qualify')
+        ->join('ea_appointments_discount', 'ea_appointments.id = ea_appointments_discount.id_appointment', 'left')
+        ->order_by('start_datetime', 'DESC')
+        ->get('ea_appointments')->result_array();
+        $query = $this->db->last_query();
 
         if ($aggregates)
         {
