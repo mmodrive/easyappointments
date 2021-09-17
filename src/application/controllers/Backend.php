@@ -306,13 +306,14 @@ class Backend extends CI_Controller {
             $view['provider'] = $provider = $this->input->post('provider');
 
             $this->db
-                ->select('CONCAT(customer.first_name, " ", customer.last_name) customer_name, CONCAT(provider.first_name, " ", provider.last_name) provider_name, provider_settings.working_plan provider_working_plan, service.name service_name, app.start_datetime, app.end_datetime, customer.phone_number, pet.id pet_id ')
+                ->select('CONCAT(customer.first_name, " ", customer.last_name) customer_name, CONCAT(provider.first_name, " ", provider.last_name) provider_name, provider_settings.working_plan provider_working_plan, service.name service_name, app.start_datetime, app.end_datetime, customer.phone_number, pet.id pet_id, disc.app_discount ')
                 ->from('ea_appointments AS app')
                 ->join('ea_users AS customer', 'app.id_users_customer=customer.id', 'inner')
                 ->join('ea_users AS provider', 'app.id_users_provider=provider.id', 'inner')
                 ->join('ea_user_settings AS provider_settings', 'provider.id=provider_settings.id_users', 'inner')
                 ->join('ea_services AS service', 'app.id_services=service.id', 'inner')
                 ->join('ea_pets AS pet', 'app.id_pets=pet.id', 'left')
+                ->join('ea_appointments_discount AS disc', 'app.id=disc.id_appointment', 'left')
                 ->where("start_datetime BETWEEN '" . date_format($post_at, "Y-m-d") . " 00:00:00' AND '" . date_format($post_at_to_date, "Y-m-d") . " 23:59:59'");
             if ($service && $service !== "all")
                 $this->db->where('app.id_services', $service);

@@ -216,7 +216,7 @@ if($new_service_provider)
         <td>'.($appointment["customer_name"] ?? '').'</td>
         <td>'.($appointment["phone_number"] ?? '').'</td>
         <td>'.($appointment["pet_title"] ?? '').'</td>
-        <td></td>
+        <td>'.($appointment["app_discount"] ? "FREE" : "").'</td>
         <td></td>
       </tr>';
   $prev_sp_appointment = $appointment;
