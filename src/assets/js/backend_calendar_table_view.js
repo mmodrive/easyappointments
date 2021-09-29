@@ -283,6 +283,7 @@ window.BackendCalendarTableView = window.BackendCalendarTableView || {};
                 $dialog.find('#address').val(customer.address);
                 $dialog.find('#city').val(customer.city);
                 $dialog.find('#zip-code').val(customer.zip_code);
+                $dialog.find('#appointment-discount-reset').prop('checked', appointment.disc_reset == 1 ? true : false);
                 $dialog.find('#appointment-notes').val(appointment.notes);
                 $dialog.find('#customer-notes').val(customer.notes);
             } else {

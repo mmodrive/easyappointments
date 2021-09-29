@@ -187,7 +187,6 @@
                 city: $('#city').val(),
                 zip_code: $('#zip-code').val(),
                 disc_qualify: $('#disc_qualify').is(":checked"),
-                id_disc_opening_appointment: $('#disc_opening_appointment').val() == '' ? null : $('#disc_opening_appointment').val(),
                 notes: $('#notes').val()
             };
 
@@ -429,35 +428,6 @@
         $('#notes').val(customer.notes);
 
         $('#customer-appointments').empty();
-        $('#disc_opening_appointment').empty();
-        $('#disc_opening_appointment').append('<option value="">Not Set</option>');
-        $.each(customer.appointments, function (index, appointment) {
-            if (GlobalVariables.user.role_slug === Backend.DB_SLUG_PROVIDER && parseInt(appointment.id_users_provider) !== GlobalVariables.user.id) {
-                return true; // continue
-            }
-
-            if (GlobalVariables.user.role_slug === Backend.DB_SLUG_SECRETARY && GlobalVariables.secretaryProviders.indexOf(appointment.id_users_provider) === -1) {
-                return true; // continue
-            }
-
-            var start = GeneralFunctions.formatDate(Date.parse(appointment.start_datetime), GlobalVariables.dateFormat, true);
-            var end = GeneralFunctions.formatDate(Date.parse(appointment.end_datetime), GlobalVariables.dateFormat, true);
-            var html =
-                '<div class="appointment-row" data-id="' + appointment.id + '">' +
-                start + ' - ' + end + '<br>' +
-                appointment.service.name + ', ' +
-                appointment.provider.first_name + ' ' + appointment.provider.last_name +
-                (appointment.pet ? '<br>' + appointment.pet.title : '') +
-                '</div>';
-            $('#customer-appointments').append(html);
-            var html_select =
-                '<option value="' + appointment.id + '">' +
-                start + ' - ' + appointment.service.name
-                '</option>';
-            $('#disc_opening_appointment').append(html_select);
-        });
-
-        $('#disc_opening_appointment').val(customer.id_disc_opening_appointment);
 
         $('#appointment-details').empty();
 

@@ -213,6 +213,12 @@
                                     <textarea id="appointment-notes" class="form-control" rows="2"></textarea>
                                 </div>
                             </div>
+                            <div class="col-xs-12 col-sm-6">
+                                <div class="form-group">
+                                    <label class="appointment-discount-reset" for="appointment-discount-reset" title="<?= lang('disc_reset_title') ?>"><?= lang('disc_reset') ?></label>
+                                    <input id="appointment-discount-reset" type="checkbox" class="form-control" title="<?= lang('disc_reset_title') ?>">
+                                </div>
+                            </div>
                         </div>
                     </fieldset>
 
