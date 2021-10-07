@@ -428,7 +428,27 @@
         $('#notes').val(customer.notes);
 
         $('#customer-appointments').empty();
+        $.each(customer.appointments, function (index, appointment) {
+            if (GlobalVariables.user.role_slug === Backend.DB_SLUG_PROVIDER && parseInt(appointment.id_users_provider) !== GlobalVariables.user.id) {
+                return true; // continue
+            }
 
+            if (GlobalVariables.user.role_slug === Backend.DB_SLUG_SECRETARY && GlobalVariables.secretaryProviders.indexOf(appointment.id_users_provider) === -1) {
+                return true; // continue
+            }
+
+            var start = GeneralFunctions.formatDate(Date.parse(appointment.start_datetime), GlobalVariables.dateFormat, true);
+            var end = GeneralFunctions.formatDate(Date.parse(appointment.end_datetime), GlobalVariables.dateFormat, true);
+            var html =
+                '<div class="appointment-row" data-id="' + appointment.id + '">' +
+                start + ' - ' + end + '<br>' +
+                appointment.service.name + ', ' +
+                appointment.provider.first_name + ' ' + appointment.provider.last_name +
+                (appointment.pet ? '<br>' + appointment.pet.title : '') +
+                '</div>';
+            $('#customer-appointments').append(html);
+        });
+        
         $('#appointment-details').empty();
 
         $('#customer-pets').empty();
