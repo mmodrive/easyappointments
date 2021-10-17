@@ -148,10 +148,10 @@ class Appointments_Model extends CI_Model {
     {
         $this->db->where('id', $appointment['id']);
 
-        if (isset($appointment['discount_count']))
-            unset($appointment['discount_count']);
-        if (isset($appointment['discount_qualify']))
-            unset($appointment['discount_qualify']);
+        if (isset($appointment['disc_count']))
+            unset($appointment['disc_count']);
+        if (isset($appointment['disc_qualify']))
+            unset($appointment['disc_qualify']);
 
         if ( ! $this->db->update('ea_appointments', $appointment))
         {
@@ -380,7 +380,7 @@ class Appointments_Model extends CI_Model {
         }
 
         $appointments = $this->db
-        ->select('ea_appointments.*, ea_appointments_discount.app_counter AS discount_count, ea_appointments_discount.app_discount AS discount_qualify')
+        ->select('ea_appointments.*, ea_appointments_discount.app_counter AS disc_count, ea_appointments_discount.app_discount AS disc_qualify, ea_appointments_discount.app_last_reset AS disc_last_reset')
         ->join('ea_appointments_discount', 'ea_appointments.id = ea_appointments_discount.id_appointment', 'left')
         ->order_by('start_datetime', 'DESC')
         ->get('ea_appointments')->result_array();

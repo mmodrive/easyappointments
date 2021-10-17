@@ -158,6 +158,8 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                 $dialog.find('#city').val(customer.city);
                 $dialog.find('#zip-code').val(customer.zip_code);
                 $dialog.find('#appointment-discount-reset').prop('checked', appointment.disc_reset == 1 ? true : false);
+                $dialog.find('#appointment-discount-count').val(appointment.disc_count);
+                $dialog.find('#appointment-discount-last-reset').val(appointment.disc_last_reset);
                 $dialog.find('#appointment-notes').val(appointment.notes);
                 $dialog.find('#customer-notes').val(customer.notes);
                 $dialog.find('#depth').val(appointment.depth);
@@ -1155,7 +1157,7 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
             var calendarEvents = [];
 
             $.each(response.appointments, function (index, appointment) {
-                var backgroundColor = appointment.discount_qualify == '1' ? '#FF0000' : appointment.service.color;
+                var backgroundColor = appointment.disc_qualify == '1' ? '#FF0000' : appointment.service.color;
                 var event = {
                     id: appointment.id,
                     title: /*appointment.service.name + ' - ' +*/
@@ -1846,6 +1848,8 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
             $dialog.find('#city').val(customer.city);
             $dialog.find('#zip-code').val(customer.zip_code);
             $dialog.find('#appointment-discount-reset').prop('checked', appointment.disc_reset == 1 ? true : false);
+            $dialog.find('#appointment-discount-count').val(appointment.disc_count);
+            $dialog.find('#appointment-discount-last-reset').val(appointment.disc_last_reset);
             $dialog.find('#appointment-notes').val(appointment.notes);
             $dialog.find('#customer-notes').val(customer.notes);
             $dialog.find('#depth').val(appointment.depth);

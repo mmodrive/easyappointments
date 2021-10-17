@@ -218,6 +218,14 @@
                                     <label class="appointment-discount-reset" for="appointment-discount-reset" title="<?= lang('disc_reset_title') ?>"><?= lang('disc_reset') ?></label>
                                     <input id="appointment-discount-reset" type="checkbox" class="form-control" title="<?= lang('disc_reset_title') ?>">
                                 </div>
+                                <div class="form-group">
+                                    <label class="appointment-discount-count" for="appointment-discount-count" title="<?= lang('disc_count') ?>"><?= lang('disc_count') ?></label>
+                                    <input id="appointment-discount-count" readonly="true" class="form-control" title="<?= lang('disc_count') ?>">
+                                </div>
+                                <div class="form-group">
+                                    <label class="appointment-discount-last-reset" for="appointment-discount-last-reset" title="<?= lang('disc_last_reset') ?>"><?= lang('disc_last_reset') ?></label>
+                                    <input id="appointment-discount-last-reset" readonly="true" class="form-control" title="<?= lang('disc_last_reset') ?>">
+                                </div>
                             </div>
                         </div>
                     </fieldset>
