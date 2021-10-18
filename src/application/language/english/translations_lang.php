@@ -173,6 +173,7 @@ $lang['password'] = 'Password';
 $lang['disc_qualify'] = 'Qualifies for Discounts';
 $lang['disc_reset'] = 'Discount Reset';
 $lang['disc_reset_title'] = 'Restart Discount counter at this appointment.';
+$lang['disc_reset_last_manual'] = 'Last Manual Reset On: ';
 $lang['disc_count'] = 'Discount Appointment Counter';
 $lang['disc_last_reset'] = 'Discount Last Reset';
 $lang['retype_password'] = 'Retype Password';

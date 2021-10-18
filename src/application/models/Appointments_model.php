@@ -380,7 +380,8 @@ class Appointments_Model extends CI_Model {
         }
 
         $appointments = $this->db
-        ->select('ea_appointments.*, ea_appointments_discount.app_counter AS disc_count, ea_appointments_discount.app_discount AS disc_qualify, ea_appointments_discount.app_last_reset AS disc_last_reset')
+        ->select('ea_appointments.*, ea_appointments_discount.app_counter AS disc_count, ea_appointments_discount.app_discount AS disc_qualify,
+         ea_appointments_discount.app_last_reset AS disc_last_reset,  ea_appointments_discount.app_last_manual_reset AS disc_last_manual_reset')
         ->join('ea_appointments_discount', 'ea_appointments.id = ea_appointments_discount.id_appointment', 'left')
         ->order_by('start_datetime', 'DESC')
         ->get('ea_appointments')->result_array();

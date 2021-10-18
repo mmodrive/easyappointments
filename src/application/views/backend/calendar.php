@@ -224,7 +224,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label class="appointment-discount-last-reset" for="appointment-discount-last-reset" title="<?= lang('disc_last_reset') ?>"><?= lang('disc_last_reset') ?></label>
-                                    <input id="appointment-discount-last-reset" readonly="true" class="form-control" title="<?= lang('disc_last_reset') ?>">
+                                    <input id="appointment-discount-last-reset" readonly="true" class="form-control" data-title-pre="<?= lang('disc_reset_last_manual') ?>">
                                 </div>
                             </div>
                         </div>
