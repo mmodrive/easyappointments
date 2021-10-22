@@ -148,10 +148,11 @@ class Appointments_Model extends CI_Model {
     {
         $this->db->where('id', $appointment['id']);
 
-        if (isset($appointment['disc_count']))
-            unset($appointment['disc_count']);
-        if (isset($appointment['disc_qualify']))
-            unset($appointment['disc_qualify']);
+        unset($appointment['disc_count']);
+        unset($appointment['disc_qualify']);
+        unset($appointment['disc_reset']);
+        unset($appointment['disc_last_reset']);
+        unset($appointment['disc_last_manual_reset']);
 
         if ( ! $this->db->update('ea_appointments', $appointment))
         {
