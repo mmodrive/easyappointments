@@ -150,7 +150,6 @@ class Appointments_Model extends CI_Model {
 
         unset($appointment['disc_count']);
         unset($appointment['disc_qualify']);
-        unset($appointment['disc_reset']);
         unset($appointment['disc_last_reset']);
         unset($appointment['disc_last_manual_reset']);
 
