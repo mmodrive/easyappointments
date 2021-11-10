@@ -24,6 +24,8 @@ class Privacy extends CI_Controller {
     {
         try
         {
+            throw new InvalidArgumentException('Functionality Temporarily disabled. Please contact us by phone to resolve.');
+
             $customer_token = $this->input->post('customer_token');
 
             if (empty($customer_token))
