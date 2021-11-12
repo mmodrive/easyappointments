@@ -364,6 +364,7 @@ $lang['time_end'] = 'Time End';
 $lang['print_appointment'] = 'Print Appointments';
 $lang['notification_templates'] = 'Notifications';
 $lang['email_customer_registration'] = 'New Customer Registration Email';
+$lang['email_first_appointment'] = 'First Customer Appointment Email';
 $lang['email_appointment_new'] = 'New Appointment Email';
 $lang['email_appointment_change'] = 'Appointment Change Email';
 $lang['sms_reminder'] = '24-hour SMS Reminder';

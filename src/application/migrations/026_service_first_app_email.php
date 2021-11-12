@@ -11,25 +11,25 @@
  * @since       v1.3.2
  * ---------------------------------------------------------------------------- */
 
-class Migration_Service_color extends CI_Migration {
+class Migration_Service_first_app_email extends CI_Migration {
     public function up()
     {
         $fields = [
-            'color' => [
-                'type' => 'CHAR',
-                'constraint' => '7',
-                'default' => '#666666',
-                'null' => FALSE,
-                'after' => 'description'
+            'email_first_appointment_subject' => [
+                'type' => 'VARCHAR',
+                'constraint' => '512'
+            ],
+            'email_first_appointment' => [
+                'type' => 'TEXT'
             ],
         ];
-        $this->dbforge->add_column('ea_services', $fields);
 
-        $this->db->query("UPDATE `ea_services` SET color = CONCAT('#',LPAD(CONV(ROUND(RAND()*16777215),10,16),6,0))");
+        $this->dbforge->add_column('ea_services', $fields);
     }
     
     public function down()
     {
-        $this->dbforge->drop_column('ea_services', 'color');
+        $this->dbforge->drop_column('ea_services', 'email_first_appointment_subject');
+        $this->dbforge->drop_column('ea_services', 'email_first_appointment');
     }
 }

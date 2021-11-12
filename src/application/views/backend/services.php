@@ -182,6 +182,17 @@
                         <a id="service-link" class="form-control"></a>
                     </div>
 
+                    <h4><?= lang('email_first_appointment') ?></h4>
+
+                    <div class="form-group">
+                        <label for="email_first_appointment_subject"><?= lang('subject') ?></label>
+                        <input id="email_first_appointment_subject" data-field="email_first_appointment_subject" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <textarea id="email_first_appointment" cols="30" rows="10" class="form-control show-replaced-template"></textarea>
+                    </div>
+
                     <p id="form-message" class="text-danger">
                         <em><?= lang('fields_are_required') ?></em>
                     </p>

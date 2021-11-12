@@ -494,7 +494,7 @@ class Backend extends CI_Controller {
         $this->load->model('settings_model');
         $this->load->model('appointments_model');
 
-        $appointment = $this->appointments_model->get_sample_appointment();
+        $appointment = $this->appointments_model->get_sample_appointment($this->input->get('sid'));
 
         if($appointment){
 
@@ -506,7 +506,8 @@ class Backend extends CI_Controller {
                 $appointment->customer,
                 $appointment->pet,
                 TRUE,
-                TRUE)->body;
+                TRUE,
+                FALSE)->body;
             
             if (strpos($template_name, 'sms_') === 0)
                 $html = '<pre>'.$html.'</pre>';

@@ -134,6 +134,8 @@
                 availabilities_type: $('#service-availabilities-type').val(),
                 disc_timeframe_days: $('#service-disc_timeframe_days').val(),
                 disc_num_of_apps_before: $('#service-disc_num_of_apps_before').val(),
+                email_first_appointment_subject: $('#email_first_appointment_subject').val(),
+                email_first_appointment: $('#email_first_appointment').trumbowyg('html'),
             };
 
             if ($('#service-category').val() !== 'null') {
@@ -190,6 +192,8 @@
             GeneralFunctions.displayMessageBox(EALang.delete_service,
                 EALang.delete_record_prompt, buttons);
         });
+
+        $('#email_first_appointment').trumbowyg();
     };
 
     /**
@@ -285,6 +289,8 @@
         $('#filter-services .selected').removeClass('selected');
         $('#filter-services button').prop('disabled', false);
         $('#filter-services .results').css('color', '');
+
+        $('.show-replaced-template').each(function(el){ $(this).closest('.form-group').children('iframe').remove(); });
     };
 
     /**
@@ -306,6 +312,18 @@
         $('#service-availabilities-type').val(service.availabilities_type);
         $('#service-disc_num_of_apps_before').val(service.disc_num_of_apps_before);
         $('#service-disc_timeframe_days').val(service.disc_timeframe_days);
+        $('#email_first_appointment_subject').val(service.email_first_appointment_subject);
+        $('#email_first_appointment').trumbowyg('html', service.email_first_appointment ?? '');
+        $('.show-replaced-template').each(function(el){
+            var ifrm = $("<iframe />",{
+                        name: this.id + 'preview',
+                        id: this.id + 'preview',
+                        src: GlobalVariables.baseUrl + '/index.php/backend/GetTemplate/' + this.id + '?sid=' + service.id,
+                        class: 'preview'
+                    });
+            $(this).closest('.form-group').children('iframe').remove();
+            $(this).closest('.form-group').append(ifrm);
+        });
 
         var categoryId = (service.id_service_categories !== null) ? service.id_service_categories : 'null';
         $('#service-category').val(categoryId);

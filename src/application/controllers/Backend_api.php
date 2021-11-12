@@ -942,7 +942,7 @@ class Backend_api extends CI_Controller {
         try
         {
             $this->load->model('services_model');
-            $service = json_decode($this->input->post('service'), TRUE);
+            $service = json_decode($this->input->post('service', FALSE), TRUE);
 
             $REQUIRED_PRIV = ( ! isset($service['id']))
                 ? $this->privileges[PRIV_SERVICES]['add']

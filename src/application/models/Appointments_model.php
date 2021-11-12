@@ -570,18 +570,24 @@ class Appointments_Model extends CI_Model {
         return $appointment;
     }
 
-    public function get_sample_appointment()
+    public function get_sample_appointment($service_id)
     {
+        $where = [];
+        if( $service_id )
+            $where = array('id_services' => $service_id);
+
         $appointment_id = $this->db
             ->select('id')
             ->from('ea_appointments')
             ->where('id_pets IS NOT NULL')
+            ->where($where)
             ->order_by('id', 'DESC')
             ->limit(1)
             ->get()->row()->id ?? 
             $this->db
             ->select('id')
             ->from('ea_appointments')
+            ->where($where)
             ->order_by('id', 'DESC')
             ->limit(1)
             ->get()->row()->id ?? NULL;
