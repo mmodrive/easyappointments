@@ -88,6 +88,7 @@
             $('#admins .record-details').find('select').prop('disabled', false);
             $('#admin-password, #admin-password-confirm').addClass('required');
             $('#admin-notifications').prop('disabled', false);
+            $('#admin-new-customer-notifications').prop('disabled', false);
             $('#filter-admins button').prop('disabled', true);
             $('#filter-admins .results').css('color', '#AAA');
         }.bind(this));
@@ -102,6 +103,7 @@
             $('#admins .record-details').find('select').prop('disabled', false);
             $('#admin-password, #admin-password-confirm').removeClass('required');
             $('#admin-notifications').prop('disabled', false);
+            $('#admin-new-customer-notifications').prop('disabled', false);
             $('#filter-admins button').prop('disabled', true);
             $('#filter-admins .results').css('color', '#AAA');
         });
@@ -150,6 +152,7 @@
                 settings: {
                     username: $('#admin-username').val(),
                     notifications: $('#admin-notifications').hasClass('active'),
+                    notifications_new_customer: $('#admin-new-customer-notifications').hasClass('active'),
                     calendar_view: $('#admin-calendar-view').val()
                 }
             };
@@ -300,6 +303,8 @@
         $('#admin-notifications').prop('disabled', true);
         $('#admins .record-details').find('input, textarea').val('');
         $('#admin-notifications').removeClass('active');
+        $('#admin-new-customer-notifications').prop('disabled', true);
+        $('#admin-new-customer-notifications').removeClass('active');
         $('#edit-admin, #delete-admin').prop('disabled', true);
 
         $('#filter-admins .selected').removeClass('selected');
@@ -331,6 +336,11 @@
             $('#admin-notifications').addClass('active');
         } else {
             $('#admin-notifications').removeClass('active');
+        }
+        if (admin.settings.notifications_new_customer == true) {
+            $('#admin-new-customer-notifications').addClass('active');
+        } else {
+            $('#admin-new-customer-notifications').removeClass('active');
         }
     };
 

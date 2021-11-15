@@ -646,6 +646,19 @@ class Appointments extends CI_Controller {
                     );
                     $email->sendEmail($notification, new Email($provider['email']), new Text($ics_stream));
                 }
+
+                // Notify all staff of new customer registration
+                if(!$is_existing_customer){
+                    $notification = $this->settings_model->getNotification(
+                        'email_customer_registration',$appointment, $provider, $service, $customer, $pet, TRUE
+                    );
+
+                    $addresses = $this->settings_model->get_new_customer_notification_emails();
+
+                    foreach ($addresses as $key => $value) {
+                        $email->sendEmail($notification, new Email($value['email']));
+                    }
+                }
             }
             catch (Exception $exc)
             {

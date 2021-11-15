@@ -681,9 +681,7 @@ body .form-horizontal .controls {
     cursor: pointer;
 }
 
-#users-page #secretary-notifications.active,
-#users-page #provider-notifications.active,
-#users-page #admin-notifications.active {
+#users-page [id$='-notifications'].active{
     background: #B6DCFF;
     box-shadow: none;
 }

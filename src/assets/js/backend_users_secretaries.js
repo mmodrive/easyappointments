@@ -94,6 +94,7 @@
             $('#secretaries .record-details').find('select').prop('disabled', false);
             $('#secretary-password, #secretary-password-confirm').addClass('required');
             $('#secretary-notifications').prop('disabled', false);
+            $('#secretary-new-customer-notifications').prop('disabled', false);
             $('#secretary-providers input:checkbox').prop('disabled', false);
         }.bind(this));
 
@@ -109,6 +110,7 @@
             $('#secretaries .record-details').find('select').prop('disabled', false);
             $('#secretary-password, #secretary-password-confirm').removeClass('required');
             $('#secretary-notifications').prop('disabled', false);
+            $('#secretary-new-customer-notifications').prop('disabled', false);
             $('#secretary-providers input:checkbox').prop('disabled', false);
         });
 
@@ -155,6 +157,7 @@
                 settings: {
                     username: $('#secretary-username').val(),
                     notifications: $('#secretary-notifications').hasClass('active'),
+                    notifications_new_customer: $('#secretary-new-customer-notifications').hasClass('active'),
                     calendar_view: $('#secretary-calendar-view').val()
                 }
             };
@@ -314,6 +317,8 @@
         $('#secretaries .form-message').hide();
         $('#secretary-notifications').removeClass('active');
         $('#secretary-notifications').prop('disabled', true);
+        $('#secretary-new-customer-notifications').removeClass('active');
+        $('#secretary-new-customer-notifications').prop('disabled', true);
         $('#secretary-providers input:checkbox').prop('checked', false);
         $('#secretary-providers input:checkbox').prop('disabled', true);
         $('#secretaries .has-error').removeClass('has-error');
@@ -347,6 +352,11 @@
             $('#secretary-notifications').addClass('active');
         } else {
             $('#secretary-notifications').removeClass('active');
+        }
+        if (secretary.settings.notifications_new_customer == true) {
+            $('#secretary-new-customer-notifications').addClass('active');
+        } else {
+            $('#secretary-new-customer-notifications').removeClass('active');
         }
 
         $('#secretary-providers input:checkbox').prop('checked', false);

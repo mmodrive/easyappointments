@@ -222,6 +222,11 @@
                                     <span><?= lang('receive_notifications') ?></span>
                                 </button>
 
+                                <button type="button" id="provider-new-customer-notifications" class="btn btn-default" data-toggle="button">
+                                    <span class="glyphicon glyphicon-envelope"></span>
+                                    <span><?= lang('new_customer_notifications') ?></span>
+                                </button>
+
                                 <br><br>
 
                                 <h4><?= lang('services') ?></h4>
@@ -558,6 +563,11 @@
                                 <span><?= lang('receive_notifications') ?></span>
                             </button>
 
+                            <button type="button" id="secretary-new-customer-notifications" class="btn btn-default" data-toggle="button">
+                                <span class="glyphicon glyphicon-envelope"></span>
+                                <span><?= lang('new_customer_notifications') ?></span>
+                            </button>
+
                             <br><br>
 
                             <h4><?= lang('providers') ?></h4>
@@ -711,6 +721,11 @@
                             <button type="button" id="admin-notifications" class="btn btn-default" data-toggle="button">
                                 <span class="glyphicon glyphicon-envelope"></span>
                                 <span><?= lang('receive_notifications') ?></span>
+                            </button>
+
+                            <button type="button" id="admin-new-customer-notifications" class="btn btn-default" data-toggle="button">
+                                <span class="glyphicon glyphicon-envelope"></span>
+                                <span><?= lang('new_customer_notifications') ?></span>
                             </button>
                         </div>
                     </div>

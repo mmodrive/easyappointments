@@ -178,6 +178,7 @@ $lang['disc_count'] = 'Discount Appointment Counter';
 $lang['disc_last_reset'] = 'Discount Last Reset';
 $lang['retype_password'] = 'Retype Password';
 $lang['receive_notifications'] = 'Receive Notifications';
+$lang['new_customer_notifications'] = 'New Customer Registration Notifications';
 $lang['passwords_mismatch'] = 'Passwords mismatch!';
 $lang['admin_saved'] = 'Admin saved successfully!';
 $lang['provider_saved'] = 'Provider saved successfully!';

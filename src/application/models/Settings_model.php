@@ -51,6 +51,28 @@ class Settings_Model extends CI_Model {
     }
 
     /**
+     * Get emails of staff that require new customer registration notification.
+     *
+     * This method returns an array of emails.
+     *     *
+     * @return Array Returns the array of email addresses.
+     *
+     */
+    public function get_new_customer_notification_emails()
+    {
+        $emails = $this->db
+                    ->select('ea_users.email')
+                    ->from('ea_users')
+                    ->join('ea_user_settings', 'ea_users.id = ea_user_settings.id_users', 'inner')
+                    ->where('ea_user_settings.notifications', TRUE)
+                    ->where('ea_user_settings.notifications_new_customer', TRUE)
+                    ->where('ea_users.email IS NOT NULL')
+                    ->get()->result_array();
+
+        return $emails;
+    }
+
+    /**
      * Get setting value from database.
      *
      * This method returns a system setting from the database.

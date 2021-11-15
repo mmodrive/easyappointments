@@ -92,6 +92,7 @@
             $('#providers .record-details').find('select').prop('disabled', false);
             $('#provider-password, #provider-password-confirm').addClass('required');
             $('#provider-notifications').prop('disabled', false);
+            $('#provider-new-customer-notifications').prop('disabled', false);
             $('#providers').find('.add-break, .edit-break, .delete-break, #reset-working-plan').prop('disabled', false);
 			$('#providers').find('.add-availability, .edit-availability, .delete-availability').prop('disabled', false);
             $('#provider-services input:checkbox').prop('disabled', false);
@@ -114,6 +115,7 @@
             $('#providers .record-details').find('select').prop('disabled', false);
             $('#provider-password, #provider-password-confirm').removeClass('required');
             $('#provider-notifications').prop('disabled', false);
+            $('#provider-new-customer-notifications').prop('disabled', false);
             $('#provider-services input:checkbox').prop('disabled', false);
             $('#providers').find('.add-break, .edit-break, .delete-break, #reset-working-plan').prop('disabled', false);
 			$('#providers').find('.add-availability, .edit-availability, .delete-availability').prop('disabled', false);
@@ -166,6 +168,7 @@
                     username: $('#provider-username').val(),
                     working_plan: JSON.stringify(BackendUsers.wp.get()),
                     notifications: $('#provider-notifications').hasClass('active'),
+                    notifications_new_customer: $('#provider-new-customer-notifications').hasClass('active'),
                     calendar_view: $('#provider-calendar-view').val()
                 }
             };
@@ -377,6 +380,8 @@
         $('#providers .form-message').hide();
         $('#provider-notifications').removeClass('active');
         $('#provider-notifications').prop('disabled', true);
+        $('#provider-new-customer-notifications').removeClass('active');
+        $('#provider-new-customer-notifications').prop('disabled', true);
         $('#provider-services input:checkbox').prop('disabled', true);
         $('#providers .add-break, #reset-working-plan').prop('disabled', true);
 		$('#providers .add-availability').prop('disabled', true);
@@ -418,6 +423,11 @@
             $('#provider-notifications').addClass('active');
         } else {
             $('#provider-notifications').removeClass('active');
+        }
+        if (provider.settings.notifications_new_customer == true) {
+            $('#provider-new-customer-notifications').addClass('active');
+        } else {
+            $('#provider-new-customer-notifications').removeClass('active');
         }
 
         // Add dedicated provider link.
