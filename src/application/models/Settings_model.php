@@ -204,15 +204,17 @@ class Settings_Model extends CI_Model {
         {
             if ($is_customer_notification) {
                 // If new appointment template was requested but this is a first appointment
-                if($replaceFirstApp && $template_name == 'email_appointment_new') {
-                    if($this->db->get_where('ea_appointments', ['id_users_customer' => $customer['id'], 'id_services' => $service['id']])->num_rows() == 1)
-                        $template_name = 'email_first_appointment';
-                }
-                // If first appointment template was requested but there is no service template
-                if($replaceFirstApp && $template_name == 'email_first_appointment') {
-                    if(!($service['email_first_appointment_subject'] && $service['email_first_appointment_subject']))
-                        $template_name = 'email_appointment_new';
-                }
+                // if($replaceFirstApp && $template_name == 'email_appointment_new') {
+                //     if($this->db->get_where('ea_appointments', ['id_users_customer' => $customer['id'], 'id_services' => $service['id']])->num_rows() == 1)
+                //         $template_name = 'email_first_appointment';
+                // }
+                // // If first appointment template was requested but there is no service template
+                // if($replaceFirstApp && $template_name == 'email_first_appointment') {
+                //     if(!($service['email_first_appointment_subject'] && $service['email_first_appointment_subject']))
+                //         $template_name = 'email_appointment_new';
+                //     }
+                if($service['email_first_appointment_subject'] && $service['email_first_appointment_subject'])
+                    $template_name = 'email_first_appointment';
                 $title = new Text(($template_name == 'email_first_appointment' ? $service['email_first_appointment_subject'] : null) ?? $this->get_setting('email_appointment_new_subject') ?? $this->lang->line('appointment_booked'));
                 $message = new Text($this->lang->line('thank_you_for_appointment'));
             }
