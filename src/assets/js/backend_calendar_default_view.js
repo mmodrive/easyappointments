@@ -1548,10 +1548,11 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
             $('#select-service').val(service.id).trigger('change');
 
         } else {
-            var provider_service = BackendCalendarApi.getProviderService(calendar.data('calendar-id'));
+            // var provider_service = BackendCalendarApi.getProviderService(calendar.data('calendar-id'));
 
-            $('#select-service').val(provider_service.any_service).trigger('change');
-            $('#select-provider').val(provider_service.provider).trigger('change');
+            // $('#select-service').val(provider_service.any_service).trigger('change');
+            $('#select-service').val("").trigger('change');
+            // $('#select-provider').val(provider_service.provider).trigger('change');
         }
 
         // Preselect time

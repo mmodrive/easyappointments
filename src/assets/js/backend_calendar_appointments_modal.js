@@ -150,13 +150,15 @@ window.BackendCalendarAppointmentsModal = window.BackendCalendarAppointmentsModa
 
             // Set the selected filter item and find the next appointment time as the default modal values.
             if ($('#select-filter-item option:selected').attr('type') == 'provider') {
-                var provider_service = BackendCalendarApi.getProviderService($('#select-filter-item').val());
+                // var provider_service = BackendCalendarApi.getProviderService($('#select-filter-item').val());
 
-                $('#select-service').val(provider_service.any_service).trigger('change');
-                $('#select-provider').val(provider_service.provider).trigger('change');
+                // $('#select-service').val(provider_service.any_service).trigger('change');
+                $('#select-service').val("").trigger('change');
+                // $('#select-provider').val(provider_service.provider).trigger('change');
 
-                $dialog.find('#select-service').val(provider_service.any_service).trigger('change');
-                $dialog.find('#select-provider').val(provider_service.provider);
+                // $dialog.find('#select-service').val(provider_service.any_service).trigger('change');
+                $dialog.find('#select-service').val("").trigger('change');
+                // $dialog.find('#select-provider').val(provider_service.provider);
             } else {
                 $dialog.find('#select-service option[value="'
                     + $('#select-filter-item').val() + '"]').prop('selected', true);
@@ -333,6 +335,11 @@ window.BackendCalendarAppointmentsModal = window.BackendCalendarAppointmentsModa
                 }
             });
 
+            var calendarProvider = null;
+            if ($('#select-filter-item option:selected').attr('type') == 'provider') {
+                calendarProvider = $('#select-filter-item').val();
+            }
+
             // Update the providers select box.
             $.each(GlobalVariables.availableProviders, function (indexProvider, provider) {
                 $.each(provider.services, function (indexService, serviceId) {
@@ -346,7 +353,8 @@ window.BackendCalendarAppointmentsModal = window.BackendCalendarAppointmentsModa
 
                     // If the current provider is able to provide the selected service, add him to the listbox.
                     if (serviceId == sid) {
-                        var optionHtml = '<option value="' + provider.id + '">'
+                        var optionHtml = '<option value="' + provider.id + '"'
+                        + (calendarProvider == provider.id ? "selected" : "") + '>'
                             + provider.first_name + ' ' + provider.last_name
                             + '</option>';
                         $('#select-provider').append(optionHtml);
@@ -354,15 +362,15 @@ window.BackendCalendarAppointmentsModal = window.BackendCalendarAppointmentsModa
                 });
             });
 
-        if( pets_option == 'N' )
-            $('#pet_id').closest('fieldset').slideUp();
-        else{
-            $('#pet_id').closest('fieldset').slideDown();
-            if( pets_option == 'O' )
-                $('#pet_id').closest('fieldset').find('.required').data('input_required', 1).removeClass('required');
-            else
-                $('#pet_id').closest('fieldset').find('[data-input_required]').addClass('required');
-        } 
+            if( pets_option == 'N' )
+                $('#pet_id').closest('fieldset').slideUp();
+            else{
+                $('#pet_id').closest('fieldset').slideDown();
+                if( pets_option == 'O' )
+                    $('#pet_id').closest('fieldset').find('.required').data('input_required', 1).removeClass('required');
+                else
+                    $('#pet_id').closest('fieldset').find('[data-input_required]').addClass('required');
+            } 
 
         });
 

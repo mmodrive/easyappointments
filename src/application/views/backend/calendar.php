@@ -142,6 +142,8 @@
                                             }
                                         }
 
+                                        echo '<option value=""></option>';
+
                                         if ($has_category) {
                                             $grouped_services = array();
 
