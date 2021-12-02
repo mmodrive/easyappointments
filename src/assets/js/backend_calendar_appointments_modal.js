@@ -305,7 +305,7 @@ window.BackendCalendarAppointmentsModal = window.BackendCalendarAppointmentsModa
                             || c.address.toLowerCase().indexOf(key) != -1
                             || c.city.toLowerCase().indexOf(key) != -1
                             || c.zip_code.toLowerCase().indexOf(key) != -1
-                            || c.notes.toLowerCase().indexOf(key) != -1) {
+                            || (c.notes ?? "").toLowerCase().indexOf(key) != -1) {
                             $list.append('<div data-id="' + c.id + '">'
                                 + c.first_name + ' ' + c.last_name + '</div>');
                         }

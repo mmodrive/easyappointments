@@ -432,6 +432,18 @@ class Backend_api extends CI_Controller {
                     $email->sendEmail($notification, new Email($provider['email']), new Text($ics_stream));
                 }
 
+                // Notify all staff of new customer registration
+                if(!$is_existing_customer){
+                    $notification = $this->settings_model->getNotification(
+                        'email_customer_registration',$appointment, $provider, $service, $customer, $pet, TRUE
+                    );
+
+                    $addresses = $this->settings_model->get_new_customer_notification_emails();
+
+                    foreach ($addresses as $key => $value) {
+                        $email->sendEmail($notification, new Email($value['email']));
+                    }
+                }
             }
             catch (Exception $exc)
             {
@@ -648,17 +660,16 @@ class Backend_api extends CI_Controller {
             $this->load->model('customers_model');
 
             $key = $this->db->escape_str($this->input->post('key'));
-            $key = strtoupper($key);
 
             $where_clause =
-                '(first_name LIKE upper("%' . $key . '%") OR ' .
-                'last_name  LIKE upper("%' . $key . '%") OR ' .
-                'email LIKE upper("%' . $key . '%") OR ' .
-                'phone_number LIKE upper("%' . $key . '%") OR ' .
-                'address LIKE upper("%' . $key . '%") OR ' .
-                'city LIKE upper("%' . $key . '%") OR ' .
-                'zip_code LIKE upper("%' . $key . '%") OR ' .
-                'notes LIKE upper("%' . $key . '%"))';
+                '(first_name LIKE "%' . $key . '%" OR ' .
+                'last_name  LIKE "%' . $key . '%" OR ' .
+                'email LIKE "%' . $key . '%" OR ' .
+                'phone_number LIKE "%' . $key . '%" OR ' .
+                'address LIKE "%' . $key . '%" OR ' .
+                'city LIKE "%' . $key . '%" OR ' .
+                'zip_code LIKE "%' . $key . '%" OR ' .
+                'notes LIKE "%' . $key . '%")';
 
             $customers = $this->customers_model->get_batch($where_clause);
 
