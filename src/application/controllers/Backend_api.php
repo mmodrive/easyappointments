@@ -1777,7 +1777,7 @@ class Backend_api extends CI_Controller {
         try
         {
             $this->load->model('soap_reports_model');
-            $report = json_decode($this->input->post('report'), TRUE);
+            $report = json_decode($this->input->post('report', FALSE), TRUE);
 
             $REQUIRED_PRIV = ( ! isset($customer['id']))
                 ? $this->privileges[PRIV_APPOINTMENTS]['add']
