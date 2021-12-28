@@ -254,11 +254,11 @@
                         <table class="availabilities table table-striped">
                             <thead>
                                 <tr>
-                                    <th><?= lang('date_start') ?></th>
-									<th><?= lang('date_end') ?></th>
+                                    <th><?= lang('date') ?></th>
+									<!-- <th><?= lang('date_end') ?></th> -->
 									<th><?= lang('hours_restriction') ?></th>
-                                    <!-- <th><?= lang('time_start') ?></th>
-                                    <th><?= lang('time_end') ?></th> -->
+                                    <th><?= lang('time_start') ?></th>
+                                    <th><?= lang('time_end') ?></th>
 									<th><?= lang('services') ?></th>
                                     <th><?= lang('actions') ?></th>
                                 </tr>

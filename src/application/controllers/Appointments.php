@@ -1158,7 +1158,9 @@ class Appointments extends CI_Controller {
             $format = 'YmdGisu';
             foreach ($working_plan['availabilities'] as $index => $availability) {
                 $start = DateTime::createFromFormat($format, $availability["start"].'000000000000');
-                $end = DateTime::createFromFormat($format, $availability["end"].'235959999999');
+                // $end date is ignored i.e. is taken from start 
+                $end = DateTime::createFromFormat($format, $availability["start"].'235959999999');
+                // $end = DateTime::createFromFormat($format, $availability["end"].'235959999999');
                 if(($date >= $start) && ($date <= $end))
                 {
                     return $availability;
