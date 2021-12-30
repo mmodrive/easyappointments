@@ -874,7 +874,7 @@ class Appointments extends CI_Controller {
         $this->load->model('providers_model');
         $this->load->model('services_model');
 
-        // Get the service, provider's working plan and provider appointments.
+        // Get the service, provider's working plan and availabilities and provider appointments.
         $working_plan = json_decode($this->providers_model->get_setting('working_plan', $provider_id), TRUE);
 
         $provider_appointments = $this->appointments_model->get_batch([
@@ -904,22 +904,29 @@ class Appointments extends CI_Controller {
         $hoursRestriction = 0;
         $allowed_window_start;
         $allowed_window_end;
+        
+        $availabilities = $this->_get_availabilities($working_plan, $selected_date_dt, $service_id);
 
         // Check if service is provided on the day
-        if( !$selected_date_working_plan || !$selected_date_working_plan['services'] || !in_array($service_id, $selected_date_working_plan['services']) )
+        if( !(
+               $selected_date_working_plan 
+            && $selected_date_working_plan['services'] 
+            && in_array($service_id, $selected_date_working_plan['services'])
+            || !empty($availabilities) ) )
             return $periods;
-        
+
         if(!empty($selected_date_working_plan['hours_restriction']))
             $hoursRestriction = intval($selected_date_working_plan['hours_restriction']);
+        elseif( $availabilities ){
+            $availHoursRestriction = [];
+            foreach ($availabilities as $availability)
+                if (!empty($availability['hours_restriction']) && is_numeric($availability['hours_restriction']))
+                    $availHoursRestriction[] = intval($availability['hours_restriction']);
+            if( !empty($availHoursRestriction) )
+                $hoursRestriction = min($availHoursRestriction);
+        }
 
-        $availability = $this->_check_workingplan_available($working_plan, $selected_date_dt);    
-        if( $availability === FALSE )
-            return array_values($periods);
-        elseif( $availability !== TRUE ){
-            if (!empty($availability['hours_restriction']) && is_numeric($availability['hours_restriction']))
-                $hoursRestriction = intval($availability['hours_restriction']);
-        }        
-
+        // Work out day start and end times within Restriction Hours
         if( $hoursRestriction > 0 || !empty($selected_date_working_plan['hours_restriction']) )
         {
             $appointmentStarts = [];
@@ -981,11 +988,22 @@ class Appointments extends CI_Controller {
             }
         }
         
-        if (isset($selected_date_working_plan['start']))
+        $day_starts = [];
+        $day_ends = [];
+
+        if( isset($selected_date_working_plan['start']) )
+            $day_starts[] = new DateTime($selected_date_working_plan['start']);
+        $day_starts = array_merge($day_starts, array_column($availabilities, 'start'));
+        if( isset($selected_date_working_plan['end']) )
+        $day_ends[] = new DateTime($selected_date_working_plan['end']);
+        $day_ends = array_merge($day_ends, array_column($availabilities, 'end'));
+
+        // If there is a working plan or availability for the day
+        if (!empty($day_starts))
         {
-            $day_start = new DateTime($selected_date_working_plan['start']);
-            $day_end = new DateTime($selected_date_working_plan['end']);
-            
+            $day_start = min($day_starts);
+            $day_end = max($day_ends);
+
             // Curb the day start and end times by appointment windows if any
             if( isset($allowed_window_start)){
                 $today_allowed_window_start = new DateTime($allowed_window_start->format('H:i'));
@@ -1141,39 +1159,72 @@ class Appointments extends CI_Controller {
 
 
     /**
-     * Search for any provider that can handle the requested service.
-     *
-     * This method will return the database ID of the provider with the most available periods.
      *
      * @param object $working_plan Working plan of the provider.
      * @param string $date The date to be searched.
      *
      * @return object Return TRUE availabilities do no restrict the date, FALSE if not available or Availability object when one exists.
      */
-    protected function _check_workingplan_available($working_plan, $date)
+    protected function _get_availabilities($working_plan, $date, $service_id = NULL)
     {
+        $availabilities = [];
+
         // Check if there are any availabilities for the provider at all
         if (isset($working_plan['availabilities']) && !empty($working_plan['availabilities']))
         {
-            $format = 'YmdGisu';
+            $format = 'YmdG:i';
             foreach ($working_plan['availabilities'] as $index => $availability) {
-                $start = DateTime::createFromFormat($format, $availability["start"].'000000000000');
-                // $end date is ignored i.e. is taken from start 
-                $end = DateTime::createFromFormat($format, $availability["start"].'235959999999');
+                $start_time = isset($availability["ts"]) && $availability["ts"] ? $availability["ts"] : '00:00';
+                $start = DateTime::createFromFormat($format, $availability["start"].$start_time);
+                // $end date is ignored i.e. is taken from start
+                $end_time = isset($availability["te"]) && $availability["te"] ? $availability["te"] : '23:59';
+                $end = DateTime::createFromFormat($format, $availability["start"].$end_time);
                 // $end = DateTime::createFromFormat($format, $availability["end"].'235959999999');
-                if(($date >= $start) && ($date <= $end))
-                {
-                    return $availability;
-                }
+                if($start->format('Y-m-d') == $date->format('Y-m-d') &&
+                    ( empty($service_id) || ($availability['services'] 
+                        && in_array($service_id, $availability['services'])) ))
+                    $availabilities[] = [
+                        'start' => $start, 
+                        'end' => $end,
+                        'services' => $availability["services"]];
             }
 
-            // There are availabilities and requested date is not available
-            return FALSE;
         }
-
-        // No restrictions
-        return TRUE;
+        
+        return $availabilities;
     }
+
+    /**
+     *
+     * @param object $working_plan Working plan of the provider.
+     * @param string $date The date to be searched.
+     *
+     * @return object Return TRUE availabilities do no restrict the date, FALSE if not available or Availability object when one exists.
+     */
+    // protected function _check_workingplan_available($working_plan, $date)
+    // {
+    //     // Check if there are any availabilities for the provider at all
+    //     if (isset($working_plan['availabilities']) && !empty($working_plan['availabilities']))
+    //     {
+    //         $format = 'YmdGisu';
+    //         foreach ($working_plan['availabilities'] as $index => $availability) {
+    //             $start = DateTime::createFromFormat($format, $availability["start"].'000000000000');
+    //             // $end date is ignored i.e. is taken from start 
+    //             $end = DateTime::createFromFormat($format, $availability["start"].'235959999999');
+    //             // $end = DateTime::createFromFormat($format, $availability["end"].'235959999999');
+    //             if(($date >= $start) && ($date <= $end))
+    //             {
+    //                 return $availability;
+    //             }
+    //         }
+
+    //         // There are availabilities and requested date is not available
+    //         return FALSE;
+    //     }
+
+    //     // No restrictions
+    //     return TRUE;
+    // }
 
     /**
      * Search for any provider that can handle the requested service.
@@ -1255,19 +1306,21 @@ class Appointments extends CI_Controller {
                     }
                     else{
                         $working_plan = json_decode($provider['settings']['working_plan'], TRUE);
-                        $availability = $this->_check_workingplan_available($working_plan, $selected_date);
-                        if ($availability){ // If the date is available
-                            if( $availability !== TRUE ){
-                                if (array_key_exists('services',$availability) && in_array($service_id, $availability['services'])) // If availability includes the service
-                                    $provider_list[] = $provider['id'];
-                            }
-                            else { // Check the Working Plan
-                                $selected_date_working_plan = $working_plan[strtolower(date_format($selected_date, 'l'))];
-                                // check wp
-                                if ($selected_date_working_plan && array_key_exists('services',$selected_date_working_plan) && in_array($service_id, $selected_date_working_plan['services'])) // If working plan includes the service
-                                    $provider_list[] = $provider['id'];
+                        $availabilities = $this->_get_availabilities($working_plan, $selected_date);
+                        // check availabilities
+                        if( $availabilities ){
+                            foreach ($availabilities as $availability){
+                                if (isset($availability['services'])
+                                    && in_array($service_id, $availability['services'])) // If availability includes the service
+                                        $provider_list[] = $provider['id'];
                             }
                         }
+                        $selected_date_working_plan = $working_plan[strtolower(date_format($selected_date, 'l'))];
+                        // check wp
+                        if ($selected_date_working_plan 
+                            && array_key_exists('services',$selected_date_working_plan) 
+                            && in_array($service_id, $selected_date_working_plan['services'])) 
+                            $provider_list[] = $provider['id'];
                     }
                 }
             }
