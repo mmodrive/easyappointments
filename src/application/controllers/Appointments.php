@@ -991,11 +991,22 @@ class Appointments extends CI_Controller {
         $day_starts = [];
         $day_ends = [];
 
-        if( isset($selected_date_working_plan['start']) )
-            $day_starts[] = new DateTime($selected_date_working_plan['start']);
+        // If WP defined for this day
+        if( isset($selected_date_working_plan['start']) ){
+            // Empty services assumes all allowed in this WP
+            if( !$selected_date_working_plan['services'] || in_array($service_id, $selected_date_working_plan['services']) )
+                $day_starts[] = new DateTime($selected_date_dt->format('Ymd').' '.$selected_date_working_plan['start']);
+            // If WP does not allow current service, we want to override and exclude the WP window
+            // from the window opened by Availabilities by creating an artificial Break for later processing
+            if( $selected_date_working_plan['services'] && !in_array($service_id, $selected_date_working_plan['services']) )
+                $selected_date_working_plan['breaks'][] = 
+                [ 'start'=> $selected_date_working_plan['start'], 
+                'end' => $selected_date_working_plan['end']];
+        }
+        // Add all Availabilities windows
         $day_starts = array_merge($day_starts, array_column($availabilities, 'start'));
         if( isset($selected_date_working_plan['end']) )
-        $day_ends[] = new DateTime($selected_date_working_plan['end']);
+            $day_ends[] = new DateTime($selected_date_dt->format('Ymd').' '.$selected_date_working_plan['end']);
         $day_ends = array_merge($day_ends, array_column($availabilities, 'end'));
 
         // If there is a working plan or availability for the day
@@ -1022,8 +1033,8 @@ class Appointments extends CI_Controller {
                 // Split the working plan to available time periods that do not contain the breaks in them.
                 foreach ($selected_date_working_plan['breaks'] as $index => $break)
                 {
-                    $break_start = new DateTime($break['start']);
-                    $break_end = new DateTime($break['end']);
+                    $break_start = new DateTime($selected_date_dt->format('Ymd').' '.$break['start']);
+                    $break_end = new DateTime($selected_date_dt->format('Ymd').' '.$break['end']);
 
                     if ($break_start < $day_start)
                     {
@@ -1042,8 +1053,8 @@ class Appointments extends CI_Controller {
 
                     foreach ($periods as $key => $period)
                     {
-                        $period_start = new DateTime($period['start']);
-                        $period_end = new DateTime($period['end']);
+                        $period_start = new DateTime($selected_date_dt->format('Ymd').' '.$period['start']);
+                        $period_end = new DateTime($selected_date_dt->format('Ymd').' '.$period['end']);
 
                         $remove_current_period = FALSE;
 
