@@ -1223,45 +1223,64 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                         var availableDates = getAvailableDates();
 
                         switch (calendarView) {
-                            case 'timeGridDay':
-                                var selectedDayName = weekDays[calendar.view.activeStart.getDay()];
+                            case "timeGridDay":
+                                var selectedDayName =
+                                    weekDays[
+                                        calendar.view.activeStart.getDay()
+                                    ];
 
                                 // Add custom unavailable periods.
-                                $.each(response.unavailables, function (index, unavailable) {
-                                    var notes = unavailable.notes ? ' - ' + unavailable.notes : '';
+                                $.each(
+                                    response.unavailables,
+                                    function (index, unavailable) {
+                                        var notes = unavailable.notes
+                                            ? " - " + unavailable.notes
+                                            : "";
 
-                                    if (unavailable.notes.length > 30) {
-                                        notes = unavailable.notes.substring(0, 30) + '...'
+                                        if (unavailable.notes.length > 30) {
+                                            notes =
+                                                unavailable.notes.substring(
+                                                    0,
+                                                    30
+                                                ) + "...";
+                                        }
+
+                                        var unavailablePeriod = {
+                                            title: EALang.unavailable + notes,
+                                            start: +moment(
+                                                unavailable.start_datetime
+                                            ),
+                                            end: +moment(
+                                                unavailable.end_datetime
+                                            ),
+                                            allDay: false,
+                                            color: "#879DB4",
+                                            editable: true,
+                                            className:
+                                                "fc-unavailable fc-custom",
+                                            data: unavailable,
+                                        };
+
+                                        calendarEvents.push(unavailablePeriod);
                                     }
+                                );
 
-                                    var unavailablePeriod = {
-                                        title: EALang.unavailable + notes,
-                                        start: +moment(unavailable.start_datetime),
-                                        end: +moment(unavailable.end_datetime),
-                                        allDay: false,
-                                        color: '#879DB4',
-                                        editable: true,
-                                        className: 'fc-unavailable fc-custom',
-                                        data: unavailable
-                                    };
-
-                                    calendarEvents.push(unavailablePeriod);
-                                });
-
-                                // If Available-Dates are used, then we filter our workingplan to only those dates
-                                if (availableDates && !availableDates.isInRange(calendar.view.activeStart))
-                                    workingPlan[selectedDayName] = null;
+                                // // If Available-Dates are used, then we filter our workingplan to only those dates
+                                // if (availableDates && !availableDates.isInRange(calendar.view.activeStart))
+                                //     workingPlan[selectedDayName] = null;
 
                                 // Non-working day.
                                 if (workingPlan[selectedDayName] == null) {
                                     unavailablePeriod = {
                                         title: EALang.not_working,
-                                        start: +moment(calendar.view.activeStart),
+                                        start: +moment(
+                                            calendar.view.activeStart
+                                        ),
                                         end: +moment(calendar.view.activeEnd),
                                         allDay: false,
-                                        color: '#BEBEBE',
+                                        color: "#BEBEBE",
                                         editable: false,
-                                        className: 'fc-unavailable'
+                                        className: "fc-unavailable",
                                     };
 
                                     calendarEvents.push(unavailablePeriod);
@@ -1270,8 +1289,15 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                                 }
 
                                 // Add unavailable period before work starts.
-                                var calendarDateStart = moment(calendar.view.activeStart.toString('yyyy-MM-dd') + ' 00:00:00');
-                                var startHour = workingPlan[selectedDayName].start.split(':');
+                                var calendarDateStart = moment(
+                                    calendar.view.activeStart.toString(
+                                        "yyyy-MM-dd"
+                                    ) + " 00:00:00"
+                                );
+                                var startHour =
+                                    workingPlan[selectedDayName].start.split(
+                                        ":"
+                                    );
                                 var workDateStart = calendarDateStart.clone();
                                 workDateStart.hour(parseInt(startHour[0]));
                                 workDateStart.minute(parseInt(startHour[1]));
@@ -1282,16 +1308,23 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                                         start: +calendarDateStart,
                                         end: +workDateStart,
                                         allDay: false,
-                                        color: '#BEBEBE',
+                                        color: "#BEBEBE",
                                         editable: false,
-                                        className: 'fc-unavailable'
+                                        className: "fc-unavailable",
                                     };
-                                    calendarEvents.push(unavailablePeriodBeforeWorkStarts);
+                                    calendarEvents.push(
+                                        unavailablePeriodBeforeWorkStarts
+                                    );
                                 }
 
                                 // Add unavailable period after work ends.
-                                var calendarDateEnd = moment(calendar.view.activeEnd.toString('yyyy-MM-dd') + ' 00:00:00');
-                                var endHour = workingPlan[selectedDayName].end.split(':');
+                                var calendarDateEnd = moment(
+                                    calendar.view.activeEnd.toString(
+                                        "yyyy-MM-dd"
+                                    ) + " 00:00:00"
+                                );
+                                var endHour =
+                                    workingPlan[selectedDayName].end.split(":");
                                 var workDateEnd = calendarDateStart.clone();
 
                                 workDateEnd.hour(parseInt(endHour[0]));
@@ -1303,169 +1336,292 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                                         start: +workDateEnd,
                                         end: +calendarDateEnd,
                                         allDay: false,
-                                        color: '#BEBEBE',
+                                        color: "#BEBEBE",
                                         editable: false,
-                                        className: 'fc-unavailable'
+                                        className: "fc-unavailable",
                                     };
 
-                                    calendarEvents.push(unavailablePeriodAfterWorkEnds);
+                                    calendarEvents.push(
+                                        unavailablePeriodAfterWorkEnds
+                                    );
                                 }
 
                                 // Add unavailable periods for breaks.
                                 var breakStart;
                                 var breakEnd;
 
-                                $.each(workingPlan[selectedDayName].breaks, function (index, currentBreak) {
-                                    var breakStartString = currentBreak.start.split(':');
-                                    breakStart = calendarDateStart.clone();
-                                    breakStart.hour(parseInt(breakStartString[0]));
-                                    breakStart.minute(parseInt(breakStartString[1]));
+                                $.each(
+                                    workingPlan[selectedDayName].breaks,
+                                    function (index, currentBreak) {
+                                        var breakStartString =
+                                            currentBreak.start.split(":");
+                                        breakStart = calendarDateStart.clone();
+                                        breakStart.hour(
+                                            parseInt(breakStartString[0])
+                                        );
+                                        breakStart.minute(
+                                            parseInt(breakStartString[1])
+                                        );
 
-                                    var breakEndString = currentBreak.end.split(':');
-                                    breakEnd = calendarDateStart.clone();
-                                    breakEnd.hour(parseInt(breakEndString[0]));
-                                    breakEnd.minute(parseInt(breakEndString[1]));
-
-                                    var unavailablePeriod = {
-                                        title: EALang.break,
-                                        start: +breakStart,
-                                        end: +breakEnd,
-                                        allDay: false,
-                                        color: '#BEBEBE',
-                                        editable: false,
-                                        className: 'fc-unavailable fc-break'
-                                    };
-
-                                    calendarEvents.push(unavailablePeriod);
-                                });
-
-                                break;
-
-                            case 'timeGridWeek':
-                                var currentDateStart = calendar.view.activeStart.clone();
-                                var currentDateEnd = currentDateStart.clone().addDays(1);
-
-                                // Add custom unavailable periods (they are always displayed on the calendar, even if
-                                // the provider won't work on that day).
-                                $.each(response.unavailables, function (index, unavailable) {
-                                    var notes = unavailable.notes ? ' - ' + unavailable.notes : '';
-
-                                    if (unavailable.notes.length > 30) {
-                                        notes = unavailable.notes.substring(0, 30) + '...'
-                                    }
-
-                                    unavailablePeriod = {
-                                        title: EALang.unavailable + notes,
-                                        start: +moment(unavailable.start_datetime),
-                                        end: +moment(unavailable.end_datetime),
-                                        allDay: false,
-                                        color: '#879DB4',
-                                        editable: true,
-                                        className: 'fc-unavailable fc-custom',
-                                        data: unavailable
-                                    };
-
-                                    calendarEvents.push(unavailablePeriod);
-                                });
-
-                                $.each(workingPlan, function (index, workingDay) {
-                                    // If Available-Dates are used, then we filter our workingplan to only those dates
-                                    if (availableDates && !availableDates.isInRange(currentDateStart))
-                                        workingDay = null;
-
-                                    if (workingDay == null) {
-                                        // Add a full day unavailable event.
-                                        unavailablePeriod = {
-                                            title: EALang.not_working,
-                                            start: +moment(currentDateStart.toString('yyyy-MM-dd')),
-                                            end: +moment(currentDateEnd.toString('yyyy-MM-dd')),
-                                            allDay: false,
-                                            color: '#BEBEBE',
-                                            editable: false,
-                                            className: 'fc-unavailable'
-                                        };
-
-                                        calendarEvents.push(unavailablePeriod);
-                                        currentDateStart.addDays(1);
-                                        currentDateEnd.addDays(1);
-
-                                        return; // Go to the next loop.
-                                    }
-
-                                    var start;
-                                    var end;
-
-                                    // Add unavailable period before work starts.
-                                    var workingDayStartString = workingDay.start.split(':');
-                                    start = currentDateStart.clone();
-                                    start.hour(parseInt(workingDayStartString[0]));
-                                    start.minute(parseInt(workingDayStartString[1]));
-
-                                    if (currentDateStart < start) {
-                                        unavailablePeriod = {
-                                            title: EALang.not_working,
-                                            start: +moment(currentDateStart.toString('yyyy-MM-dd') + ' 00:00:00'),
-                                            end: +moment(currentDateStart.toString('yyyy-MM-dd') + ' ' + workingDay.start + ':00'),
-                                            allDay: false,
-                                            color: '#BEBEBE',
-                                            editable: false,
-                                            className: 'fc-unavailable'
-                                        };
-
-                                        calendarEvents.push(unavailablePeriod);
-                                    }
-
-                                    // Add unavailable period after work ends.
-                                    var workingDayEndString = workingDay.end.split(':');
-                                    end = currentDateStart.clone();
-                                    end.hour(parseInt(workingDayEndString[0]));
-                                    end.minute(parseInt(workingDayEndString[1]));
-
-                                    if (currentDateEnd > end) {
-                                        unavailablePeriod = {
-                                            title: EALang.not_working,
-                                            start: +moment(currentDateStart.toString('yyyy-MM-dd') + ' ' + workingDay.end + ':00'),
-                                            end: +moment(currentDateEnd.toString('yyyy-MM-dd') + ' 00:00:00'),
-                                            allDay: false,
-                                            color: '#BEBEBE',
-                                            editable: false,
-                                            className: 'fc-unavailable'
-                                        };
-
-                                        calendarEvents.push(unavailablePeriod);
-                                    }
-
-                                    // Add unavailable periods during day breaks.
-                                    var breakStart;
-                                    var breakEnd;
-
-                                    $.each(workingDay.breaks, function (index, currentBreak) {
-                                        var breakStartString = currentBreak.start.split(':');
-                                        breakStart = currentDateStart.clone();
-                                        breakStart.hour(parseInt(breakStartString[0]));
-                                        breakStart.minute(parseInt(breakStartString[1]));
-
-                                        var breakEndString = currentBreak.end.split(':');
-                                        breakEnd = currentDateStart.clone();
-                                        breakEnd.hour(parseInt(breakEndString[0]));
-                                        breakEnd.minute(parseInt(breakEndString[1]));
+                                        var breakEndString =
+                                            currentBreak.end.split(":");
+                                        breakEnd = calendarDateStart.clone();
+                                        breakEnd.hour(
+                                            parseInt(breakEndString[0])
+                                        );
+                                        breakEnd.minute(
+                                            parseInt(breakEndString[1])
+                                        );
 
                                         var unavailablePeriod = {
                                             title: EALang.break,
-                                            start: +moment(currentDateStart.toString('yyyy-MM-dd') + ' ' + currentBreak.start),
-                                            end: +moment(currentDateStart.toString('yyyy-MM-dd') + ' ' + currentBreak.end),
+                                            start: +breakStart,
+                                            end: +breakEnd,
                                             allDay: false,
-                                            color: '#BEBEBE',
+                                            color: "#BEBEBE",
                                             editable: false,
-                                            className: 'fc-unavailable fc-break'
+                                            className:
+                                                "fc-unavailable fc-break",
                                         };
 
                                         calendarEvents.push(unavailablePeriod);
-                                    });
+                                    }
+                                );
 
-                                    currentDateStart.addDays(1);
-                                    currentDateEnd.addDays(1);
-                                });
+                                break;
+
+                            case "timeGridWeek":
+                                var currentDateStart =
+                                    calendar.view.activeStart.clone();
+                                var currentDateEnd = currentDateStart
+                                    .clone()
+                                    .addDays(1);
+
+                                // Add custom unavailable periods (they are always displayed on the calendar, even if
+                                // the provider won't work on that day).
+                                $.each(
+                                    response.unavailables,
+                                    function (index, unavailable) {
+                                        var notes = unavailable.notes
+                                            ? " - " + unavailable.notes
+                                            : "";
+
+                                        if (unavailable.notes.length > 30) {
+                                            notes =
+                                                unavailable.notes.substring(
+                                                    0,
+                                                    30
+                                                ) + "...";
+                                        }
+
+                                        unavailablePeriod = {
+                                            title: EALang.unavailable + notes,
+                                            start: +moment(
+                                                unavailable.start_datetime
+                                            ),
+                                            end: +moment(
+                                                unavailable.end_datetime
+                                            ),
+                                            allDay: false,
+                                            color: "#879DB4",
+                                            editable: true,
+                                            className:
+                                                "fc-unavailable fc-custom",
+                                            data: unavailable,
+                                        };
+
+                                        calendarEvents.push(unavailablePeriod);
+                                    }
+                                );
+
+                                $.each(
+                                    workingPlan,
+                                    function (index, workingDay) {
+                                        // // If Available-Dates are used, then we filter our workingplan to only those dates
+                                        // if (
+                                        //     availableDates &&
+                                        //     !availableDates.isInRange(
+                                        //         currentDateStart
+                                        //     )
+                                        // )
+                                        //     workingDay = null;
+
+                                        if (workingDay == null) {
+                                            // Add a full day unavailable event.
+                                            unavailablePeriod = {
+                                                title: EALang.not_working,
+                                                start: +moment(
+                                                    currentDateStart.toString(
+                                                        "yyyy-MM-dd"
+                                                    )
+                                                ),
+                                                end: +moment(
+                                                    currentDateEnd.toString(
+                                                        "yyyy-MM-dd"
+                                                    )
+                                                ),
+                                                allDay: false,
+                                                color: "#BEBEBE",
+                                                editable: false,
+                                                className: "fc-unavailable",
+                                            };
+
+                                            calendarEvents.push(
+                                                unavailablePeriod
+                                            );
+                                            currentDateStart.addDays(1);
+                                            currentDateEnd.addDays(1);
+
+                                            return; // Go to the next loop.
+                                        }
+
+                                        var start;
+                                        var end;
+
+                                        // Add unavailable period before work starts.
+                                        var workingDayStartString =
+                                            workingDay.start.split(":");
+                                        start = currentDateStart.clone();
+                                        start.hour(
+                                            parseInt(workingDayStartString[0])
+                                        );
+                                        start.minute(
+                                            parseInt(workingDayStartString[1])
+                                        );
+
+                                        if (currentDateStart < start) {
+                                            unavailablePeriod = {
+                                                title: EALang.not_working,
+                                                start: +moment(
+                                                    currentDateStart.toString(
+                                                        "yyyy-MM-dd"
+                                                    ) + " 00:00:00"
+                                                ),
+                                                end: +moment(
+                                                    currentDateStart.toString(
+                                                        "yyyy-MM-dd"
+                                                    ) +
+                                                        " " +
+                                                        workingDay.start +
+                                                        ":00"
+                                                ),
+                                                allDay: false,
+                                                color: "#BEBEBE",
+                                                editable: false,
+                                                className: "fc-unavailable",
+                                            };
+
+                                            calendarEvents.push(
+                                                unavailablePeriod
+                                            );
+                                        }
+
+                                        // Add unavailable period after work ends.
+                                        var workingDayEndString =
+                                            workingDay.end.split(":");
+                                        end = currentDateStart.clone();
+                                        end.hour(
+                                            parseInt(workingDayEndString[0])
+                                        );
+                                        end.minute(
+                                            parseInt(workingDayEndString[1])
+                                        );
+
+                                        if (currentDateEnd > end) {
+                                            unavailablePeriod = {
+                                                title: EALang.not_working,
+                                                start: +moment(
+                                                    currentDateStart.toString(
+                                                        "yyyy-MM-dd"
+                                                    ) +
+                                                        " " +
+                                                        workingDay.end +
+                                                        ":00"
+                                                ),
+                                                end: +moment(
+                                                    currentDateEnd.toString(
+                                                        "yyyy-MM-dd"
+                                                    ) + " 00:00:00"
+                                                ),
+                                                allDay: false,
+                                                color: "#BEBEBE",
+                                                editable: false,
+                                                className: "fc-unavailable",
+                                            };
+
+                                            calendarEvents.push(
+                                                unavailablePeriod
+                                            );
+                                        }
+
+                                        // Add unavailable periods during day breaks.
+                                        var breakStart;
+                                        var breakEnd;
+
+                                        $.each(
+                                            workingDay.breaks,
+                                            function (index, currentBreak) {
+                                                var breakStartString =
+                                                    currentBreak.start.split(
+                                                        ":"
+                                                    );
+                                                breakStart =
+                                                    currentDateStart.clone();
+                                                breakStart.hour(
+                                                    parseInt(
+                                                        breakStartString[0]
+                                                    )
+                                                );
+                                                breakStart.minute(
+                                                    parseInt(
+                                                        breakStartString[1]
+                                                    )
+                                                );
+
+                                                var breakEndString =
+                                                    currentBreak.end.split(":");
+                                                breakEnd =
+                                                    currentDateStart.clone();
+                                                breakEnd.hour(
+                                                    parseInt(breakEndString[0])
+                                                );
+                                                breakEnd.minute(
+                                                    parseInt(breakEndString[1])
+                                                );
+
+                                                var unavailablePeriod = {
+                                                    title: EALang.break,
+                                                    start: +moment(
+                                                        currentDateStart.toString(
+                                                            "yyyy-MM-dd"
+                                                        ) +
+                                                            " " +
+                                                            currentBreak.start
+                                                    ),
+                                                    end: +moment(
+                                                        currentDateStart.toString(
+                                                            "yyyy-MM-dd"
+                                                        ) +
+                                                            " " +
+                                                            currentBreak.end
+                                                    ),
+                                                    allDay: false,
+                                                    color: "#BEBEBE",
+                                                    editable: false,
+                                                    className:
+                                                        "fc-unavailable fc-break",
+                                                };
+
+                                                calendarEvents.push(
+                                                    unavailablePeriod
+                                                );
+                                            }
+                                        );
+
+                                        currentDateStart.addDays(1);
+                                        currentDateEnd.addDays(1);
+                                    }
+                                );
 
                                 break;
                         }
