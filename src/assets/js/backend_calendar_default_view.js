@@ -1198,9 +1198,9 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                     "saturday",
                 ];
 
-                // :: ADD PROVIDER'S UNAVAILABLE TIME PERIODS
                 var calendarView = calendar.view.type;
 
+                // ADD Breaks and Unavailables for Day and Week views
                 if (calendarView !== "dayGridMonth") {
                     $.each(
                         GlobalVariables.availableProviders,
@@ -1213,83 +1213,6 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                                     provider.settings.working_plan
                                 );
                                 var unavailablePeriod;
-
-                                var getAvailableDates = function () {
-                                    var availableDates = null;
-                                    if (this.availabilities) {
-                                        $.each(
-                                            this.availabilities,
-                                            function (index, rangeString) {
-                                                if (!availableDates)
-                                                    availableDates = [];
-                                                availableDates.push({
-                                                    start: new Date(
-                                                        +moment(
-                                                            rangeString.start +
-                                                                " " +
-                                                                rangeString.ts,
-                                                            GlobalVariables.dbDateFormat
-                                                        ).toDate()
-                                                    ),
-                                                    end: new Date(
-                                                        +moment(
-                                                            rangeString.end +
-                                                                " " +
-                                                                rangeString.ts,
-                                                            GlobalVariables.dbDateFormat
-                                                        )
-                                                            // .add(1, "d")
-                                                            // .subtract(1, "ms")
-                                                            .toDate()
-                                                    ),
-                                                });
-                                            }
-                                        );
-                                    }
-                                    delete workingPlan.availabilities;
-                                    if (availableDates) {
-                                        availableDates.isInRange = function (
-                                            date
-                                        ) {
-                                            for (
-                                                var i = 0;
-                                                i < this.length;
-                                                i++
-                                            ) {
-                                                if (
-                                                    date >= this[i].start &&
-                                                    date <= this[i].end
-                                                ) {
-                                                    return true;
-                                                }
-                                            }
-                                            return false;
-                                        };
-                                        availableDates.getTimes = function (
-                                            dateStart,
-                                            dateEnd
-                                        ) {
-                                            var times = [];
-                                            for (
-                                                var i = 0;
-                                                i < this.length;
-                                                i++
-                                            ) {
-                                                if (
-                                                    this[i].start >=
-                                                        dateStart &&
-                                                    this[i].end <= dateEnd
-                                                ) {
-                                                    times.push(this);
-                                                }
-                                            }
-                                            return times;
-                                        };
-                                    }
-                                    return availableDates;
-                                }.bind(workingPlan);
-
-                                var availableDates = getAvailableDates();
 
                                 switch (calendarView) {
                                     case "timeGridDay":
@@ -1353,36 +1276,6 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                                             calendar.view.activeStart.toString(
                                                 "yyyy-MM-dd"
                                             ) + " 00:00:00"
-                                        );
-                                        var startHour =
-                                            workingPlan[
-                                                selectedDayName
-                                            ].start.split(":");
-                                        var workDateStart =
-                                            calendarDateStart.clone();
-                                        workDateStart.hour(
-                                            parseInt(startHour[0])
-                                        );
-                                        workDateStart.minute(
-                                            parseInt(startHour[1])
-                                        );
-
-                                        // Add unavailable period after work ends.
-                                        var calendarDateEnd = moment(
-                                            calendar.view.activeEnd.toString(
-                                                "yyyy-MM-dd"
-                                            ) + " 00:00:00"
-                                        );
-                                        var endHour =
-                                            workingPlan[
-                                                selectedDayName
-                                            ].end.split(":");
-                                        var workDateEnd =
-                                            calendarDateStart.clone();
-
-                                        workDateEnd.hour(parseInt(endHour[0]));
-                                        workDateEnd.minute(
-                                            parseInt(endHour[1])
                                         );
 
                                         // Add unavailable periods for breaks.
@@ -1489,22 +1382,9 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                                                 );
                                             }
                                         );
-                                        var times = availableDates.getTimes(
-                                            currentDateStart,
-                                            currentDateEnd
-                                        );
                                         $.each(
                                             workingPlan,
                                             function (index, workingDay) {
-                                                // // If Available-Dates are used, then we filter our workingplan to only those dates
-                                                // if (
-                                                //     availableDates &&
-                                                //     !availableDates.isInRange(
-                                                //         currentDateStart
-                                                //     )
-                                                // )
-                                                //     workingDay = null;
-
                                                 if (workingDay == null) {
                                                     currentDateStart.addDays(1);
                                                     currentDateEnd.addDays(1);
@@ -1512,41 +1392,7 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                                                     return; // Go to the next loop.
                                                 }
 
-                                                var start;
-                                                var end;
-
-                                                // Add unavailable period before work starts.
-                                                var workingDayStartString =
-                                                    workingDay.start.split(":");
-                                                start =
-                                                    currentDateStart.clone();
-                                                start.hour(
-                                                    parseInt(
-                                                        workingDayStartString[0]
-                                                    )
-                                                );
-                                                start.minute(
-                                                    parseInt(
-                                                        workingDayStartString[1]
-                                                    )
-                                                );
-
-                                                // Add unavailable period after work ends.
-                                                var workingDayEndString =
-                                                    workingDay.end.split(":");
-                                                end = currentDateStart.clone();
-                                                end.hour(
-                                                    parseInt(
-                                                        workingDayEndString[0]
-                                                    )
-                                                );
-                                                end.minute(
-                                                    parseInt(
-                                                        workingDayEndString[1]
-                                                    )
-                                                );
-
-                                                // Add unavailable periods during day breaks.
+                                                // Add breaks.
                                                 var breakStart;
                                                 var breakEnd;
 
@@ -1632,6 +1478,7 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                     );
                 }
 
+                // ADD Not Working slots for Day and Week Views
                 if (calendarView !== "dayGridMonth") {
                     url =
                         GlobalVariables.baseUrl +
