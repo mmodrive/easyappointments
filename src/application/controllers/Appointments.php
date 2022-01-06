@@ -22,6 +22,11 @@ use \EA\Engine\Types\Url;
  */
 class Appointments extends CI_Controller {
     /**
+     * @var array
+     */
+    protected $privileges;
+
+    /**
      * Class Constructor
      */
     public function __construct()
@@ -44,6 +49,13 @@ class Appointments extends CI_Controller {
 
         // Common helpers
         $this->load->helper('google_analytics');
+
+        $this->load->model('roles_model');
+
+        if ($this->session->userdata('role_slug'))
+        {
+            $this->privileges = $this->roles_model->get_privileges($this->session->userdata('role_slug'));
+        }
     }
 
     /**
@@ -679,6 +691,118 @@ class Appointments extends CI_Controller {
                 ->set_output(json_encode([
                     'exceptions' => [exceptionToJavaScript($exc)]
                 ]));
+        }
+    }
+
+    public function ajax_get_notworking_times()
+    {
+        try
+        {
+            if ($this->privileges[PRIV_APPOINTMENTS]['view'] == FALSE)
+            {
+                throw new Exception('You do not have the required privileges for this task.');
+            }
+
+            $response['periods'] = [];
+
+            if ( ! $this->input->post('filter_type'))
+            {
+                $this->output
+                    ->set_content_type('application/json')
+                    ->set_output(json_encode($response));
+                return;
+            }
+
+            $this->load->model('appointments_model');
+            $this->load->model('providers_model');
+            $this->load->model('services_model');
+
+            $record_id = $_POST['record_id'];
+            $start_date = new DateTime($_POST['start_date']);
+            $end_date = new DateTime($_POST['end_date']);
+
+            if ($this->input->post('filter_type') == FILTER_TYPE_PROVIDER)
+            {
+                $working_plan = json_decode($this->providers_model->get_setting('working_plan', $record_id), TRUE);
+                $all_periods = [];
+
+                for($current_date = $start_date; $current_date < $end_date; $current_date->modify('+1 day')){
+                    $periods = [];
+                    $periods[] = [
+                        'start' => new DateTime($current_date->format('Ymd').' 00:00'),
+                        'end' => new DateTime($current_date->format('Ymd').' 23:59')
+                    ];
+
+                    // Get Availabilities
+                    $open_periods = $this->_get_availabilities($working_plan, $current_date);
+                    
+                    // Add Working Plan Openings
+                    $selected_date_working_plan = $working_plan[strtolower($current_date->format('l'))];
+                    if( $selected_date_working_plan )
+                        $open_periods[] = [
+                            'start' => new DateTime($current_date->format('Ymd').' '.$selected_date_working_plan['start']),
+                            'end' => new DateTime($current_date->format('Ymd').' '.$selected_date_working_plan['end']),
+                            'services' => $selected_date_working_plan["services"]];
+                    
+                    if (!empty($open_periods))
+                    {
+                        // Split the working plan to available time periods that do not contain the breaks in them.
+                        foreach ($open_periods as $open_period)
+                        {        
+                            foreach ($periods as $key => $period)
+                            {
+                                $remove_current_period = FALSE;
+        
+                                if ($open_period['start'] > $period['start'] && $open_period['start'] < $period['end'] && $open_period['end'] > $period['start'])
+                                {
+                                    $periods[] = [
+                                        'start' => $period['start'],
+                                        'end' => $open_period['start']
+                                    ];
+        
+                                    $remove_current_period = TRUE;
+                                }
+        
+                                if ($open_period['start'] < $period['end'] && $open_period['end'] > $period['start'] && $open_period['end'] < $period['end'])
+                                {
+                                    $periods[] = [
+                                        'start' => $open_period['end'],
+                                        'end' => $period['end']
+                                    ];
+        
+                                    $remove_current_period = TRUE;
+                                }
+        
+                                if ($open_period['start'] == $period['start'] && $open_period['end'] == $period['end'])
+                                {
+                                    $remove_current_period = TRUE;
+                                }
+        
+                                if ($remove_current_period)
+                                {
+                                    unset($periods[$key]);
+                                }
+                            }
+                        }
+                    }
+                    $all_periods = array_merge($all_periods, $periods);
+                }
+
+                $response['periods'] = $all_periods;
+            }
+            else
+            {
+            }
+
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode($response));
+        }
+        catch (Exception $exc)
+        {
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode(['exceptions' => [exceptionToJavaScript($exc)]]));
         }
     }
 
