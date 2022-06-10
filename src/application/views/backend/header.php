@@ -85,7 +85,7 @@
                     </a>
                 </li>
 
-                <?php $hidden = ($privileges[PRIV_SERVICES]['view'] ==  TRUE) ? '' : 'hidden' ?>
+                <?php $hidden = ($privileges[PRIV_APPOINTMENTS]['view'] ==  TRUE) ? '' : 'hidden' ?>
                 <?php $active = ($active_menu == MENU_PRINT_APPOINTMENTS) ? 'active' : '' ?>
                 <li class="<?= $active . $hidden ?>">
                     <a href="<?= site_url('backend/print_appointments') ?>" class="menu-item"
