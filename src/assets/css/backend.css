@@ -420,6 +420,25 @@ iframe.preview {
     font-size: 10px;
 }
 
+#calendar-page .calendar .fc-timegrid-event.cancelled {
+    background-image: linear-gradient(to top left,
+            rgba(0, 0, 0, 0) 0%,
+            rgba(0, 0, 0, 0) calc(50% - 0.8px),
+            rgba(0, 0, 0, 1) 50%,
+            rgba(0, 0, 0, 0) calc(50% + 0.8px),
+            rgba(0, 0, 0, 0) 100%),
+        linear-gradient(to top right,
+            rgba(0, 0, 0, 0) 0%,
+            rgba(0, 0, 0, 0) calc(50% - 0.8px),
+            rgba(0, 0, 0, 1) 50%,
+            rgba(0, 0, 0, 0) calc(50% + 0.8px),
+            rgba(0, 0, 0, 0) 100%);
+}
+
+#calendar-page .calendar .fc-timegrid-event.late .fc-event-time {
+    color: red;
+    font-weight: bold;
+}
 #calendar-page .calendar .fc-break {
     background-image: url('../img/break.jpg');
 }

@@ -288,6 +288,15 @@ window.BackendCalendarTableView = window.BackendCalendarTableView || {};
                 $dialog.find('#appointment-discount-last-reset').val(appointment.disc_last_reset);
                 $dialog.find('#appointment-discount-last-reset').prop('title', $dialog.find('#appointment-discount-last-reset').data('title-pre') + (appointment.disc_last_manual_reset ?? 'none'));
                 $dialog.find('#appointment-notes').val(appointment.notes);
+                $dialog
+                    .find("#appointment-is-cancelled")
+                    .prop(
+                        "checked",
+                        appointment.is_cancelled == 1 ? true : false
+                    );
+                $dialog
+                    .find("#appointment-is-late")
+                    .prop("checked", appointment.is_late == 1 ? true : false);
                 $dialog.find('#customer-notes').val(customer.notes);
             } else {
                 var unavailable = lastFocusedEventData;

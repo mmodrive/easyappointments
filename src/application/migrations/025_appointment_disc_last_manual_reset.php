@@ -43,7 +43,7 @@ WITH apps AS (
     WINDOW w AS (PARTITION BY id_services, id_users_customer, id_pets ORDER BY start_datetime))
 SELECT id_appointment,
     @app_counter    :=IF(position = 1 OR opening_app OR @days_sum+days_passed > disc_timeframe_days OR @app_counter+1 > disc_num_of_apps_before+1,1,@app_counter+1) AS app_counter,
-    @days_sum       :=IF(position = 1 OR opening_app OR @days_sum+days_passed > disc_timeframe_days,0,@days_sum+days_passed) AS days_sum,
+    @days_sum       :=IF(@app_counter = 1,0,@days_sum+days_passed) AS days_sum,
     IF(disc_qualify AND disc_num_of_apps_before > 0 AND disc_timeframe_days > 0 AND @app_counter = disc_num_of_apps_before+1,TRUE,FALSE) AS app_discount,
     @app_last_reset :=IF(@app_counter = 1,app_datetime,@app_last_reset) AS app_last_reset,
     @app_last_manual_reset :=IF(opening_app, app_datetime, IF(position = 1,NULL,@app_last_manual_reset)) AS app_last_manual_reset

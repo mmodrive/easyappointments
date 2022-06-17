@@ -214,6 +214,14 @@
                                     <label for="appointment-notes" class="control-label"><?= lang('notes') ?></label>
                                     <textarea id="appointment-notes" class="form-control" rows="2"></textarea>
                                 </div>
+                                <div class="form-group">
+                                    <label class="appointment-is-cancelled" for="appointment-is-cancelled" ><?= lang('is_cancelled') ?></label>
+                                    <input id="appointment-is-cancelled" type="checkbox" class="form-control" >
+                                </div>
+                                <div class="form-group">
+                                    <label class="appointment-is-late" for="appointment-is-late" ><?= lang('is_late') ?></label>
+                                    <input id="appointment-is-late" type="checkbox" class="form-control" >
+                                </div>
                             </div>
                             <div class="col-xs-12 col-sm-6">
                                 <div class="form-group">

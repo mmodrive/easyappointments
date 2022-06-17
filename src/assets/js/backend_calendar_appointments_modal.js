@@ -57,8 +57,14 @@ window.BackendCalendarAppointmentsModal = window.BackendCalendarAppointmentsModa
                 id_users_provider: $dialog.find("#select-provider").val(),
                 start_datetime: startDatetime,
                 end_datetime: endDatetime,
-                disc_reset: $dialog.find("#appointment-discount-reset").is(":checked"),
+                disc_reset: $dialog
+                    .find("#appointment-discount-reset")
+                    .is(":checked"),
                 notes: $dialog.find("#appointment-notes").val(),
+                is_cancelled: $dialog
+                    .find("#appointment-is-cancelled")
+                    .is(":checked"),
+                is_late: $dialog.find("#appointment-is-late").is(":checked"),
                 is_unavailable: false,
                 depth: $dialog.find("#depth:visible").val(),
                 speed: $dialog.find("#speed:visible").val(),
