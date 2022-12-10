@@ -570,7 +570,7 @@ class Appointments_Model extends CI_Model {
         return $appointment;
     }
 
-    public function get_sample_appointment($service_id)
+    public function get_sample_appointment($service_id = FALSE)
     {
         $where = [];
         if( $service_id )

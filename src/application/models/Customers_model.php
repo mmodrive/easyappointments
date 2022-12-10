@@ -241,6 +241,9 @@ class Customers_Model extends CI_Model {
             $this->db->trans_rollback();
             throw new Exception('Could not transfer pets.');
         }
+
+        // 1.5 Potential Pet Merge:
+        // UPDATE ea_soap_reports SET id_pets = 363 WHERE id_pets = 207;UPDATE ea_appointments SET id_pets = 363 WHERE id_pets = 207;UPDATE ea_attachments SET id_pets = 363 WHERE id_pets = 207;DELETE FROM ea_pets WHERE id = 207;
         
         // 2. Transfer all appointments
         $this->db->where('id_users_customer', $from_id);
