@@ -179,6 +179,7 @@ $lang['disc_reset_last_manual'] = 'Last Manual Reset On: ';
 $lang['disc_count'] = 'Discount Appointment Counter';
 $lang['disc_last_reset'] = 'Discount Last Reset';
 $lang['retype_password'] = 'Retype Password';
+$lang['secretary-provider-calendar'] = 'Provider\'s Service Calendars';
 $lang['receive_notifications'] = 'Receive Notifications';
 $lang['new_customer_notifications'] = 'New Customer Registration Notifications';
 $lang['passwords_mismatch'] = 'Passwords mismatch!';

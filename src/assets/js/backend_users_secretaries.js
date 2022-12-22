@@ -35,170 +35,229 @@
          *
          * Filter the secretary records with the given key string.
          */
-        $('#secretaries').on('submit', '#filter-secretaries form', function () {
-            var key = $('#filter-secretaries .key').val();
-            $('#filter-secretaries .selected').removeClass('selected');
-            this.resetForm();
-            this.filter(key);
-            return false;
-        }.bind(this));
+        $("#secretaries").on(
+            "submit",
+            "#filter-secretaries form",
+            function () {
+                var key = $("#filter-secretaries .key").val();
+                $("#filter-secretaries .selected").removeClass("selected");
+                this.resetForm();
+                this.filter(key);
+                return false;
+            }.bind(this)
+        );
 
         /**
          * Event: Clear Filter Results Button "Click"
          */
-        $('#secretaries').on('click', '#filter-secretaries .clear', function () {
-            this.filter('');
-            $('#filter-secretaries .key').val('');
-            this.resetForm();
-        }.bind(this));
+        $("#secretaries").on(
+            "click",
+            "#filter-secretaries .clear",
+            function () {
+                this.filter("");
+                $("#filter-secretaries .key").val("");
+                this.resetForm();
+            }.bind(this)
+        );
 
         /**
          * Event: Filter Secretary Row "Click"
          *
          * Display the selected secretary data to the user.
          */
-        $('#secretaries').on('click', '.secretary-row', function (e) {
-            if ($('#filter-secretaries .filter').prop('disabled')) {
-                $('#filter-secretaries .results').css('color', '#AAA');
-                return; // exit because we are currently on edit mode
-            }
-
-            var secretaryId = $(e.currentTarget).attr('data-id');
-            var secretary = {};
-
-            $.each(this.filterResults, function (index, item) {
-                if (item.id === secretaryId) {
-                    secretary = item;
-                    return false;
+        $("#secretaries").on(
+            "click",
+            ".secretary-row",
+            function (e) {
+                if ($("#filter-secretaries .filter").prop("disabled")) {
+                    $("#filter-secretaries .results").css("color", "#AAA");
+                    return; // exit because we are currently on edit mode
                 }
-            });
 
-            this.display(secretary);
+                var secretaryId = $(e.currentTarget).attr("data-id");
+                var secretary = {};
 
-            $('#filter-secretaries .selected').removeClass('selected');
-            $(e.currentTarget).addClass('selected');
-            $('#edit-secretary, #delete-secretary').prop('disabled', false);
-        }.bind(this));
+                $.each(this.filterResults, function (index, item) {
+                    if (item.id === secretaryId) {
+                        secretary = item;
+                        return false;
+                    }
+                });
+
+                this.display(secretary);
+
+                $("#filter-secretaries .selected").removeClass("selected");
+                $(e.currentTarget).addClass("selected");
+                $("#edit-secretary, #delete-secretary").prop("disabled", false);
+            }.bind(this)
+        );
 
         /**
          * Event: Add New Secretary Button "Click"
          */
-        $('#secretaries').on('click', '#add-secretary', function () {
-            this.resetForm();
-            $('#filter-secretaries button').prop('disabled', true);
-            $('#filter-secretaries .results').css('color', '#AAA');
+        $("#secretaries").on(
+            "click",
+            "#add-secretary",
+            function () {
+                this.resetForm();
+                $("#filter-secretaries button").prop("disabled", true);
+                $("#filter-secretaries .results").css("color", "#AAA");
 
-            $('#secretaries .add-edit-delete-group').hide();
-            $('#secretaries .save-cancel-group').show();
-            $('#secretaries .record-details').find('input, textarea').prop('readonly', false);
-            $('#secretaries .record-details').find('select').prop('disabled', false);
-            $('#secretary-password, #secretary-password-confirm').addClass('required');
-            $('#secretary-notifications').prop('disabled', false);
-            $('#secretary-new-customer-notifications').prop('disabled', false);
-            $('#secretary-providers input:checkbox').prop('disabled', false);
-        }.bind(this));
+                $("#secretaries .add-edit-delete-group").hide();
+                $("#secretaries .save-cancel-group").show();
+                $("#secretaries .record-details")
+                    .find("input, textarea")
+                    .prop("readonly", false);
+                $("#secretaries .record-details")
+                    .find("select")
+                    .prop("disabled", false);
+                $("#secretary-password, #secretary-password-confirm").addClass(
+                    "required"
+                );
+                $("#secretary-notifications").prop("disabled", false);
+                $("#secretary-new-customer-notifications").prop(
+                    "disabled",
+                    false
+                );
+                $("#secretary-providers input:checkbox").prop(
+                    "disabled",
+                    false
+                );
+            }.bind(this)
+        );
 
         /**
          * Event: Edit Secretary Button "Click"
          */
-        $('#secretaries').on('click', '#edit-secretary', function () {
-            $('#filter-secretaries button').prop('disabled', true);
-            $('#filter-secretaries .results').css('color', '#AAA');
-            $('#secretaries .add-edit-delete-group').hide();
-            $('#secretaries .save-cancel-group').show();
-            $('#secretaries .record-details').find('input, textarea').prop('readonly', false);
-            $('#secretaries .record-details').find('select').prop('disabled', false);
-            $('#secretary-password, #secretary-password-confirm').removeClass('required');
-            $('#secretary-notifications').prop('disabled', false);
-            $('#secretary-new-customer-notifications').prop('disabled', false);
-            $('#secretary-providers input:checkbox').prop('disabled', false);
+        $("#secretaries").on("click", "#edit-secretary", function () {
+            $("#filter-secretaries button").prop("disabled", true);
+            $("#filter-secretaries .results").css("color", "#AAA");
+            $("#secretaries .add-edit-delete-group").hide();
+            $("#secretaries .save-cancel-group").show();
+            $("#secretaries .record-details")
+                .find("input, textarea")
+                .prop("readonly", false);
+            $("#secretaries .record-details")
+                .find("select")
+                .prop("disabled", false);
+            $("#secretary-password, #secretary-password-confirm").removeClass(
+                "required"
+            );
+            $("#secretary-notifications").prop("disabled", false);
+            $("#secretary-new-customer-notifications").prop("disabled", false);
+            $("#secretary-providers input:checkbox").prop("disabled", false);
         });
 
         /**
          * Event: Delete Secretary Button "Click"
          */
-        $('#secretaries').on('click', '#delete-secretary', function () {
-            var secretaryId = $('#secretary-id').val();
-            var buttons = [
-                {
-                    text: EALang.delete,
-                    click: function () {
-                        this.delete(secretaryId);
-                        $('#message_box').dialog('close');
-                    }.bind(this)
-                },
-                {
-                    text: EALang.cancel,
-                    click: function () {
-                        $('#message_box').dialog('close');
-                    }
-                }
-            ];
+        $("#secretaries").on(
+            "click",
+            "#delete-secretary",
+            function () {
+                var secretaryId = $("#secretary-id").val();
+                var buttons = [
+                    {
+                        text: EALang.delete,
+                        click: function () {
+                            this.delete(secretaryId);
+                            $("#message_box").dialog("close");
+                        }.bind(this),
+                    },
+                    {
+                        text: EALang.cancel,
+                        click: function () {
+                            $("#message_box").dialog("close");
+                        },
+                    },
+                ];
 
-            GeneralFunctions.displayMessageBox(EALang.delete_secretary,
-                EALang.delete_record_prompt, buttons);
-        }.bind(this));
+                GeneralFunctions.displayMessageBox(
+                    EALang.delete_secretary,
+                    EALang.delete_record_prompt,
+                    buttons
+                );
+            }.bind(this)
+        );
 
         /**
          * Event: Save Secretary Button "Click"
          */
-        $('#secretaries').on('click', '#save-secretary', function () {
-            var secretary = {
-                first_name: $('#secretary-first-name').val(),
-                last_name: $('#secretary-last-name').val(),
-                email: $('#secretary-email').val(),
-                mobile_number: $('#secretary-mobile-number').val(),
-                phone_number: $('#secretary-phone-number').val(),
-                address: $('#secretary-address').val(),
-                city: $('#secretary-city').val(),
-                state: $('#secretary-state').val(),
-                zip_code: $('#secretary-zip-code').val(),
-                notes: $('#secretary-notes').val(),
-                settings: {
-                    username: $('#secretary-username').val(),
-                    notifications: $('#secretary-notifications').hasClass('active'),
-                    notifications_new_customer: $('#secretary-new-customer-notifications').hasClass('active'),
-                    calendar_view: $('#secretary-calendar-view').val()
+        $("#secretaries").on(
+            "click",
+            "#save-secretary",
+            function () {
+                var secretary = {
+                    first_name: $("#secretary-first-name").val(),
+                    last_name: $("#secretary-last-name").val(),
+                    email: $("#secretary-email").val(),
+                    mobile_number: $("#secretary-mobile-number").val(),
+                    phone_number: $("#secretary-phone-number").val(),
+                    address: $("#secretary-address").val(),
+                    city: $("#secretary-city").val(),
+                    state: $("#secretary-state").val(),
+                    zip_code: $("#secretary-zip-code").val(),
+                    notes: $("#secretary-notes").val(),
+                    settings: {
+                        username: $("#secretary-username").val(),
+                        notifications: $("#secretary-notifications").hasClass(
+                            "active"
+                        ),
+                        notifications_new_customer: $(
+                            "#secretary-new-customer-notifications"
+                        ).hasClass("active"),
+                        calendar_view: $("#secretary-calendar-view").val(),
+                        id_users_secretary_provider:
+                            $("#secretary-provider-calendar").val() == ""
+                                ? null
+                                : $("#secretary-provider-calendar").val(),
+                    },
+                };
+
+                // Include secretary services.
+                secretary.providers = [];
+                $("#secretary-providers input:checkbox").each(function () {
+                    if ($(this).prop("checked")) {
+                        secretary.providers.push($(this).attr("data-id"));
+                    }
+                });
+
+                // Include password if changed.
+                if ($("#secretary-password").val() !== "") {
+                    secretary.settings.password = $(
+                        "#secretary-password"
+                    ).val();
                 }
-            };
 
-            // Include secretary services.
-            secretary.providers = [];
-            $('#secretary-providers input:checkbox').each(function () {
-                if ($(this).prop('checked')) {
-                    secretary.providers.push($(this).attr('data-id'));
+                // Include ID if changed.
+                if ($("#secretary-id").val() !== "") {
+                    secretary.id = $("#secretary-id").val();
                 }
-            });
 
-            // Include password if changed.
-            if ($('#secretary-password').val() !== '') {
-                secretary.settings.password = $('#secretary-password').val();
-            }
+                if (!this.validate()) {
+                    return;
+                }
 
-            // Include ID if changed.
-            if ($('#secretary-id').val() !== '') {
-                secretary.id = $('#secretary-id').val();
-            }
-
-            if (!this.validate()) {
-                return;
-            }
-
-            this.save(secretary);
-        }.bind(this));
+                this.save(secretary);
+            }.bind(this)
+        );
 
         /**
          * Event: Cancel Secretary Button "Click"
          *
          * Cancel add or edit of an secretary record.
          */
-        $('#secretaries').on('click', '#cancel-secretary', function () {
-            var id = $('#secretary-id').val();
-            this.resetForm();
-            if (id != '') {
-                this.select(id, true);
-            }
-        }.bind(this));
+        $("#secretaries").on(
+            "click",
+            "#cancel-secretary",
+            function () {
+                var id = $("#secretary-id").val();
+                this.resetForm();
+                if (id != "") {
+                    this.select(id, true);
+                }
+            }.bind(this)
+        );
     };
 
     /**
@@ -208,21 +267,28 @@
      * then the update operation is going to be executed.
      */
     SecretariesHelper.prototype.save = function (secretary) {
-        var postUrl = GlobalVariables.baseUrl + '/index.php/backend_api/ajax_save_secretary';
+        var postUrl =
+            GlobalVariables.baseUrl +
+            "/index.php/backend_api/ajax_save_secretary";
         var postData = {
             csrfToken: GlobalVariables.csrfToken,
-            secretary: JSON.stringify(secretary)
+            secretary: JSON.stringify(secretary),
         };
 
-        $.post(postUrl, postData, function (response) {
-            if (!GeneralFunctions.handleAjaxExceptions(response)) {
-                return;
-            }
-            Backend.displayNotification(EALang.secretary_saved);
-            this.resetForm();
-            $('#filter-secretaries .key').val('');
-            this.filter('', response.id, true);
-        }.bind(this), 'json').fail(GeneralFunctions.ajaxFailureHandler);
+        $.post(
+            postUrl,
+            postData,
+            function (response) {
+                if (!GeneralFunctions.handleAjaxExceptions(response)) {
+                    return;
+                }
+                Backend.displayNotification(EALang.secretary_saved);
+                this.resetForm();
+                $("#filter-secretaries .key").val("");
+                this.filter("", response.id, true);
+            }.bind(this),
+            "json"
+        ).fail(GeneralFunctions.ajaxFailureHandler);
     };
 
     /**
@@ -231,20 +297,27 @@
      * @param {Number} id Record id to be deleted.
      */
     SecretariesHelper.prototype.delete = function (id) {
-        var postUrl = GlobalVariables.baseUrl + '/index.php/backend_api/ajax_delete_secretary';
+        var postUrl =
+            GlobalVariables.baseUrl +
+            "/index.php/backend_api/ajax_delete_secretary";
         var postData = {
             csrfToken: GlobalVariables.csrfToken,
-            secretary_id: id
+            secretary_id: id,
         };
 
-        $.post(postUrl, postData, function (response) {
-            if (!GeneralFunctions.handleAjaxExceptions(response)) {
-                return;
-            }
-            Backend.displayNotification(EALang.secretary_deleted);
-            this.resetForm();
-            this.filter($('#filter-secretaries .key').val());
-        }.bind(this), 'json').fail(GeneralFunctions.ajaxFailureHandler);
+        $.post(
+            postUrl,
+            postData,
+            function (response) {
+                if (!GeneralFunctions.handleAjaxExceptions(response)) {
+                    return;
+                }
+                Backend.displayNotification(EALang.secretary_deleted);
+                this.resetForm();
+                this.filter($("#filter-secretaries .key").val());
+            }.bind(this),
+            "json"
+        ).fail(GeneralFunctions.ajaxFailureHandler);
     };
 
     /**
@@ -253,51 +326,68 @@
      * @return {Boolean} Returns the validation result.
      */
     SecretariesHelper.prototype.validate = function () {
-        $('#secretaries .has-error').removeClass('has-error');
-        $('#secretaries .form-message').removeClass('alert-danger');
+        $("#secretaries .has-error").removeClass("has-error");
+        $("#secretaries .form-message").removeClass("alert-danger");
 
         try {
             // Validate required fields.
             var missingRequired = false;
-            $('#secretaries .required').each(function () {
-                if ($(this).val() == '' || $(this).val() == undefined) {
-                    $(this).closest('.form-group').addClass('has-error');
+            $("#secretaries .required").each(function () {
+                if ($(this).val() == "" || $(this).val() == undefined) {
+                    $(this).closest(".form-group").addClass("has-error");
                     missingRequired = true;
                 }
             });
             if (missingRequired) {
-                throw 'Fields with * are  required.';
+                throw "Fields with * are  required.";
             }
 
             // Validate passwords.
-            if ($('#secretary-password').val() != $('#secretary-password-confirm').val()) {
-                $('#secretary-password, #secretary-password-confirm').closest('.form-group').addClass('has-error');
-                throw 'Passwords mismatch!';
+            if (
+                $("#secretary-password").val() !=
+                $("#secretary-password-confirm").val()
+            ) {
+                $("#secretary-password, #secretary-password-confirm")
+                    .closest(".form-group")
+                    .addClass("has-error");
+                throw "Passwords mismatch!";
             }
 
-            if ($('#secretary-password').val().length < BackendUsers.MIN_PASSWORD_LENGTH
-                && $('#secretary-password').val() != '') {
-                $('#secretary-password, #secretary-password-confirm').closest('.form-group').addClass('has-error');
-                throw 'Password must be at least ' + BackendUsers.MIN_PASSWORD_LENGTH
-                + ' characters long.';
+            if (
+                $("#secretary-password").val().length <
+                    BackendUsers.MIN_PASSWORD_LENGTH &&
+                $("#secretary-password").val() != ""
+            ) {
+                $("#secretary-password, #secretary-password-confirm")
+                    .closest(".form-group")
+                    .addClass("has-error");
+                throw (
+                    "Password must be at least " +
+                    BackendUsers.MIN_PASSWORD_LENGTH +
+                    " characters long."
+                );
             }
 
             // Validate user email.
-            if (!GeneralFunctions.validateEmail($('#secretary-email').val())) {
-                $('#secretary-email').closest('.form-group').addClass('has-error');
-                throw 'Invalid email address!';
+            if (!GeneralFunctions.validateEmail($("#secretary-email").val())) {
+                $("#secretary-email")
+                    .closest(".form-group")
+                    .addClass("has-error");
+                throw "Invalid email address!";
             }
 
             // Check if username exists
-            if ($('#secretary-username').attr('already-exists') == 'true') {
-                $('#secretary-username').closest('.form-group').addClass('has-error');
-                throw 'Username already exists.';
+            if ($("#secretary-username").attr("already-exists") == "true") {
+                $("#secretary-username")
+                    .closest(".form-group")
+                    .addClass("has-error");
+                throw "Username already exists.";
             }
 
             return true;
         } catch (message) {
-            $('#secretaries .form-message')
-                .addClass('alert-danger')
+            $("#secretaries .form-message")
+                .addClass("alert-danger")
                 .text(message)
                 .show();
             return false;
@@ -308,24 +398,26 @@
      * Resets the admin tab form back to its initial state.
      */
     SecretariesHelper.prototype.resetForm = function () {
-        $('#secretaries .record-details').find('input, textarea').val('');
-        $('#secretaries .add-edit-delete-group').show();
-        $('#secretaries .save-cancel-group').hide();
-        $('#edit-secretary, #delete-secretary').prop('disabled', true);
-        $('#secretaries .record-details').find('input, textarea').prop('readonly', true);
-        $('#secretaries .record-details').find('select').prop('disabled', true);
-        $('#secretaries .form-message').hide();
-        $('#secretary-notifications').removeClass('active');
-        $('#secretary-notifications').prop('disabled', true);
-        $('#secretary-new-customer-notifications').removeClass('active');
-        $('#secretary-new-customer-notifications').prop('disabled', true);
-        $('#secretary-providers input:checkbox').prop('checked', false);
-        $('#secretary-providers input:checkbox').prop('disabled', true);
-        $('#secretaries .has-error').removeClass('has-error');
+        $("#secretaries .record-details").find("input, textarea").val("");
+        $("#secretaries .add-edit-delete-group").show();
+        $("#secretaries .save-cancel-group").hide();
+        $("#edit-secretary, #delete-secretary").prop("disabled", true);
+        $("#secretaries .record-details")
+            .find("input, textarea")
+            .prop("readonly", true);
+        $("#secretaries .record-details").find("select").prop("disabled", true);
+        $("#secretaries .form-message").hide();
+        $("#secretary-notifications").removeClass("active");
+        $("#secretary-notifications").prop("disabled", true);
+        $("#secretary-new-customer-notifications").removeClass("active");
+        $("#secretary-new-customer-notifications").prop("disabled", true);
+        $("#secretary-providers input:checkbox").prop("checked", false);
+        $("#secretary-providers input:checkbox").prop("disabled", true);
+        $("#secretaries .has-error").removeClass("has-error");
 
-        $('#filter-secretaries .selected').removeClass('selected');
-        $('#filter-secretaries button').prop('disabled', false);
-        $('#filter-secretaries .results').css('color', '');
+        $("#filter-secretaries .selected").removeClass("selected");
+        $("#filter-secretaries button").prop("disabled", false);
+        $("#filter-secretaries .results").css("color", "");
     };
 
     /**
@@ -334,36 +426,39 @@
      * @param {Object} secretary Contains the secretary record data.
      */
     SecretariesHelper.prototype.display = function (secretary) {
-        $('#secretary-id').val(secretary.id);
-        $('#secretary-first-name').val(secretary.first_name);
-        $('#secretary-last-name').val(secretary.last_name);
-        $('#secretary-email').val(secretary.email);
-        $('#secretary-mobile-number').val(secretary.mobile_number);
-        $('#secretary-phone-number').val(secretary.phone_number);
-        $('#secretary-address').val(secretary.address);
-        $('#secretary-city').val(secretary.city);
-        $('#secretary-state').val(secretary.state);
-        $('#secretary-zip-code').val(secretary.zip_code);
-        $('#secretary-notes').val(secretary.notes);
+        $("#secretary-id").val(secretary.id);
+        $("#secretary-first-name").val(secretary.first_name);
+        $("#secretary-last-name").val(secretary.last_name);
+        $("#secretary-email").val(secretary.email);
+        $("#secretary-mobile-number").val(secretary.mobile_number);
+        $("#secretary-phone-number").val(secretary.phone_number);
+        $("#secretary-address").val(secretary.address);
+        $("#secretary-city").val(secretary.city);
+        $("#secretary-state").val(secretary.state);
+        $("#secretary-zip-code").val(secretary.zip_code);
+        $("#secretary-notes").val(secretary.notes);
 
-        $('#secretary-username').val(secretary.settings.username);
-        $('#secretary-calendar-view').val(secretary.settings.calendar_view);
+        $("#secretary-username").val(secretary.settings.username);
+        $("#secretary-calendar-view").val(secretary.settings.calendar_view);
+        $("#secretary-provider-calendar").val(
+            secretary.settings.id_users_secretary_provider
+        );
         if (secretary.settings.notifications == true) {
-            $('#secretary-notifications').addClass('active');
+            $("#secretary-notifications").addClass("active");
         } else {
-            $('#secretary-notifications').removeClass('active');
+            $("#secretary-notifications").removeClass("active");
         }
         if (secretary.settings.notifications_new_customer == true) {
-            $('#secretary-new-customer-notifications').addClass('active');
+            $("#secretary-new-customer-notifications").addClass("active");
         } else {
-            $('#secretary-new-customer-notifications').removeClass('active');
+            $("#secretary-new-customer-notifications").removeClass("active");
         }
 
-        $('#secretary-providers input:checkbox').prop('checked', false);
+        $("#secretary-providers input:checkbox").prop("checked", false);
         $.each(secretary.providers, function (index, providerId) {
-            $('#secretary-providers input:checkbox').each(function () {
-                if ($(this).attr('data-id') == providerId) {
-                    $(this).prop('checked', true);
+            $("#secretary-providers input:checkbox").each(function () {
+                if ($(this).attr("data-id") == providerId) {
+                    $(this).prop("checked", true);
                 }
             });
         });

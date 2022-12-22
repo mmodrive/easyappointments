@@ -25,6 +25,7 @@
         'editAppointment'       : <?= json_encode($edit_appointment) ?>,
         'customers'             : <?= json_encode($customers) ?>,
         'secretaryProviders'    : <?= json_encode($secretary_providers) ?>,
+        'secretaryServices'    : <?= json_encode($secretary_services) ?>,
         'calendarView'          : <?= json_encode($calendar_view) ?>,
         'calendarSelections'          : <?= json_encode($calendar_selections) ?>,
         'user'                  : {

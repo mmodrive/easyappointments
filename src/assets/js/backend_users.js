@@ -58,52 +58,65 @@ window.BackendUsers = window.BackendUsers || {};
         // Instantiate default helper object (admin).
         helper = new ProvidersHelper();
         helper.resetForm();
-        helper.filter('');
+        helper.filter("");
         helper.bindEventHandlers();
 
         // Fill the services and providers list boxes.
-        var html = '<div>';
-        var html_opt = '';
+        var html = "<div>";
+        var html_opt = "";
         $.each(GlobalVariables.services, function (index, service) {
             html +=
                 '<div class="checkbox">' +
                 '<label class="checkbox">' +
-                '<input type="checkbox" data-id="' + service.id + '" />' +
+                '<input type="checkbox" data-id="' +
+                service.id +
+                '" />' +
                 service.name +
-                '</label>' +
-                '</div>';
+                "</label>" +
+                "</div>";
             html_opt +=
-                '<option value="' + service.id + '">' +
+                '<option value="' +
+                service.id +
+                '">' +
                 service.name +
-                '</option>';
-
+                "</option>";
         });
-        html += '</div>';
-        $('#provider-services').html(html);
-        $('.working-plan .work-services').html(html_opt);
+        html += "</div>";
+        $("#provider-services").html(html);
+        $(".working-plan .work-services").html(html_opt);
 
-        html = '<div>';
+        html = "<div>";
+        $("#secretary-provider-calendar").find("option").not(":first").remove();
         $.each(GlobalVariables.providers, function (index, provider) {
             html +=
                 '<div class="checkbox">' +
                 '<label class="checkbox">' +
-                '<input type="checkbox" data-id="' + provider.id + '" />' +
-                provider.first_name + ' ' + provider.last_name +
-                '</label>' +
-                '</div>';
-
+                '<input type="checkbox" data-id="' +
+                provider.id +
+                '" />' +
+                provider.first_name +
+                " " +
+                provider.last_name +
+                "</label>" +
+                "</div>";
+            $("#secretary-provider-calendar").append(
+                $("<option>", {
+                    value: provider.id,
+                    text: provider.first_name + " " + provider.last_name,
+                })
+            );
         });
-        html += '</div>';
-        $('#secretary-providers').html(html);
+        html += "</div>";
+        $("#secretary-providers").html(html);
 
-        $('#reset-working-plan').qtip({
+        $("#reset-working-plan").qtip({
             position: {
-                my: 'top center',
-                at: 'bottom center'
+                my: "top center",
+                at: "bottom center",
             },
             style: {
-                classes: 'qtip-green qtip-shadow custom-qtip'
-            }
+                classes: "qtip-green qtip-shadow custom-qtip",
+            },
         });
 
         // Bind event handlers.
@@ -122,47 +135,77 @@ window.BackendUsers = window.BackendUsers || {};
          *
          * Changes the displayed tab.
          */
-        $('a[data-toggle="tab"]').on('shown.bs.tab', function () {
-            if ($(this).attr('href') === '#admins') {
+        $('a[data-toggle="tab"]').on("shown.bs.tab", function () {
+            if ($(this).attr("href") === "#admins") {
                 helper = new AdminsHelper();
-            } else if ($(this).attr('href') === '#providers') {
+            } else if ($(this).attr("href") === "#providers") {
                 helper = new ProvidersHelper();
-            } else if ($(this).attr('href') === '#secretaries') {
+            } else if ($(this).attr("href") === "#secretaries") {
                 helper = new SecretariesHelper();
 
                 // Update the list with the all the available providers.
-                var url = GlobalVariables.baseUrl + '/index.php/backend_api/ajax_filter_providers';
+                var url =
+                    GlobalVariables.baseUrl +
+                    "/index.php/backend_api/ajax_filter_providers";
                 var data = {
                     csrfToken: GlobalVariables.csrfToken,
-                    key: ''
+                    key: "",
                 };
-                $.post(url, data, function (response) {
-                    if (!GeneralFunctions.handleAjaxExceptions(response)) {
-                        return;
-                    }
+                $.post(
+                    url,
+                    data,
+                    function (response) {
+                        if (!GeneralFunctions.handleAjaxExceptions(response)) {
+                            return;
+                        }
 
-                    GlobalVariables.providers = response;
+                        GlobalVariables.providers = response;
 
-                    var html = '<div>';
-                    $.each(GlobalVariables.providers, function (index, provider) {
-                        html +=
-                            '<div class="checkbox">' +
-                            '<label class="checkbox">' +
-                            '<input type="checkbox" data-id="' + provider.id + '" />' +
-                            provider.first_name + ' ' + provider.last_name +
-                            '</label>' +
-                            '</div>';
-                    });
-                    html += '</div>';
-                    $('#secretary-providers').html(html);
-                    $('#secretary-providers input:checkbox').prop('disabled', true);
-                }, 'json').fail(GeneralFunctions.ajaxFailureHandler);
+                        var html = "<div>";
+                        $("#secretary-provider-calendar")
+                            .find("option")
+                            .not(":first")
+                            .remove();
+                        $.each(
+                            GlobalVariables.providers,
+                            function (index, provider) {
+                                html +=
+                                    '<div class="checkbox">' +
+                                    '<label class="checkbox">' +
+                                    '<input type="checkbox" data-id="' +
+                                    provider.id +
+                                    '" />' +
+                                    provider.first_name +
+                                    " " +
+                                    provider.last_name +
+                                    "</label>" +
+                                    "</div>";
+                                $("#secretary-provider-calendar").append(
+                                    $("<option>", {
+                                        value: provider.id,
+                                        text:
+                                            provider.first_name +
+                                            " " +
+                                            provider.last_name,
+                                    })
+                                );
+                            }
+                        );
+                        html += "</div>";
+                        $("#secretary-providers").html(html);
+                        $("#secretary-providers input:checkbox").prop(
+                            "disabled",
+                            true
+                        );
+                    },
+                    "json"
+                ).fail(GeneralFunctions.ajaxFailureHandler);
             }
 
             helper.resetForm();
-            helper.filter('');
+            helper.filter("");
             helper.bindEventHandlers();
-            $('.filter-key').val('');
+            $(".filter-key").val("");
         });
 
         /**
@@ -171,45 +214,70 @@ window.BackendUsers = window.BackendUsers || {};
          * When the user leaves the username input field we will need to check if the username
          * is not taken by another record in the system. Usernames must be unique.
          */
-        $('#admin-username, #provider-username, #secretary-username').focusout(function () {
-            var $input = $(this);
+        $("#admin-username, #provider-username, #secretary-username").focusout(
+            function () {
+                var $input = $(this);
 
-            if ($input.prop('readonly') == true || $input.val() == '') {
-                return;
-            }
-
-            var userId = $input.parents().eq(2).find('.record-id').val();
-
-            if (userId == undefined) {
-                return;
-            }
-
-            var postUrl = GlobalVariables.baseUrl + '/index.php/backend_api/ajax_validate_username';
-            var postData = {
-                csrfToken: GlobalVariables.csrfToken,
-                username: $input.val(),
-                user_id: userId
-            };
-
-            $.post(postUrl, postData, function (response) {
-                if (!GeneralFunctions.handleAjaxExceptions(response)) {
+                if ($input.prop("readonly") == true || $input.val() == "") {
                     return;
                 }
 
-                if (response == false) {
-                    $input.closest('.form-group').addClass('has-error');
-                    $input.attr('already-exists', 'true');
-                    $input.parents().eq(3).find('.form-message').text(EALang.username_already_exists);
-                    $input.parents().eq(3).find('.form-message').show();
-                } else {
-                    $input.closest('.form-group').removeClass('has-error');
-                    $input.attr('already-exists', 'false');
-                    if ($input.parents().eq(3).find('.form-message').text() == EALang.username_already_exists) {
-                        $input.parents().eq(3).find('.form-message').hide();
-                    }
+                var userId = $input.parents().eq(2).find(".record-id").val();
+
+                if (userId == undefined) {
+                    return;
                 }
-            }, 'json').fail(GeneralFunctions.ajaxFailureHandler);
-        });
+
+                var postUrl =
+                    GlobalVariables.baseUrl +
+                    "/index.php/backend_api/ajax_validate_username";
+                var postData = {
+                    csrfToken: GlobalVariables.csrfToken,
+                    username: $input.val(),
+                    user_id: userId,
+                };
+
+                $.post(
+                    postUrl,
+                    postData,
+                    function (response) {
+                        if (!GeneralFunctions.handleAjaxExceptions(response)) {
+                            return;
+                        }
+
+                        if (response == false) {
+                            $input.closest(".form-group").addClass("has-error");
+                            $input.attr("already-exists", "true");
+                            $input
+                                .parents()
+                                .eq(3)
+                                .find(".form-message")
+                                .text(EALang.username_already_exists);
+                            $input.parents().eq(3).find(".form-message").show();
+                        } else {
+                            $input
+                                .closest(".form-group")
+                                .removeClass("has-error");
+                            $input.attr("already-exists", "false");
+                            if (
+                                $input
+                                    .parents()
+                                    .eq(3)
+                                    .find(".form-message")
+                                    .text() == EALang.username_already_exists
+                            ) {
+                                $input
+                                    .parents()
+                                    .eq(3)
+                                    .find(".form-message")
+                                    .hide();
+                            }
+                        }
+                    },
+                    "json"
+                ).fail(GeneralFunctions.ajaxFailureHandler);
+            }
+        );
     }
 
 })(window.BackendUsers);

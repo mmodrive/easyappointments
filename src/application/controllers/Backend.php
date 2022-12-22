@@ -83,10 +83,12 @@ class Backend extends CI_Controller {
         {
             $secretary = $this->secretaries_model->get_row($this->session->userdata('user_id'));
             $view['secretary_providers'] = $secretary['providers'];
+            $view['secretary_services'] = $secretary['services'];
         }
         else
         {
             $view['secretary_providers'] = [];
+            $view['secretary_services'] = [];
         }
 
         $results = $this->appointments_model->get_batch(['hash' => $appointment_hash]);
@@ -143,10 +145,12 @@ class Backend extends CI_Controller {
         {
             $secretary = $this->secretaries_model->get_row($this->session->userdata('user_id'));
             $view['secretary_providers'] = $secretary['providers'];
+            $view['secretary_services'] = $secretary['services'];
         }
         else
         {
             $view['secretary_providers'] = [];
+            $view['secretary_services'] = [];
         }
 
         $this->set_user_data($view);

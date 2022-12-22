@@ -7,6 +7,7 @@
         availableProviders : <?= json_encode($available_providers) ?>,
         availableServices  : <?= json_encode($available_services) ?>,
         secretaryProviders : <?= json_encode($secretary_providers) ?>,
+        secretaryServices  : <?= json_encode($secretary_services) ?>,
         dateFormat         : <?= json_encode($date_format) ?>,
         timeFormat         : <?= json_encode($time_format) ?>,
         baseUrl            : <?= json_encode($base_url) ?>,

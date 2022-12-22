@@ -549,6 +549,13 @@
                             </div>
 
                             <div class="form-group">
+                                <label for="secretary-provider-calendar"><?= lang('secretary-provider-calendar') ?></label>
+                                <select id="secretary-provider-calendar" class="form-control">
+                                    <option value="">None</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
                                 <label for="secretary-calendar-view"><?= lang('calendar') ?> *</label>
                                 <select id="secretary-calendar-view" class="form-control required">
                                     <option value="default">Default</option>

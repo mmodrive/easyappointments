@@ -352,6 +352,14 @@ class Secretaries_Model extends CI_Model {
         $secretary['settings'] = $this->db->get_where('ea_user_settings',
             ['id_users' => $secretary['id']])->row_array();
         unset($secretary['settings']['id_users'], $secretary['settings']['salt']);
+        
+        $secretary_services = $this->db->get_where('ea_services_providers',
+            ['id_users' => $secretary['settings']['id_users_secretary_provider']])->result_array();
+        $secretary['services'] = [];
+        foreach ($secretary_services as $secretary_service)
+        {
+            $secretary['services'][] = $secretary_service['id_services'];
+        }
 
         return $secretary;
     }
@@ -435,6 +443,14 @@ class Secretaries_Model extends CI_Model {
             $secretary['settings'] = $this->db->get_where('ea_user_settings',
                 ['id_users' => $secretary['id']])->row_array();
             unset($secretary['settings']['id_users']);
+
+            $secretary_services = $this->db->get_where('ea_services_providers',
+            ['id_users' => $secretary['settings']['id_users_secretary_provider']])->result_array();
+            $secretary['services'] = [];
+            foreach ($secretary_services as $secretary_service)
+            {
+                $secretary['services'][] = $secretary_service['id_services'];
+            }
         }
 
         return $batch;
