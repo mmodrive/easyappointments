@@ -248,11 +248,15 @@ window.BackendCalendarAppointmentsModal = window.BackendCalendarAppointmentsModa
                     var pet_select = $('#pet_id');
                     pet_select.find('option:nth-child(n+2)').remove();
                     $.each(c.pets, function(iPet, pet){
-                        pet_select.append($('<option>', { 
-                            value: pet.id,
-                            text : pet.name,
-                            'data-pet': JSON.stringify(pet)
-                        }));
+                        if (pet.active == true) {
+                            pet_select.append(
+                                $("<option>", {
+                                    value: pet.id,
+                                    text: pet.name,
+                                    "data-pet": JSON.stringify(pet),
+                                })
+                            );
+                        }
                     } );
                     pet_select.change();
                     return false;

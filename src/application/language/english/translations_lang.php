@@ -178,6 +178,7 @@ $lang['disc_reset_title'] = 'Restart Discount counter at this appointment.';
 $lang['disc_reset_last_manual'] = 'Last Manual Reset On: ';
 $lang['disc_count'] = 'Discount Appointment Counter';
 $lang['disc_last_reset'] = 'Discount Last Reset';
+$lang['active'] = 'Active';
 $lang['retype_password'] = 'Retype Password';
 $lang['secretary-provider-calendar'] = 'Provider\'s Service Calendars';
 $lang['receive_notifications'] = 'Receive Notifications';

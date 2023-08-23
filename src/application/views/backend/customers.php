@@ -166,7 +166,14 @@
                                 <?= lang('soap_report') ?>
                             </button>
                             <div id="customer-pets" class="well"></div>
-                            <div id="pet-details" class="well hidden"></div>
+                            <div id="pet-details" class="well hidden">
+                                <div id="pet-summary" class="">
+                                </div>
+                                <div class="form-group">
+                                    <input id="pet_active" type="checkbox" class="">
+                                    <label class="control-label" for="pet_active"><?= lang('active') ?></label>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     

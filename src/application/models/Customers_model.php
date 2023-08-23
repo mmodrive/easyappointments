@@ -189,6 +189,12 @@ class Customers_Model extends CI_Model {
             $settings['id_users'] = $customer['id'];
         }
 
+        $pet = null;
+        if (isset($customer['pet'])) {
+            $pet = $customer['pet'];
+            unset($customer['pet']);
+        }
+
         $this->db->trans_begin();
 
         $this->db->where('id', $customer['id']);
@@ -223,6 +229,15 @@ class Customers_Model extends CI_Model {
                     $this->db->trans_rollback();
                     throw new Exception('Could not insert customer settings into the database.');
                 }
+            }
+        }
+
+        if( !empty($pet) ){
+
+            // Update customer pet settings.
+            if ( ! $this->db->where(['id' => $pet['id']])->update('ea_pets', $pet) )
+            {
+                throw new Exception('Could not update customer pet settings.');
             }
         }
 

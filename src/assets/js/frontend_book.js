@@ -897,11 +897,15 @@ window.FrontendBook = window.FrontendBook || {};
             var pet_select = $('#pet_id');
             pet_select.find('option:nth-child(n+2)').remove();
             $.each(customer.pets, function(iPet, pet){
-                pet_select.append($('<option>', { 
-                    value: pet.id,
-                    text : pet.name,
-                    'data-pet': JSON.stringify(pet)
-                }));
+                if (pet.active == true) {
+                    pet_select.append(
+                        $("<option>", {
+                            value: pet.id,
+                            text: pet.name,
+                            "data-pet": JSON.stringify(pet),
+                        })
+                    );
+                }
             } );
             if( pet_select.find('option').length <= 1 ){
                 pet_select.val('new');
