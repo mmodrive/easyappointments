@@ -142,6 +142,11 @@
                     </div>
 
                     <div class="form-group">
+                        <label class="control-label" for="marketing_subscribe"><?= lang('marketing_subscribe') ?></label>
+                        <input id="marketing_subscribe" type="checkbox" class="form-control">
+                    </div>
+
+                    <div class="form-group">
                         <label class="control-label" for="notes"><?= lang('user_notes') ?></label>
                         <textarea id="notes" rows="4" class="form-control"></textarea>
                     </div>

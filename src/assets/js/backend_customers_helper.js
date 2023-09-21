@@ -194,6 +194,7 @@
                 city: $("#city").val(),
                 zip_code: $("#zip-code").val(),
                 disc_qualify: $("#disc_qualify").is(":checked"),
+                marketing_subscribe: $("#marketing_subscribe").is(":checked"),
                 notes: $("#notes").val(),
             };
 
@@ -470,6 +471,10 @@
         $("#disc_qualify").prop(
             "checked",
             customer.disc_qualify == 1 ? true : false
+        );
+        $("#marketing_subscribe").prop(
+            "checked",
+            customer.marketing_subscribe == 1 ? true : false
         );
         $("#notes").val(customer.notes);
 

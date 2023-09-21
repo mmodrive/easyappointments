@@ -173,6 +173,7 @@ $lang['password'] = 'Password';
 $lang['is_cancelled'] = 'Cancelled';
 $lang['is_late'] = 'Late';
 $lang['disc_qualify'] = 'Qualifies for Discounts';
+$lang['marketing_subscribe'] = 'Marketing Emails Subscription';
 $lang['disc_reset'] = 'Discount Reset';
 $lang['disc_reset_title'] = 'Restart Discount counter at this appointment.';
 $lang['disc_reset_last_manual'] = 'Last Manual Reset On: ';

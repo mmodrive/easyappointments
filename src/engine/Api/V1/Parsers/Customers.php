@@ -36,6 +36,7 @@ class Customers implements ParsersInterface {
             'city' => $response['city'],
             'zip' => $response['zip_code'],
             'disc_qualify' => $response['disc_qualify'],
+            'marketing_subscribe' => $response['marketing_subscribe'],
             'notes' => $response['notes']
         ];
 
@@ -92,9 +93,14 @@ class Customers implements ParsersInterface {
             $decodedRequest['zip_code'] = $request['zip'];
         }
 
-        if ( ! empty($request['zip']))
+        if ( ! empty($request['disc_qualify']))
         {
             $decodedRequest['disc_qualify'] = $request['disc_qualify'];
+        }
+
+        if ( ! empty($request['marketing_subscribe']))
+        {
+            $decodedRequest['marketing_subscribe'] = $request['marketing_subscribe'];
         }
 
         if ( ! empty($request['notes']))
