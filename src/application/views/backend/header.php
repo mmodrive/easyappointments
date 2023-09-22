@@ -85,12 +85,12 @@
                     </a>
                 </li>
 
-                <?php $hidden = ($privileges[PRIV_APPOINTMENTS]['view'] ==  TRUE) ? '' : 'hidden' ?>
-                <?php $active = ($active_menu == MENU_PRINT_APPOINTMENTS) ? 'active' : '' ?>
+                <?php $hidden = ($privileges[PRIV_APPOINTMENTS]['view'] == TRUE) ? '' : 'hidden' ?>
+                <?php $active = ($active_menu == MENU_MORE) ? 'active' : '' ?>
                 <li class="<?= $active . $hidden ?>">
-                    <a href="<?= site_url('backend/print_appointments') ?>" class="menu-item"
-                            title="<?= lang('print_appointment') ?>">
-                        <?= lang('print_appointment') ?>
+                    <a href="<?= site_url('backend/more') ?>" class="menu-item"
+                            title="<?= lang('menu_more_title') ?>">
+                        <?= lang('menu_more') ?>
                     </a>
                 </li>
 

@@ -241,6 +241,86 @@ class Backend extends CI_Controller {
     }
 
     /**
+     * Exports CSV file of customer data.
+     *
+     */
+    public function export_user_csv()
+    {
+        $this->session->set_userdata('dest_url', site_url('backend/more'));
+
+        if ( ! $this->_has_privileges(PRIV_USERS))
+        {
+            return;
+        }
+
+        $this->load->model('customers_model');
+        $this->load->model('services_model');
+        $this->load->model('providers_model');
+        $this->load->model('settings_model');
+        $this->load->model('user_model');
+        $this->load->model('pets_model');
+        $this->load->helper('form');
+
+        $view['available_services'] = $this->services_model->get_available_services();
+        $view['available_providers'] = $this->providers_model->get_available_providers();
+        $view['company_name'] = $this->settings_model->get_setting('company_name');
+        $view['base_url'] = $this->config->item('base_url');
+        $view['user_display_name'] = $this->user_model->get_user_display_name($this->session->userdata('user_id'));
+        $view['active_menu'] = MENU_MORE;
+        $view['date_format'] = $this->settings_model->get_setting('date_format');
+        $view['time_format'] = $this->settings_model->get_setting('time_format');
+
+        $dateFormat = '';
+        switch ($view['date_format']) {
+            case 'DMY':
+                $dateFormat = 'd/m/Y';
+                break;
+            case 'MDY':
+                $dateFormat = 'm/d/Y';
+                break;
+            case 'YMD':
+                $dateFormat = 'Y/m/d';
+                break;
+        }
+        $view['php_date_format'] = $dateFormat;
+
+        $time_format = '';
+        switch ($view['time_format']) {
+            case TIME_FORMAT_REGULAR:
+                $time_format = 'g:i A';
+                break;
+            case TIME_FORMAT_MILITARY:
+                $time_format = 'H:i';
+                break;
+        }
+        $view['php_time_format'] = $time_format;
+
+        $view['service'] = $service = $this->input->post('service');
+        $view['provider'] = $provider = $this->input->post('provider');
+
+        $this->db
+            ->select('last_name, first_name, email, mobile_number, phone_number, address, city, state, zip_code, notes')
+            ->from('ea_users AS customer')
+            ->where("marketing_subscribe = 1 AND id_roles = 3");
+        $customers = $this->db->order_by('last_name, first_name')
+            ->get()->result_array();
+
+        header("Content-type: application/csv");
+        header("Content-Disposition: attachment; filename=\"Customers".date('dmY').".csv\"");
+        header("Pragma: no-cache");
+        header("Expires: 0");
+
+        $handle = fopen('php://output', 'w');
+
+        fputcsv($handle, ['last_name', 'first_name', 'email', 'mobile_number', 'phone_number', 'address', 'city', 'state', 'zip_code', 'notes']);
+        foreach ($customers as $customer) {
+            fputcsv($handle, $customer);
+        }
+        fclose($handle);
+        exit;
+    }
+
+    /**
      * Displays the backend print appointments page.
      *
      * Here the admin user will be able to filer and list appointments.
@@ -268,7 +348,7 @@ class Backend extends CI_Controller {
         $view['company_name'] = $this->settings_model->get_setting('company_name');
         $view['base_url'] = $this->config->item('base_url');
         $view['user_display_name'] = $this->user_model->get_user_display_name($this->session->userdata('user_id'));
-        $view['active_menu'] = MENU_PRINT_APPOINTMENTS;
+        $view['active_menu'] = MENU_MORE;
         $view['date_format'] = $this->settings_model->get_setting('date_format');
         $view['time_format'] = $this->settings_model->get_setting('time_format');
 
@@ -357,6 +437,40 @@ class Backend extends CI_Controller {
 
         $this->load->view('backend/header', $view);
         $this->load->view('backend/print_appointments', $view);
+        $this->load->view('backend/footer', $view);
+    }
+
+    /**
+     * Display the more options screen.
+     *
+     */
+    public function more()
+    {
+        $this->session->set_userdata('dest_url', site_url('backend/more'));
+        if ( ! $this->_has_privileges(PRIV_APPOINTMENTS, FALSE)
+            && ! $this->_has_privileges(PRIV_APPOINTMENTS))
+        {
+            return;
+        }
+
+        $this->load->model('settings_model');
+        $this->load->model('user_model');
+
+        $this->load->library('session');
+        $user_id = $this->session->userdata('user_id');
+
+        $view['base_url'] = $this->config->item('base_url');
+        $view['user_display_name'] = $this->user_model->get_user_display_name($user_id);
+        $view['user_phone_number'] = $this->user_model->get_settings($this->session->userdata('user_id'))['phone_number'] ?? '';
+        $view['active_menu'] = MENU_MORE;
+        $view['company_name'] = $this->settings_model->get_setting('company_name');
+        $view['date_format'] = $this->settings_model->get_setting('date_format');
+        $view['time_format'] = $this->settings_model->get_setting('time_format');
+        $view['role_slug'] = $this->session->userdata('role_slug');
+        $this->set_user_data($view);
+
+        $this->load->view('backend/header', $view);
+        $this->load->view('backend/more', $view);
         $this->load->view('backend/footer', $view);
     }
 
