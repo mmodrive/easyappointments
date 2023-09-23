@@ -18,7 +18,6 @@
 !/src/storage/sessions/index.html
 /src/storage/uploads/*
 /!src/storage/uploads/index.html
-/vendor/
 /src/php.ini
 /xdebug.ini
 .vscode
