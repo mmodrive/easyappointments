@@ -79,16 +79,16 @@
 .print td {
   white-space: nowrap;
 } 
-.print tr td:nth-child(5) {
+.print tr td:nth-child(6) {
   text-align: left;
   white-space: normal;
 }
-.print tr td:nth-child(6) {
+.print tr td:nth-child(7) {
   text-align: left;
   white-space: normal;
   width: 100%;
 }
-.print tr td:nth-child(4){
+.print tr td:nth-child(5){
 }
 .print th {
   padding-top: 12px;
@@ -98,7 +98,7 @@
 }
 .print tr:nth-child(even){background-color: #f2f2f2;}
 .print tr:hover {background-color: #ddd;}
-.print tr td:nth-child(n+7), .print tr th:nth-child(n+7) {
+.print tr td:nth-child(n+8), .print tr th:nth-child(n+8) {
     display: none;
 }
 @media print
@@ -110,7 +110,7 @@
     {
         display: none;
     }
-    .print tr td:nth-child(n+7), .print tr th:nth-child(n+7) {
+    .print tr td:nth-child(n+8), .print tr th:nth-child(n+8) {
         display: table-cell;
         width: 100px;
     }
@@ -174,6 +174,7 @@ if($new_service_provider)
         <th><span><?= lang('date') ?></span></th>
         <th><span><?= lang('time_start') ?></span></th>
         <th><span><?= lang('time_end') ?></span></th>
+        <th><span><?= lang('duration') ?> <?= lang('minutes') ?></span></th>
         <th><span><?= lang('customer') ?></span></th>
         <th><span><?= lang('phone_number') ?></span></th>
         <th><span><?= lang('pet') ?></span></th>
@@ -200,6 +201,7 @@ if($new_service_provider)
                 <td>'.date($php_date_format,strtotime($appointment["start_datetime"])).'</td>
                 <td>'.date($php_time_format,strtotime($break->start)).'</td>
                 <td>'.date($php_time_format,strtotime($break->end)).'</td>
+                <td>'.round((strtotime($appointment["end_datetime"])-strtotime($appointment["start_datetime"]))/60,2).'</td>
                 <td>Break</td>
                 <td>--</td>
                 <td>--</td>
@@ -213,6 +215,7 @@ if($new_service_provider)
         <td>'.date($php_date_format,strtotime($appointment["start_datetime"])).'</td>
         <td>'.date($php_time_format,strtotime($appointment["start_datetime"])).'</td>
         <td>'.date($php_time_format,strtotime($appointment["end_datetime"])).'</td>
+        <td>'.round((strtotime($appointment["end_datetime"])-strtotime($appointment["start_datetime"]))/60,2).'</td>
         <td>'.($appointment["customer_name"] ?? '').'</td>
         <td>'.($appointment["phone_number"] ?? '').'</td>
         <td>'.($appointment["pet_title"] ?? '').'</td>
