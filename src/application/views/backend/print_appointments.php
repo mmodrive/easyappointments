@@ -78,6 +78,9 @@
 }
 .print td {
   white-space: nowrap;
+}
+.print tr.cancelled td {
+  text-decoration: line-through;
 } 
 .print tr td:nth-child(6) {
   text-align: left;
@@ -197,7 +200,7 @@ if($new_service_provider)
         });
         if ($breaks) {
           $break = reset($breaks);
-          echo '<tr>
+          echo '<tr class="no-print">
                 <td>'.date($php_date_format,strtotime($appointment["start_datetime"])).'</td>
                 <td>'.date($php_time_format,strtotime($break->start)).'</td>
                 <td>'.date($php_time_format,strtotime($break->end)).'</td>
@@ -211,7 +214,7 @@ if($new_service_provider)
         }
       }
   }
-  echo '<tr>
+  echo '<tr class="'.($appointment["is_cancelled"] == 1 ? 'cancelled' : '').'">
         <td>'.date($php_date_format,strtotime($appointment["start_datetime"])).'</td>
         <td>'.date($php_time_format,strtotime($appointment["start_datetime"])).'</td>
         <td>'.date($php_time_format,strtotime($appointment["end_datetime"])).'</td>

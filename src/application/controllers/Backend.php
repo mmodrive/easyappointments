@@ -390,7 +390,7 @@ class Backend extends CI_Controller {
             $view['provider'] = $provider = $this->input->post('provider');
 
             $this->db
-                ->select('CONCAT(customer.first_name, " ", customer.last_name) customer_name, CONCAT(provider.first_name, " ", provider.last_name) provider_name, provider_settings.working_plan provider_working_plan, service.name service_name, app.start_datetime, app.end_datetime, customer.phone_number, pet.id pet_id, disc.app_discount ')
+                ->select('CONCAT(customer.first_name, " ", customer.last_name) customer_name, CONCAT(provider.first_name, " ", provider.last_name) provider_name, provider_settings.working_plan provider_working_plan, service.name service_name, app.start_datetime, app.end_datetime, app.is_cancelled, customer.phone_number, pet.id pet_id, disc.app_discount ')
                 ->from('ea_appointments AS app')
                 ->join('ea_users AS customer', 'app.id_users_customer=customer.id', 'inner')
                 ->join('ea_users AS provider', 'app.id_users_provider=provider.id', 'inner')
