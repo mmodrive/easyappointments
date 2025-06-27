@@ -409,75 +409,39 @@ class Backend_api extends CI_Controller {
                 $this->load->library('ics_file');
                 $ics_stream = $this->ics_file->get_stream($appointment, $service, $provider, $customer);
 
-                // TEMPORARY SERVICE FILTER
-                if ($service['id'] == 7) {
-                    if ((bool)$send_customer === TRUE && $notify_fields_changed) {
+                if ((bool)$send_customer === TRUE && $notify_fields_changed)
+                {
+                    if(!$is_existing_customer){
                         $notification = $this->settings_model->getNotification(
-                            $notification_type,
-                            $appointment,
-                            $provider,
-                            $service,
-                            $customer,
-                            $pet,
-                            TRUE
+                            'email_customer_registration',$appointment, $provider, $service, $customer, $pet, TRUE
                         );
-                        $email->sendEmail($notification, new Email($customer['email']), new Text($ics_stream));
-                    } {
-                        if (!$is_existing_customer) {
-                            $notification = $this->settings_model->getNotification(
-                                'email_customer_registration',
-                                $appointment,
-                                $provider,
-                                $service,
-                                $customer,
-                                $pet,
-                                TRUE
-                            );
-                            $email->sendEmail($notification, new Email($customer['email']));
-                        }
-
-                        $notification = $this->settings_model->getNotification(
-                            $notification_type,
-                            $appointment,
-                            $provider,
-                            $service,
-                            $customer,
-                            $pet,
-                            TRUE
-                        );
-                        $email->sendEmail($notification, new Email($customer['email']), new Text($ics_stream));
+                        $email->sendEmail($notification, new Email($customer['email']));
                     }
 
-                    if ($send_provider == TRUE && $notify_fields_changed) {
-                        $notification = $this->settings_model->getNotification(
-                            $notification_type,
-                            $appointment,
-                            $provider,
-                            $service,
-                            $customer,
-                            $pet,
-                            FALSE
-                        );
-                        $email->sendEmail($notification, new Email($provider['email']), new Text($ics_stream));
-                    }
+                    $notification = $this->settings_model->getNotification(
+                        $notification_type,$appointment, $provider, $service, $customer, $pet, TRUE
+                    );
+                    $email->sendEmail($notification, new Email($customer['email']), new Text($ics_stream));
+                }
 
-                    // Notify all staff of new customer registration
-                    if (!$is_existing_customer) {
-                        $notification = $this->settings_model->getNotification(
-                            'email_customer_registration',
-                            $appointment,
-                            $provider,
-                            $service,
-                            $customer,
-                            $pet,
-                            TRUE
-                        );
+                if ($send_provider == TRUE && $notify_fields_changed)
+                {
+                    $notification = $this->settings_model->getNotification(
+                        $notification_type,$appointment, $provider, $service, $customer, $pet, FALSE
+                    );
+                    $email->sendEmail($notification, new Email($provider['email']), new Text($ics_stream));
+                }
 
-                        $addresses = $this->settings_model->get_new_customer_notification_emails();
+                // Notify all staff of new customer registration
+                if(!$is_existing_customer){
+                    $notification = $this->settings_model->getNotification(
+                        'email_customer_registration',$appointment, $provider, $service, $customer, $pet, TRUE
+                    );
 
-                        foreach ($addresses as $key => $value) {
-                            $email->sendEmail($notification, new Email($value['email']));
-                        }
+                    $addresses = $this->settings_model->get_new_customer_notification_emails();
+
+                    foreach ($addresses as $key => $value) {
+                        $email->sendEmail($notification, new Email($value['email']));
                     }
                 }
             }
@@ -594,19 +558,12 @@ class Backend_api extends CI_Controller {
                 }
 
                 $send_customer = $this->settings_model->get_setting('customer_notifications');
-                // TEMPORARY SERVICE FILTER
-                if ($service['id'] == 7) {
-                    if ((bool)$send_customer === TRUE) {
-                        $email->sendDeleteAppointment(
-                            $appointment,
-                            $provider,
-                            $service,
-                            $customer,
-                            $company_settings,
-                            new Email($customer['email']),
-                            new Text($this->input->post('delete_reason'))
-                        );
-                    }
+
+                if ((bool)$send_customer === TRUE)
+                {
+                    $email->sendDeleteAppointment($appointment, $provider,
+                        $service, $customer, $company_settings, new Email($customer['email']),
+                        new Text($this->input->post('delete_reason')));
                 }
             }
             catch (Exception $exc)

@@ -66,8 +66,6 @@ class Cron extends CI_Controller {
                 ->from('ea_appointments AS a')
                 ->join('ea_users AS c', 'a.id_users_customer=c.id', 'inner')
                 ->where('a.sms_notification IS NULL')
-                ->where('a.id_services = 7')  // TEMPORARY SERVICE FILTER
-                ->where('a.sms_notification IS NULL')
                 ->where('c.phone_number IS NOT NULL')
                 ->where('start_datetime >=', $from->format('Y-m-d H:i:s'))
                 ->where('start_datetime <', $to->format('Y-m-d H:i:s'))
